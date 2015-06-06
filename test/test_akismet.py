@@ -97,7 +97,7 @@ def results(req):
         return no_key % 'Valid '
     # check the form - it contains some relevant data
     # the rest will be filled in with defaults
-    for entry, val in os.environ.items():
+    for entry, val in list(os.environ.items()):
         if entry.startswith('HTTP'):
             req[entry] = val
     result = api.comment_check(req['comment'], req, DEBUG=DEBUG)
@@ -113,7 +113,7 @@ def main():
     req = getrequest(valuelist)
     cgiprint(serverline)
     cgiprint()
-    print header
+    print(header)
     #
     if req['comment'].strip():
         result = '<br><br>%s<br><br>' % results(req)
@@ -121,16 +121,16 @@ def main():
         req['comment_author'] = 'viagra-test-123'
         result = ''
     rep = {'**result**': result }
-    for key, val in req.items():
+    for key, val in list(req.items()):
         rep['**%s**' % key] = val.strip()
     rep['**scriptname**'] = os.environ['SCRIPT_NAME']
-    print replace(form, rep)
-    print footer
+    print(replace(form, rep))
+    print(footer)
 
 
 if __name__ == '__main__':
     if not 'SCRIPT_NAME' in os.environ:
-        print 'This script must be run as a CGI'
+        print('This script must be run as a CGI')
     else:
         main()
 
