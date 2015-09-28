@@ -56,7 +56,10 @@ Usage example::
 
 
 import os, sys
-from urllib.parse import urlencode
+try:
+    from urllib.parse import urlencode
+except ImportError:
+    from urllib import urlencode
 
 import socket
 if hasattr(socket, 'setdefaulttimeout'):
@@ -85,7 +88,10 @@ urllib2 = None
 try:
     from google.appengine.api import urlfetch
 except ImportError:
-    import urllib.request, urllib.error, urllib.parse
+    try:
+        import urllib.request as request
+    except ImportError:
+        import urllib2 as request
 
 if urllib2 is None:
     def _fetch_url(url, data, headers):
@@ -96,8 +102,8 @@ if urllib2 is None:
                         (url, req.status_code))
 else:
     def _fetch_url(url, data, headers):
-        req = urllib.request.Request(url, data, headers)
-        h = urllib.request.urlopen(req)
+        req = request.Request(url, data, headers)
+        h = request.urlopen(req)
         resp = h.read()
         return resp
 
