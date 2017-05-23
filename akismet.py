@@ -82,7 +82,7 @@ class Akismet(object):
     BLOG_URL_ENV_VAR = 'PYTHON_AKISMET_BLOG_URL'
     USER_AGENT_ENV_VAR = 'PYTHON_AKISMET_USER_AGENT'
 
-    COMMENT_CHECK_OPTIONAL_KEYS = (
+    OPTIONAL_KEYS = (
         'referrer', 'permalink', 'comment_type', 'comment_author',
         'comment_author_email', 'comment_author_url', 'comment_content',
         'comment_date_gmt', 'comment_post_modified_gmt', 'blog_lang',
@@ -149,7 +149,7 @@ class Akismet(object):
 
         """
         data = {'blog': self.blog_url, 'user_ip': user_ip, 'user_agent': user_agent}
-        for key in self.COMMENT_CHECK_OPTIONAL_KEYS:
+        for key in self.OPTIONAL_KEYS:
             if key in kwargs:
                 data[key] = kwargs[key]
         resp = requests.post(self.COMMENT_CHECK_URL.format(self.api_key),
