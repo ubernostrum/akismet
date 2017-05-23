@@ -196,7 +196,7 @@ class Akismet(object):
 
         """
         response_text = self._api_request(self.SUBMIT_SPAM_URL, user_ip, user_agent, **kwargs)
-        if response_text = self.SUBMIT_SUCCESS_RESPONSE:
+        if response_text == self.SUBMIT_SUCCESS_RESPONSE:
             return True
         else:
             self._protocol_error('submit_spam', response_text)
@@ -216,7 +216,7 @@ class Akismet(object):
 
         """
         response_text = self._api_request(self.SUBMIT_HAM_URL, user_ip, user_agent, **kwargs)
-        if response_text = self.SUBMIT_SUCCESS_RESPONSE:
+        if response_text == self.SUBMIT_SUCCESS_RESPONSE:
             return True
         else:
             self._protocol_error('submit_ham', response_text)
