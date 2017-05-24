@@ -106,7 +106,7 @@ class Akismet(object):
     def _set_key_and_url(self, key=None, blog_url=None):
         maybe_key = key if key is not None else os.getenv(self.API_KEY_ENV_VAR)
         maybe_url = blog_url if blog_url is not None else os.getenv(self.BLOG_URL_ENV_VAR)
-        if maybe_key is None or maybe_url is None:
+        if maybe_key in (None, '') or maybe_url in (None, ''):
             raise ConfigurationError(self.MISSING_CONFIG.format(maybe_key, maybe_url))
         try:
             self.verify_key(maybe_key, maybe_url)
