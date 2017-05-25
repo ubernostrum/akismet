@@ -127,3 +127,30 @@ class AkismetAPITests(unittest.TestCase):
             user_role='administrator',
         )
         self.assertFalse(self.api.comment_check(**check_kwargs))
+
+    def test_submit_spam(self):
+        """
+        The submit_spam method succeeds.
+
+        """
+        spam_kwargs = self.base_kwargs.copy()
+        spam_kwargs.update(
+            comment_type='comment',
+            comment_author='viagra-test-123',
+            comment_content='viagra-test-123',
+        )
+        self.assertTrue(self.api.submit_spam(**spam_kwargs))
+
+    def test_submit_ham(self):
+        """
+        The submit_ham method succeeds.
+
+        """
+        ham_kwargs = self.base_kwargs.copy()
+        ham_kwargs.update(
+            comment_type='comment',
+            comment_author='Legitimate Author',
+            comment_content='This is a legitimate comment.',
+            user_role='administrator',
+        )
+        self.assertTrue(self.api.submit_ham(**ham_kwargs))
