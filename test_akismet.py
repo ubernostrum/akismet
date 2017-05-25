@@ -1,6 +1,10 @@
+import datetime
 import os
 import sys
 import unittest
+
+import mock
+import requests
 
 import akismet
 
@@ -154,3 +158,98 @@ class AkismetAPITests(unittest.TestCase):
             user_role='administrator',
         )
         self.assertTrue(self.api.submit_ham(**ham_kwargs))
+
+    def test_full_kwargs(self):
+        """
+        All optional Akismet arguments are correctly passed through.
+
+        """
+        modified_timestamp = datetime.datetime.now()
+        posted_timestamp = modified_timestamp - datetime.timedelta(seconds=30)
+        full_kwargs = self.base_kwargs.copy()
+        full_kwargs.update(
+            referrer='http://www.example.com/',
+            permalink='http://www.example.com/#comment123',
+            comment_type='comment',
+            comment_author='Legitimate Author',
+            comment_author_email='email@example.com',
+            comment_author_url='http://www.example.com/',
+            comment_content='This is a fine comment.',
+            comment_date_gmt=posted_timestamp.isoformat(),
+            comment_post_modified_gmt=modified_timestamp.isoformat(),
+            blog_lang='en_us',
+            blog_charset='utf-8',
+            user_role='administrator',
+        )
+        expected_data = full_kwargs.copy()
+        expected_data.update(
+            blog=self.api.blog_url
+        )
+        post_mock = mock.MagicMock()
+        post_mock.return_value.text = 'false'
+        with mock.patch('requests.post', post_mock):
+            self.api.comment_check(**full_kwargs)
+            post_mock.assert_called_with(
+                akismet.Akismet.COMMENT_CHECK_URL.format(
+                    self.api.api_key
+                ),
+                data=expected_data,
+                headers=self.api._get_headers()
+            )
+
+    def test_unexpected_verify_key_response(self):
+        """
+        Unexpected verify_key API responses are correctly handled.
+
+        """
+        post_mock = mock.MagicMock()
+        with mock.patch('requests.post', post_mock):
+            with self.assertRaises(akismet.AkismetError):
+                self.api.verify_key(self.api_key, self.blog_url)
+
+    def test_unexpected_comment_check_response(self):
+        """
+        Unexpected comment_check API responses are correctly handled.
+
+        """
+        post_mock = mock.MagicMock()
+        with mock.patch('requests.post', post_mock):
+            with self.assertRaises(akismet.AkismetError):
+                check_kwargs = self.base_kwargs.copy()
+                check_kwargs.update(
+                    comment_author='viagra-test-123',
+                )
+                self.api.comment_check(**check_kwargs)
+
+    def test_unexpected_submit_spam_response(self):
+        """
+        Unexpected submit_spam API responses are correctly handled.
+
+        """
+        post_mock = mock.MagicMock()
+        with mock.patch('requests.post', post_mock):
+            with self.assertRaises(akismet.AkismetError):
+                spam_kwargs = self.base_kwargs.copy()
+                spam_kwargs.update(
+                    comment_type='comment',
+                    comment_author='viagra-test-123',
+                    comment_content='viagra-test-123',
+                )
+                self.api.submit_spam(**spam_kwargs)
+
+    def test_unexpected_submit_ham_response(self):
+        """
+        Unexpected submit_ham API responses are correctly handled.
+
+        """
+        post_mock = mock.MagicMock()
+        with mock.patch('requests.post', post_mock):
+            with self.assertRaises(akismet.AkismetError):
+                ham_kwargs = self.base_kwargs.copy()
+                ham_kwargs.update(
+                    comment_type='comment',
+                    comment_author='Legitimate Author',
+                    comment_content='This is a legitimate comment.',
+                    user_role='administrator',
+                )
+                self.api.submit_ham(**ham_kwargs)
