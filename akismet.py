@@ -131,7 +131,7 @@ class Akismet(object):
 
     def __init__(self, key=None, blog_url=None):
         self.user_agent = self.USER_AGENT.format(
-            '{}.{}.{}'.format(sys.version_info[0], sys.version_info[1], sys.version_info[2]),
+            '{}.{}.{}'.format(*sys.version_info[:3]),
             __version__
         )
         self._set_key_and_url(key, blog_url)

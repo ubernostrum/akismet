@@ -1,4 +1,5 @@
 import os
+import sys
 import unittest
 
 import akismet
@@ -55,3 +56,74 @@ class AkismetConfigurationTests(unittest.TestCase):
             api = akismet.Akismet(key=None, blog_url=None)
         with self.assertRaises(akismet.ConfigurationError):
             api = akismet.Akismet()
+
+    def test_user_agent(self):
+        """
+        The Akismet class creates the correct user-agent string.
+
+        """
+        api = akismet.Akismet(key=self.api_key, blog_url=self.blog_url)
+        expected_agent = "Python/{} | akismet.py/{}".format(
+            '{}.{}.{}'.format(*sys.version_info[:3]),
+            akismet.__version__
+        )
+        self.assertEqual(expected_agent, api.user_agent)
+
+
+class AkismetAPITests(unittest.TestCase):
+    """
+    Test implementation of the Akismet API.
+
+    """
+    api_key = os.getenv('TEST_AKISMET_API_KEY')
+    blog_url = os.getenv('TEST_AKISMET_BLOG_URL')
+
+    base_kwargs = {
+        'user_ip': '127.0.0.1',
+        'user_agent': 'Mozilla',
+        # Always send this when testing; Akismet recognizes it as a
+        # test query and does not train/learn from it.
+        'is_test': 1,
+    }
+
+    def setUp(self):
+        self.api = akismet.Akismet(key=self.api_key, blog_url=self.blog_url)
+
+    def test_verify_key_valid(self):
+        """
+        The verify_key operation succeeds with a valid key and URL.
+
+        """
+        self.api.verify_key(self.api_key, self.blog_url)
+
+    def test_verify_key_invalid(self):
+        """
+        The verify_key operation fails with an invalid key and URL.
+
+        """
+        with self.assertRaises(akismet.APIKeyError):
+            self.api.verify_key('invalid', 'invalid')
+
+    def test_comment_check_spam(self):
+        """
+        The comment_check method correctly identifies spam.
+
+        """
+        check_kwargs = self.base_kwargs.copy()
+        check_kwargs.update(
+            # Akismet guarantees this will be classified spam.
+            comment_author='viagra-test-123',
+        )
+        self.assertTrue(self.api.comment_check(**check_kwargs))
+
+    def test_comment_check_not_spam(self):
+        """
+        The comment_check method correctly identifies non-spam.
+
+        """
+        check_kwargs = self.base_kwargs.copy()
+        check_kwargs.update(
+            # Akismet guarantees this will not be classified spam.
+            user_role='administrator',
+        )
+        self.assertFalse(self.api.comment_check(**check_kwargs))
