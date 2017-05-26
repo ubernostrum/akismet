@@ -107,7 +107,7 @@ class Akismet:
         if not self.verify_key(maybe_key, maybe_url):
             raise APIKeyError(
                 'Akismet configuration ({}, {}) is invalid.'.format(
-                    key, blog_url
+                    maybe_key, maybe_url
                 )
             )
         self.api_key = maybe_key
