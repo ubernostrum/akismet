@@ -135,7 +135,7 @@ class Akismet:
             headers=self.user_agent_header)
         return response.text
 
-    def _submit_call(self, operation, user_ip, user_agent, **kwargs):
+    def _submission_request(self, operation, user_ip, user_agent, **kwargs):
         """
         Submit spam or ham to the Akismet API.
 
@@ -222,7 +222,9 @@ class Akismet:
         Returns True on success (the only expected response).
 
         """
-        return self._submit_call('submit_spam', user_ip, user_agent, **kwargs)
+        return self._submission_request(
+            'submit_spam', user_ip, user_agent, **kwargs
+        )
 
     def submit_ham(self, user_ip, user_agent, **kwargs):
         """
@@ -238,4 +240,6 @@ class Akismet:
         Returns True on success (the only expected response).
 
         """
-        return self._submit_call('submit_ham', user_ip, user_agent, **kwargs)
+        return self._submission_request(
+            'submit_ham', user_ip, user_agent, **kwargs
+        )
