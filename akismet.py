@@ -77,25 +77,8 @@ class Akismet(object):
     SUBMIT_SPAM_URL = 'https://{}.rest.akismet.com/1.1/submit-spam'
     VERIFY_KEY_URL = 'https://rest.akismet.com/1.1/verify-key'
 
-    INVALID_CONFIG = 'Akismet configuration ({}, {}) is invalid.'
-    MISSING_CONFIG = textwrap.dedent('''Could not find full Akismet configuration.
-    
-    Found API key: {}
-    Found blog URL: {}
-    ''')
-    PROTOCOL_ERROR = textwrap.dedent('''
-    Received unexpected or non-standard response from Akismet API.
-    
-    API operation was: {}
-    API response received was: {}
-    ''')
     SUBMIT_SUCCESS_RESPONSE = 'Thanks for making the web a better place.'
     
-    USER_AGENT = 'Python/{} | akismet.py/{}'
-
-    API_KEY_ENV_VAR = 'PYTHON_AKISMET_API_KEY'
-    BLOG_URL_ENV_VAR = 'PYTHON_AKISMET_BLOG_URL'
-
     OPTIONAL_KEYS = (
         'referrer', 'permalink', 'comment_type', 'comment_author',
         'comment_author_email', 'comment_author_url', 'comment_content',
@@ -103,60 +86,98 @@ class Akismet(object):
         'blog_charset', 'user_role', 'is_test'
     )
 
-    def _set_key_and_url(self, key=None, blog_url=None):
-        maybe_key = key if key is not None else os.getenv(self.API_KEY_ENV_VAR)
-        maybe_url = blog_url if blog_url is not None else os.getenv(self.BLOG_URL_ENV_VAR)
+    user_agent_header = {
+        'User-Agent': 'Python/{} | akismet.py/{}'.format(
+            '{}.{}'.format(*sys.version_info[:2]),
+            __version__
+    )}
+
+    def __init__(self, key=None, blog_url=None):
+        maybe_key = key if key is not None \
+                    else os.getenv('PYTHON_AKISMET_API_KEY')
+        maybe_url = blog_url if blog_url is not None \
+                    else os.getenv('PYTHON_AKISMET_BLOG_URL')
         if maybe_key in (None, '') or maybe_url in (None, ''):
-            raise ConfigurationError(self.MISSING_CONFIG.format(maybe_key, maybe_url))
-        try:
-            self.verify_key(maybe_key, maybe_url)
-            self.api_key = maybe_key
-            self.blog_url = maybe_url
-        except APIKeyError:
-            raise ConfigurationError(self.INVALID_CONFIG.format(maybe_key, maybe_url))
+            raise ConfigurationError(textwrap.dedent('''
+                Could not find full Akismet configuration.
+                
+                Found API key: {}
+                Found blog URL: {}
+            '''.format(maybe_key, maybe_url)))
+        if not self.verify_key(maybe_key, maybe_url):
+            raise APIKeyError(
+                'Akismet configuration ({}, {}) is invalid.'.format(key, blog_url)
+            )
+        self.api_key = maybe_key
+        self.blog_url = maybe_url
 
     def _api_request(self, endpoint, user_ip, user_agent, **kwargs):
+        """
+        Make a request to the Akismet API.
+
+        This method is used for all API calls except key verification,
+        since all endpoints other than key verification must
+        interpolate the API key into the URL and supply certain basic
+        data.
+
+        """
         data = {'blog': self.blog_url, 'user_ip': user_ip, 'user_agent': user_agent}
         for key in self.OPTIONAL_KEYS:
             if key in kwargs:
                 data[key] = kwargs[key]
-        response = requests.post(endpoint.format(self.api_key),
-                                 data=data,
-                                 headers=self._get_headers())
+        response = requests.post(
+            endpoint.format(self.api_key),
+            data=data,
+            headers=self.user_agent_header)
         return response.text
-        
 
-    def _protocol_error(self, operation, message):
-        raise AkismetError(self.PROTOCOL_ERROR.format(operation, message))
+    def _submit_call(self, operation, user_ip, user_agent, **kwargs):
+        """
+        Submit spam or ham to the Akismet API.
 
-    def __init__(self, key=None, blog_url=None):
-        self.user_agent = self.USER_AGENT.format(
-            '{}.{}.{}'.format(*sys.version_info[:3]),
-            __version__
+        """
+        endpoint = {'submit_spam': self.SUBMIT_SPAM_URL,
+                    'submit_ham': self.SUBMIT_HAM_URL}[operation]
+        response_text = self._api_request(
+            endpoint, user_ip, user_agent, **kwargs
         )
-        self._set_key_and_url(key, blog_url)
+        if response_text == self.SUBMIT_SUCCESS_RESPONSE:
+            return True
+        else:
+            self._protocol_error(operation, response_text)
 
-    def _get_headers(self):
-        return {'User-Agent': self.user_agent}
+    @classmethod
+    def _protocol_error(cls, operation, message):
+        """
+        Raise an appropriate exception for unexpected API responses.
 
-    def verify_key(self, key, blog_url):
+        """
+        raise ProtocolError(textwrap.dedent('''
+        Received unexpected or non-standard response from Akismet API.
+        
+        API operation was: {}
+        API response received was: {}
+        ''').format(operation, message))
+
+    @classmethod
+    def verify_key(cls, key, blog_url):
         """
         Verify an Akismet API key and URL.
 
-        If the key and URL are valid, this function returns None;
-        otherwise, it raises APIKeyError.
+        Returns True if the key and URL are valid, False otherwise.
 
         """
-        response = requests.post(self.VERIFY_KEY_URL,
-                                 data={'key': key, 'blog': blog_url},
-                                 headers=self._get_headers()
+        response = requests.post(
+            cls.VERIFY_KEY_URL,
+            data={'key': key, 'blog': blog_url},
+            headers=cls.user_agent_header
         )
         if response.text == 'valid':
-            return
+            return True
         elif response.text == 'invalid':
-            raise APIKeyError(self.INVALID_CONFIG.format(key, blog_url))
+            return False
         else:
-            self._protocol_error('verify_key', response.text)
+            cls._protocol_error('verify_key', response.text)
 
     def comment_check(self, user_ip, user_agent, **kwargs):
         """
@@ -195,11 +216,7 @@ class Akismet(object):
         Returns True on success (the only expected response).
 
         """
-        response_text = self._api_request(self.SUBMIT_SPAM_URL, user_ip, user_agent, **kwargs)
-        if response_text == self.SUBMIT_SUCCESS_RESPONSE:
-            return True
-        else:
-            self._protocol_error('submit_spam', response_text)
+        return self._submit_call('submit_spam', user_ip, user_agent, **kwargs)
 
     def submit_ham(self, user_ip, user_agent, **kwargs):
         """
@@ -215,8 +232,4 @@ class Akismet(object):
         Returns True on success (the only expected response).
 
         """
-        response_text = self._api_request(self.SUBMIT_HAM_URL, user_ip, user_agent, **kwargs)
-        if response_text == self.SUBMIT_SUCCESS_RESPONSE:
-            return True
-        else:
-            self._protocol_error('submit_ham', response_text)
+        return self._submit_call('submit_ham', user_ip, user_agent, **kwargs)

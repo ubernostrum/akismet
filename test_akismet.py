@@ -17,6 +17,10 @@ class AkismetConfigurationTests(unittest.TestCase):
     api_key = os.getenv('TEST_AKISMET_API_KEY')
     blog_url = os.getenv('TEST_AKISMET_BLOG_URL')
 
+    api_key_env_var = 'PYTHON_AKISMET_API_KEY'
+    blog_url_env_var = 'PYTHON_AKISMET_BLOG_URL'
+    
+
     def test_config_from_args(self):
         """Configuring via explicit arguments succeeds."""
         api = akismet.Akismet(
@@ -26,7 +30,7 @@ class AkismetConfigurationTests(unittest.TestCase):
 
     def test_bad_config_args(self):
         """Configuring with bad arguments fails."""
-        with self.assertRaises(akismet.ConfigurationError):
+        with self.assertRaises(akismet.APIKeyError):
             api = akismet.Akismet(
                 key='invalid',
                 blog_url='invalid'
@@ -35,24 +39,24 @@ class AkismetConfigurationTests(unittest.TestCase):
     def test_config_from_env(self):
         """Configuring via environment variables succeeds."""
         try:
-            os.environ[akismet.Akismet.API_KEY_ENV_VAR] = self.api_key
-            os.environ[akismet.Akismet.BLOG_URL_ENV_VAR] = self.blog_url
+            os.environ[self.api_key_env_var] = self.api_key
+            os.environ[self.blog_url_env_var] = self.blog_url
             api = akismet.Akismet(key=None, blog_url=None)
             api = akismet.Akismet()
         finally:
-            os.environ[akismet.Akismet.API_KEY_ENV_VAR] = ''
-            os.environ[akismet.Akismet.BLOG_URL_ENV_VAR] = ''
+            os.environ[self.api_key_env_var] = ''
+            os.environ[self.blog_url_env_var] = ''
 
     def test_bad_config_env(self):
         """Configuring with bad environment variables fails."""
         try:
-            os.environ[akismet.Akismet.API_KEY_ENV_VAR] = 'invalid'
-            os.environ[akismet.Akismet.BLOG_URL_ENV_VAR] = 'invalid'
-            with self.assertRaises(akismet.ConfigurationError):
+            os.environ[self.api_key_env_var] = 'invalid'
+            os.environ[self.blog_url_env_var] = 'invalid'
+            with self.assertRaises(akismet.APIKeyError):
                 api = akismet.Akismet()
         finally:
-            os.environ[akismet.Akismet.API_KEY_ENV_VAR] = ''
-            os.environ[akismet.Akismet.BLOG_URL_ENV_VAR] = ''
+            os.environ[self.api_key_env_var] = ''
+            os.environ[self.blog_url_env_var] = ''
 
     def test_missing_config(self):
         """Instantiating without any configuration fails."""
@@ -68,10 +72,13 @@ class AkismetConfigurationTests(unittest.TestCase):
         """
         api = akismet.Akismet(key=self.api_key, blog_url=self.blog_url)
         expected_agent = "Python/{} | akismet.py/{}".format(
-            '{}.{}.{}'.format(*sys.version_info[:3]),
+            '{}.{}'.format(*sys.version_info[:2]),
             akismet.__version__
         )
-        self.assertEqual(expected_agent, api.user_agent)
+        self.assertEqual(
+            expected_agent,
+            api.user_agent_header['User-Agent']
+        )
 
 
 class AkismetAPITests(unittest.TestCase):
@@ -98,15 +105,14 @@ class AkismetAPITests(unittest.TestCase):
         The verify_key operation succeeds with a valid key and URL.
 
         """
-        self.api.verify_key(self.api_key, self.blog_url)
+        akismet.Akismet.verify_key(self.api_key, self.blog_url)
 
     def test_verify_key_invalid(self):
         """
         The verify_key operation fails with an invalid key and URL.
 
         """
-        with self.assertRaises(akismet.APIKeyError):
-            self.api.verify_key('invalid', 'invalid')
+        self.assertFalse(akismet.Akismet.verify_key('invalid', 'invalid'))
 
     def test_comment_check_spam(self):
         """
@@ -194,7 +200,7 @@ class AkismetAPITests(unittest.TestCase):
                     self.api.api_key
                 ),
                 data=expected_data,
-                headers=self.api._get_headers()
+                headers=self.api.user_agent_header
             )
 
     def test_unexpected_verify_key_response(self):
@@ -204,8 +210,8 @@ class AkismetAPITests(unittest.TestCase):
         """
         post_mock = mock.MagicMock()
         with mock.patch('requests.post', post_mock):
-            with self.assertRaises(akismet.AkismetError):
-                self.api.verify_key(self.api_key, self.blog_url)
+            with self.assertRaises(akismet.ProtocolError):
+                akismet.Akismet.verify_key(self.api_key, self.blog_url)
 
     def test_unexpected_comment_check_response(self):
         """
@@ -214,7 +220,7 @@ class AkismetAPITests(unittest.TestCase):
         """
         post_mock = mock.MagicMock()
         with mock.patch('requests.post', post_mock):
-            with self.assertRaises(akismet.AkismetError):
+            with self.assertRaises(akismet.ProtocolError):
                 check_kwargs = self.base_kwargs.copy()
                 check_kwargs.update(
                     comment_author='viagra-test-123',
@@ -228,7 +234,7 @@ class AkismetAPITests(unittest.TestCase):
         """
         post_mock = mock.MagicMock()
         with mock.patch('requests.post', post_mock):
-            with self.assertRaises(akismet.AkismetError):
+            with self.assertRaises(akismet.ProtocolError):
                 spam_kwargs = self.base_kwargs.copy()
                 spam_kwargs.update(
                     comment_type='comment',
@@ -244,7 +250,7 @@ class AkismetAPITests(unittest.TestCase):
         """
         post_mock = mock.MagicMock()
         with mock.patch('requests.post', post_mock):
-            with self.assertRaises(akismet.AkismetError):
+            with self.assertRaises(akismet.ProtocolError):
                 ham_kwargs = self.base_kwargs.copy()
                 ham_kwargs.update(
                     comment_type='comment',
