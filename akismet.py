@@ -42,7 +42,7 @@ class APIKeyError(ConfigurationError):
     pass
 
 
-class Akismet(object):
+class Akismet:
     """
     A Python implementation of the Akismet web API.
 
