@@ -25,11 +25,13 @@ class AkismetConfigurationTests(unittest.TestCase):
             key=self.api_key,
             blog_url=self.blog_url
         )
+        self.assertEqual(self.api_key, api.api_key)
+        self.assertEqual(self.blog_url, api.blog_url)
 
     def test_bad_config_args(self):
         """Configuring with bad arguments fails."""
         with self.assertRaises(akismet.APIKeyError):
-            api = akismet.Akismet(
+            akismet.Akismet(
                 key='invalid',
                 blog_url='invalid'
             )
@@ -40,7 +42,11 @@ class AkismetConfigurationTests(unittest.TestCase):
             os.environ[self.api_key_env_var] = self.api_key
             os.environ[self.blog_url_env_var] = self.blog_url
             api = akismet.Akismet(key=None, blog_url=None)
+            self.assertEqual(self.api_key, api.api_key)
+            self.assertEqual(self.blog_url, api.blog_url)
             api = akismet.Akismet()
+            self.assertEqual(self.api_key, api.api_key)
+            self.assertEqual(self.blog_url, api.blog_url)
         finally:
             os.environ[self.api_key_env_var] = ''
             os.environ[self.blog_url_env_var] = ''
@@ -51,7 +57,7 @@ class AkismetConfigurationTests(unittest.TestCase):
             os.environ[self.api_key_env_var] = 'invalid'
             os.environ[self.blog_url_env_var] = 'invalid'
             with self.assertRaises(akismet.APIKeyError):
-                api = akismet.Akismet()
+                akismet.Akismet()
         finally:
             os.environ[self.api_key_env_var] = ''
             os.environ[self.blog_url_env_var] = ''
@@ -59,9 +65,9 @@ class AkismetConfigurationTests(unittest.TestCase):
     def test_missing_config(self):
         """Instantiating without any configuration fails."""
         with self.assertRaises(akismet.ConfigurationError):
-            api = akismet.Akismet(key=None, blog_url=None)
+            akismet.Akismet(key=None, blog_url=None)
         with self.assertRaises(akismet.ConfigurationError):
-            api = akismet.Akismet()
+            akismet.Akismet()
 
     def test_user_agent(self):
         """
@@ -103,7 +109,9 @@ class AkismetAPITests(unittest.TestCase):
         The verify_key operation succeeds with a valid key and URL.
 
         """
-        akismet.Akismet.verify_key(self.api_key, self.blog_url)
+        self.assertTrue(
+            akismet.Akismet.verify_key(self.api_key, self.blog_url)
+        )
 
     def test_verify_key_invalid(self):
         """
