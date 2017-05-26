@@ -4,7 +4,6 @@ import sys
 import unittest
 
 import mock
-import requests
 
 import akismet
 
@@ -19,7 +18,6 @@ class AkismetConfigurationTests(unittest.TestCase):
 
     api_key_env_var = 'PYTHON_AKISMET_API_KEY'
     blog_url_env_var = 'PYTHON_AKISMET_BLOG_URL'
-    
 
     def test_config_from_args(self):
         """Configuring via explicit arguments succeeds."""

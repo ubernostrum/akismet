@@ -1,5 +1,4 @@
 import os
-import os.path
 import sys
 import textwrap
 
@@ -78,7 +77,7 @@ class Akismet(object):
     VERIFY_KEY_URL = 'https://rest.akismet.com/1.1/verify-key'
 
     SUBMIT_SUCCESS_RESPONSE = 'Thanks for making the web a better place.'
-    
+
     OPTIONAL_KEYS = (
         'referrer', 'permalink', 'comment_type', 'comment_author',
         'comment_author_email', 'comment_author_url', 'comment_content',
@@ -90,23 +89,26 @@ class Akismet(object):
         'User-Agent': 'Python/{} | akismet.py/{}'.format(
             '{}.{}'.format(*sys.version_info[:2]),
             __version__
-    )}
+        )
+    }
 
     def __init__(self, key=None, blog_url=None):
-        maybe_key = key if key is not None \
-                    else os.getenv('PYTHON_AKISMET_API_KEY')
-        maybe_url = blog_url if blog_url is not None \
-                    else os.getenv('PYTHON_AKISMET_BLOG_URL')
+        maybe_key = (key if key is not None
+                     else os.getenv('PYTHON_AKISMET_API_KEY'))
+        maybe_url = (blog_url if blog_url is not None
+                     else os.getenv('PYTHON_AKISMET_BLOG_URL'))
         if maybe_key in (None, '') or maybe_url in (None, ''):
             raise ConfigurationError(textwrap.dedent('''
                 Could not find full Akismet configuration.
-                
+
                 Found API key: {}
                 Found blog URL: {}
             '''.format(maybe_key, maybe_url)))
         if not self.verify_key(maybe_key, maybe_url):
             raise APIKeyError(
-                'Akismet configuration ({}, {}) is invalid.'.format(key, blog_url)
+                'Akismet configuration ({}, {}) is invalid.'.format(
+                    key, blog_url
+                )
             )
         self.api_key = maybe_key
         self.blog_url = maybe_url
@@ -121,7 +123,9 @@ class Akismet(object):
         data.
 
         """
-        data = {'blog': self.blog_url, 'user_ip': user_ip, 'user_agent': user_agent}
+        data = {'blog': self.blog_url,
+                'user_ip': user_ip,
+                'user_agent': user_agent}
         for key in self.OPTIONAL_KEYS:
             if key in kwargs:
                 data[key] = kwargs[key]
@@ -154,7 +158,7 @@ class Akismet(object):
         """
         raise ProtocolError(textwrap.dedent('''
         Received unexpected or non-standard response from Akismet API.
-        
+
         API operation was: {}
         API response received was: {}
         ''').format(operation, message))
@@ -194,7 +198,9 @@ class Akismet(object):
         spam, and False for a comment that is not spam.
 
         """
-        response_text = self._api_request(self.COMMENT_CHECK_URL, user_ip, user_agent, **kwargs)
+        response_text = self._api_request(
+            self.COMMENT_CHECK_URL, user_ip, user_agent, **kwargs
+        )
         if response_text == 'true':
             return True
         elif response_text == 'false':
