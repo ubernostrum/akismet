@@ -1,0 +1,24 @@
+import os
+
+on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
+
+extensions = []
+templates_path = ['_templates']
+source_suffix = '.rst'
+master_doc = 'index'
+project = u'akismet'
+copyright = u'2005-2017, Michael Foord and James Bennett'
+version = '1.0'
+release = '1.0'
+exclude_trees = ['_build']
+pygments_style = 'sphinx'
+html_static_path = ['_static']
+htmlhelp_basename = 'akismetdoc'
+latex_documents = [
+  ('index', 'akismet.tex', u'akismet Documentation',
+   u'Michael Foord and James Bennett', 'manual'),
+]
+if not on_rtd:
+    import sphinx_rtd_theme
+    html_theme = 'sphinx_rtd_theme'
+    html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
