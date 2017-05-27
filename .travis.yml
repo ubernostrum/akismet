@@ -1,10 +1,12 @@
 language: python
 sudo: false
-python:
-  - "3.6"
-  - "3.5"
-  - "3.4"
-  - "3.3"
-  - "2.7"
-install: pip install tox-travis
+python: 3.6
+env:
+  - TOXENV=py27
+  - TOXENV=py33
+  - TOXENV=py34
+  - TOXENV=py35
+  - TOXENV=py36
+  - TOXENV=docs
+install: pip install -U tox
 script: tox
