@@ -39,7 +39,7 @@ class AkismetConfigurationTests(unittest.TestCase):
         with self.assertRaises(akismet.APIKeyError):
             akismet.Akismet(
                 key='invalid',
-                blog_url='invalid'
+                blog_url='http://invalid'
             )
 
     def test_config_from_env(self):
@@ -69,12 +69,28 @@ class AkismetConfigurationTests(unittest.TestCase):
         """
         try:
             os.environ[self.api_key_env_var] = 'invalid'
-            os.environ[self.blog_url_env_var] = 'invalid'
+            os.environ[self.blog_url_env_var] = 'http://invalid'
             with self.assertRaises(akismet.APIKeyError):
                 akismet.Akismet()
         finally:
             os.environ[self.api_key_env_var] = ''
             os.environ[self.blog_url_env_var] = ''
+
+    def test_bad_url(self):
+        """
+        Configuring with a bad URL fails.
+
+        """
+        bad_urls = (
+            'example.com',
+            'ftp://example.com',
+            'www.example.com',
+            'http//example.com',
+            'https//example.com',
+        )
+        for url in bad_urls:
+            with self.assertRaises(akismet.ConfigurationError):
+                akismet.Akismet(key=self.api_key, blog_url=url)
 
     def test_missing_config(self):
         """

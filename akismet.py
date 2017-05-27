@@ -107,6 +107,15 @@ class Akismet:
                 '''.format(maybe_key, maybe_url)
                 )
             )
+        if not maybe_url.startswith(('http://', 'https://')):
+            raise ConfigurationError(
+                textwrap.dedent('''
+                Invalid site URL specified: {}
+
+                Akismet requires the full URL including the leading
+                'http://' or 'https://'.
+                ''').format(maybe_url)
+            )
         if not self.verify_key(maybe_key, maybe_url):
             raise APIKeyError(
                 'Akismet key ({}, {}) is invalid.'.format(
