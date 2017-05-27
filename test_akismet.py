@@ -10,7 +10,7 @@ import akismet
 
 class AkismetConfigurationTests(unittest.TestCase):
     """
-    Test configuration of the Akismet class.
+    Tests configuration of the Akismet class.
 
     """
     api_key = os.getenv('TEST_AKISMET_API_KEY')
@@ -20,7 +20,10 @@ class AkismetConfigurationTests(unittest.TestCase):
     blog_url_env_var = 'PYTHON_AKISMET_BLOG_URL'
 
     def test_config_from_args(self):
-        """Configuring via explicit arguments succeeds."""
+        """
+        Configuring via explicit arguments succeeds.
+
+        """
         api = akismet.Akismet(
             key=self.api_key,
             blog_url=self.blog_url
@@ -29,7 +32,10 @@ class AkismetConfigurationTests(unittest.TestCase):
         self.assertEqual(self.blog_url, api.blog_url)
 
     def test_bad_config_args(self):
-        """Configuring with bad arguments fails."""
+        """
+        Configuring with bad arguments fails.
+
+        """
         with self.assertRaises(akismet.APIKeyError):
             akismet.Akismet(
                 key='invalid',
@@ -37,7 +43,10 @@ class AkismetConfigurationTests(unittest.TestCase):
             )
 
     def test_config_from_env(self):
-        """Configuring via environment variables succeeds."""
+        """
+        Configuring via environment variables succeeds.
+
+        """
         try:
             os.environ[self.api_key_env_var] = self.api_key
             os.environ[self.blog_url_env_var] = self.blog_url
@@ -52,7 +61,10 @@ class AkismetConfigurationTests(unittest.TestCase):
             os.environ[self.blog_url_env_var] = ''
 
     def test_bad_config_env(self):
-        """Configuring with bad environment variables fails."""
+        """
+        Configuring with bad environment variables fails.
+
+        """
         try:
             os.environ[self.api_key_env_var] = 'invalid'
             os.environ[self.blog_url_env_var] = 'invalid'
@@ -63,7 +75,10 @@ class AkismetConfigurationTests(unittest.TestCase):
             os.environ[self.blog_url_env_var] = ''
 
     def test_missing_config(self):
-        """Instantiating without any configuration fails."""
+        """
+        Instantiating without any configuration fails.
+
+        """
         with self.assertRaises(akismet.ConfigurationError):
             akismet.Akismet(key=None, blog_url=None)
         with self.assertRaises(akismet.ConfigurationError):
@@ -87,7 +102,7 @@ class AkismetConfigurationTests(unittest.TestCase):
 
 class AkismetAPITests(unittest.TestCase):
     """
-    Test implementation of the Akismet API.
+    Tests implementation of the Akismet API.
 
     """
     api_key = os.getenv('TEST_AKISMET_API_KEY')

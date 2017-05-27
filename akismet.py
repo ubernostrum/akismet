@@ -44,7 +44,7 @@ class APIKeyError(ConfigurationError):
 
 class Akismet:
     """
-    A Python implementation of the Akismet web API.
+    A Python wrapper for the Akismet web API.
 
     Two configuration parameters -- your Akismet API key and
     registered URL -- are required; they can be passed when
@@ -115,7 +115,7 @@ class Akismet:
 
     def _api_request(self, endpoint, user_ip, user_agent, **kwargs):
         """
-        Make a request to the Akismet API.
+        Makes a request to the Akismet API.
 
         This method is used for all API calls except key verification,
         since all endpoints other than key verification must
@@ -137,7 +137,7 @@ class Akismet:
 
     def _submission_request(self, operation, user_ip, user_agent, **kwargs):
         """
-        Submit spam or ham to the Akismet API.
+        Submits spam or ham to the Akismet API.
 
         """
         endpoint = {'submit_spam': self.SUBMIT_SPAM_URL,
@@ -153,7 +153,7 @@ class Akismet:
     @classmethod
     def _protocol_error(cls, operation, message):
         """
-        Raise an appropriate exception for unexpected API responses.
+        Raises an appropriate exception for unexpected API responses.
 
         """
         raise ProtocolError(textwrap.dedent('''
@@ -166,7 +166,7 @@ class Akismet:
     @classmethod
     def verify_key(cls, key, blog_url):
         """
-        Verify an Akismet API key and URL.
+        Verifies an Akismet API key and URL.
 
         Returns True if the key and URL are valid, False otherwise.
 
@@ -185,12 +185,12 @@ class Akismet:
 
     def comment_check(self, user_ip, user_agent, **kwargs):
         """
-        Check a comment to determine whether it is spam.
+        Checks a comment to determine whether it is spam.
 
         The IP address and user-agent string of the remote user are
         required. All other arguments documented by Akismet (other
-        than the PHP server information) are also optionally accepted;
-        see the Akismet API documentation for a full list:
+        than the PHP server information) are also optionally accepted.
+        See the Akismet API documentation for a full list:
 
         https://akismet.com/development/api/#comment-check
 
@@ -210,12 +210,12 @@ class Akismet:
 
     def submit_spam(self, user_ip, user_agent, **kwargs):
         """
-        Inform Akismet that a comment is spam.
+        Informs Akismet that a comment is spam.
 
         The IP address and user-agent string of the remote user are
         required. All other arguments documented by Akismet (other
-        than the PHP server information) are also optionally accepted;
-        see the Akismet API documentation for a full list:
+        than the PHP server information) are also optionally accepted.
+        See the Akismet API documentation for a full list:
 
         https://akismet.com/development/api/#submit-spam
 
@@ -228,12 +228,12 @@ class Akismet:
 
     def submit_ham(self, user_ip, user_agent, **kwargs):
         """
-        Inform Akismet that a comment is not spam.
+        Informs Akismet that a comment is not spam.
 
         The IP address and user-agent string of the remote user are
         required. All other arguments documented by Akismet (other
-        than the PHP server information) are also optionally accepted;
-        see the Akismet API documentation for a full list:
+        than the PHP server information) are also optionally accepted.
+        See the Akismet API documentation for a full list:
 
         https://akismet.com/development/api/#submit-ham
 
