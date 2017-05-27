@@ -50,9 +50,11 @@ class AkismetConfigurationTests(unittest.TestCase):
         try:
             os.environ[self.api_key_env_var] = self.api_key
             os.environ[self.blog_url_env_var] = self.blog_url
+            
             api = akismet.Akismet(key=None, blog_url=None)
             self.assertEqual(self.api_key, api.api_key)
             self.assertEqual(self.blog_url, api.blog_url)
+            
             api = akismet.Akismet()
             self.assertEqual(self.api_key, api.api_key)
             self.assertEqual(self.blog_url, api.blog_url)

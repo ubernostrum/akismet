@@ -98,12 +98,15 @@ class Akismet:
         maybe_url = (blog_url if blog_url is not None
                      else os.getenv('PYTHON_AKISMET_BLOG_URL'))
         if maybe_key in (None, '') or maybe_url in (None, ''):
-            raise ConfigurationError(textwrap.dedent('''
+            raise ConfigurationError(
+                textwrap.dedent('''
                 Could not find full Akismet configuration.
 
                 Found API key: {}
                 Found blog URL: {}
-            '''.format(maybe_key, maybe_url)))
+                '''.format(maybe_key, maybe_url)
+                )
+            )
         if not self.verify_key(maybe_key, maybe_url):
             raise APIKeyError(
                 'Akismet key ({}, {}) is invalid.'.format(
@@ -156,12 +159,14 @@ class Akismet:
         Raises an appropriate exception for unexpected API responses.
 
         """
-        raise ProtocolError(textwrap.dedent('''
-        Received unexpected or non-standard response from Akismet API.
+        raise ProtocolError(
+            textwrap.dedent('''
+            Received unexpected or non-standard response from Akismet API.
 
-        API operation was: {}
-        API response received was: {}
-        ''').format(operation, message))
+            API operation was: {}
+            API response received was: {}
+            ''').format(operation, message)
+        )
 
     @classmethod
     def verify_key(cls, key, blog_url):
