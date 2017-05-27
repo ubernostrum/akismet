@@ -14,9 +14,9 @@ Configuration via file no longer supported
 In 0.2.0, ``akismet`` supported configuration via a file named
 ``apikey.txt``. Support for this has been removed in favor of either
 explicitly configuring via arguments as the :class:`~akismet.Akismet`
-class is instantiated, or via environment variables. If you were
-relying on an ``apikey.txt`` file for configuration, you will need to
-switch to explicit arguments or environment variables.
+class is instantiated, or configuring via environment variables. If
+you were relying on an ``apikey.txt`` file for configuration, you will
+need to switch to explicit arguments or environment variables.
 
 
 Custom user agent no longer supported
