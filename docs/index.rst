@@ -21,3 +21,4 @@ Documentation contents
    :maxdepth: 1
 
    install
+   overview
