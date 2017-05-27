@@ -22,3 +22,4 @@ Documentation contents
 
    install
    overview
+   upgrade
