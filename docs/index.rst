@@ -23,3 +23,4 @@ Documentation contents
    install
    overview
    upgrade
+   faq
