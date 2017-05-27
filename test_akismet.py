@@ -8,17 +8,25 @@ import mock
 import akismet
 
 
-class AkismetConfigurationTests(unittest.TestCase):
-    """
-    Tests configuration of the Akismet class.
-
-    """
+class AkismetTests(unittest.TestCase):
     api_key = os.getenv('TEST_AKISMET_API_KEY')
     blog_url = os.getenv('TEST_AKISMET_BLOG_URL')
 
     api_key_env_var = 'PYTHON_AKISMET_API_KEY'
     blog_url_env_var = 'PYTHON_AKISMET_BLOG_URL'
 
+    def setUp(self):
+        self.api = akismet.Akismet(
+            key=self.api_key,
+            blog_url=self.blog_url
+        )
+
+
+class AkismetConfigurationTests(AkismetTests):
+    """
+    Tests configuration of the Akismet class.
+
+    """
     def test_config_from_args(self):
         """
         Configuring via explicit arguments succeeds.
@@ -118,14 +126,11 @@ class AkismetConfigurationTests(unittest.TestCase):
         )
 
 
-class AkismetAPITests(unittest.TestCase):
+class AkismetAPITests(AkismetTests):
     """
     Tests implementation of the Akismet API.
 
     """
-    api_key = os.getenv('TEST_AKISMET_API_KEY')
-    blog_url = os.getenv('TEST_AKISMET_BLOG_URL')
-
     base_kwargs = {
         'user_ip': '127.0.0.1',
         'user_agent': 'Mozilla',
@@ -133,9 +138,6 @@ class AkismetAPITests(unittest.TestCase):
         # test query and does not train/learn from it.
         'is_test': 1,
     }
-
-    def setUp(self):
-        self.api = akismet.Akismet(key=self.api_key, blog_url=self.blog_url)
 
     def test_verify_key_valid(self):
         """
@@ -204,44 +206,6 @@ class AkismetAPITests(unittest.TestCase):
         )
         self.assertTrue(self.api.submit_ham(**ham_kwargs))
 
-    def test_full_kwargs(self):
-        """
-        All optional Akismet arguments are correctly passed through.
-
-        """
-        modified_timestamp = datetime.datetime.now()
-        posted_timestamp = modified_timestamp - datetime.timedelta(seconds=30)
-        full_kwargs = self.base_kwargs.copy()
-        full_kwargs.update(
-            referrer='http://www.example.com/',
-            permalink='http://www.example.com/#comment123',
-            comment_type='comment',
-            comment_author='Legitimate Author',
-            comment_author_email='email@example.com',
-            comment_author_url='http://www.example.com/',
-            comment_content='This is a fine comment.',
-            comment_date_gmt=posted_timestamp.isoformat(),
-            comment_post_modified_gmt=modified_timestamp.isoformat(),
-            blog_lang='en_us',
-            blog_charset='utf-8',
-            user_role='administrator',
-        )
-        expected_data = full_kwargs.copy()
-        expected_data.update(
-            blog=self.api.blog_url
-        )
-        post_mock = mock.MagicMock()
-        post_mock.return_value.text = 'false'
-        with mock.patch('requests.post', post_mock):
-            self.api.comment_check(**full_kwargs)
-            post_mock.assert_called_with(
-                akismet.Akismet.COMMENT_CHECK_URL.format(
-                    self.api.api_key
-                ),
-                data=expected_data,
-                headers=self.api.user_agent_header
-            )
-
     def test_unexpected_verify_key_response(self):
         """
         Unexpected verify_key API responses are correctly handled.
@@ -298,3 +262,126 @@ class AkismetAPITests(unittest.TestCase):
                     user_role='administrator',
                 )
                 self.api.submit_ham(**ham_kwargs)
+
+
+class AkismetRequestTests(AkismetTests):
+    """
+    Tests the requests constructed by the Akismet class.
+
+    """
+    def _get_mock(self, text):
+        """
+        Create a mock for requests.post() returning expected text.
+
+        """
+        post_mock = mock.MagicMock()
+        post_mock.return_value.text = text
+        return post_mock
+
+    def _mock_request(self, method, endpoint, text, method_kwargs):
+        """
+        Issue a mocked request and verify requests.post() was called
+        with the correct arguments.
+
+        """
+        method_kwargs.update(
+            user_ip='127.0.0.1',
+            user_agent='Mozilla',
+            is_test=1,
+        )
+        expected_kwargs = method_kwargs.copy()
+        expected_kwargs.update(blog=self.blog_url)
+        post_mock = self._get_mock(text)
+        with mock.patch('requests.post', post_mock):
+            getattr(self.api, method)(
+                **method_kwargs
+            )
+            post_mock.assert_called_with(
+                endpoint.format(self.api_key),
+                data=expected_kwargs,
+                headers=akismet.Akismet.user_agent_header
+            )
+
+    def test_verify_key(self):
+        """
+        The request issued by verify_key() is correct.
+
+        """
+        post_mock = self._get_mock('valid')
+        with mock.patch('requests.post', post_mock):
+            akismet.Akismet.verify_key(
+                self.api_key,
+                self.blog_url
+            )
+            post_mock.assert_called_with(
+                akismet.Akismet.VERIFY_KEY_URL,
+                data={'key': self.api_key,
+                      'blog': self.blog_url},
+                headers=akismet.Akismet.user_agent_header
+            )
+
+    def test_comment_check(self):
+        """
+        The request issued by comment_check() is correct.
+
+        """
+        self._mock_request(
+            'comment_check',
+            akismet.Akismet.COMMENT_CHECK_URL,
+            'true',
+            {'comment_author': 'viagra-test-123'}
+        )
+
+    def test_submit_spam(self):
+        """
+        The request issued by submit_spam() is correct.
+
+        """
+        self._mock_request(
+            'submit_spam',
+            akismet.Akismet.SUBMIT_SPAM_URL,
+            akismet.Akismet.SUBMIT_SUCCESS_RESPONSE,
+            {'comment_content': 'Bad comment',
+             'comment_author': 'viagra-test-123'}
+        )
+
+    def test_submit_ham(self):
+        """
+        The request issued by submit_ham() is correct.
+
+        """
+        self._mock_request(
+            'submit_ham',
+            akismet.Akismet.SUBMIT_HAM_URL,
+            akismet.Akismet.SUBMIT_SUCCESS_RESPONSE,
+            {'comment_content': 'Good comment',
+             'comment_author': 'Legitimate commenter'}
+        )
+
+    def test_full_kwargs(self):
+        """
+        All optional Akismet arguments are correctly passed through.
+
+        """
+        modified_timestamp = datetime.datetime.now()
+        posted_timestamp = modified_timestamp - datetime.timedelta(seconds=30)
+        full_kwargs = {
+            'referrer': 'http://www.example.com/',
+            'permalink': 'http://www.example.com/#comment123',
+            'comment_type': 'comment',
+            'comment_author': 'Legitimate Author',
+            'comment_author_email': 'email@example.com',
+            'comment_author_url': 'http://www.example.com/',
+            'comment_content': 'This is a fine comment.',
+            'comment_date_gmt': posted_timestamp.isoformat(),
+            'comment_post_modified_gmt': modified_timestamp.isoformat(),
+            'blog_lang': 'en_us',
+            'blog_charset': 'utf-8',
+            'user_role': 'administrator',
+        }
+        self._mock_request(
+            'comment_check',
+            akismet.Akismet.COMMENT_CHECK_URL,
+            'false',
+            full_kwargs
+        )
