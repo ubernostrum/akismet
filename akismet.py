@@ -107,15 +107,6 @@ class Akismet:
                 '''.format(maybe_key, maybe_url)
                 )
             )
-        if not maybe_url.startswith(('http://', 'https://')):
-            raise ConfigurationError(
-                textwrap.dedent('''
-                Invalid site URL specified: {}
-
-                Akismet requires the full URL including the leading
-                'http://' or 'https://'.
-                ''').format(maybe_url)
-            )
         if not self.verify_key(maybe_key, maybe_url):
             raise APIKeyError(
                 'Akismet key ({}, {}) is invalid.'.format(
@@ -185,6 +176,15 @@ class Akismet:
         Returns True if the key and URL are valid, False otherwise.
 
         """
+        if not blog_url.startswith(('http://', 'https://')):
+            raise ConfigurationError(
+                textwrap.dedent('''
+                Invalid site URL specified: {}
+
+                Akismet requires the full URL including the leading
+                'http://' or 'https://'.
+                ''').format(blog_url)
+            )
         response = requests.post(
             cls.VERIFY_KEY_URL,
             data={'key': key, 'blog': blog_url},

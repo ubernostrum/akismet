@@ -153,7 +153,9 @@ class AkismetAPITests(AkismetTests):
         The verify_key operation fails with an invalid key and URL.
 
         """
-        self.assertFalse(akismet.Akismet.verify_key('invalid', 'invalid'))
+        self.assertFalse(
+            akismet.Akismet.verify_key('invalid', 'http://invalid')
+        )
 
     def test_comment_check_spam(self):
         """
