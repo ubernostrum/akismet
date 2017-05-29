@@ -1,0 +1,7 @@
+include LICENSE
+include MANIFEST.in
+include README.rst
+include test_akismet.py
+include test_requirements.txt
+include tox.ini
+recursive-include docs *
