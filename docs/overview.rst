@@ -116,7 +116,7 @@ Using ``akismet``
 
       :param user_ip: The IP address of the user posting the comment.
       :type user_ip: ``str``
-      :param user_agent: The HTTP ``User-Agent`` heaer of th euser
+      :param user_agent: The HTTP ``User-Agent`` header of the user
          posting the comment.
       :type user_agent: ``str``
       :rtype: ``bool``
@@ -136,7 +136,7 @@ Using ``akismet``
 
       :param user_ip: The IP address of the user posting the comment.
       :type user_ip: ``str``
-      :param user_agent: The HTTP ``User-Agent`` heaer of th euser
+      :param user_agent: The HTTP ``User-Agent`` header of the user
          posting the comment.
       :type user_agent: ``str``
       :rtype: ``bool``
@@ -156,7 +156,7 @@ Using ``akismet``
 
       :param user_ip: The IP address of the user posting the comment.
       :type user_ip: ``str``
-      :param user_agent: The HTTP ``User-Agent`` heaer of th euser
+      :param user_agent: The HTTP ``User-Agent`` header of the user
          posting the comment.
       :type user_agent: ``str``
       :rtype: ``bool``

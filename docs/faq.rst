@@ -92,8 +92,8 @@ The Akismet web service documentation recommends sending a string
 identifying the application or platform with version, and Akismet
 plugin/implementation name with version. In accordance with this,
 ``akismet`` sends an HTTP ``User-Agent`` based on the versions of
-Python and ``akismet`` in use. For example, on Python 3.5 the string
-will be ``Python/3.5 | akismet.py/1.0``.
+Python and ``akismet`` in use. For example, ``akismet`` 1.0 on Python
+3.5 will send ``Python/3.5 | akismet.py/1.0.1``.
 
 
 Does ``akismet`` support the "pro-tip" header?

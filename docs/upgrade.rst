@@ -28,7 +28,7 @@ documentation now recomends a standard format for the ``User-Agent``
 header, and as a result this is no longer directly configurable. The
 ``User-Agent`` string of ``akismet`` will now be based on the Python
 version and the version of ``akismet``, in accordance with the Akismet
-service's recommendation. For example, ``akismet`` |version| on Python
+service's recommendation. For example, ``akismet`` 1.0 on Python
 3.5 will send the string ``Python/3.5 | akismet.py/1.0``.
 
 If you do need to send a custom ``User-Agent``, you can subclass
