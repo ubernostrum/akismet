@@ -29,7 +29,7 @@ For API methods other than :meth:`~Akismet.verify_key`, only the end
 user's IP address and user-agent string are required to be passed as
 arguments (a third argument, ``blog``, will be automatically inserted
 for you). However, these methods all accept a large set of optional
-keyword arguments, corresponding to additinoal data accepted by the
+keyword arguments, corresponding to additional data accepted by the
 Akismet web service. This set of arguments is identical across all the
 API methods.
 
