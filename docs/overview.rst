@@ -47,7 +47,7 @@ The most commonly useful arguments are:
   the person posting the comment.
 
 * ``comment_content`` -- a string containing the contents of the
-  commant.
+  comment.
 
 * ``comment_type`` -- a string indicating the type of comment. For
   typical site comments, set this to ``"comment"``. For a contact

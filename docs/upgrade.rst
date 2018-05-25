@@ -24,7 +24,7 @@ Custom user agent no longer supported
 
 In 0.2.0, ``akismet`` allowed you to specify the string which would be
 sent in the ``User-Agent`` HTTP header. The Akismet web service
-documentation now recomends a standard format for the ``User-Agent``
+documentation now recommends a standard format for the ``User-Agent``
 header, and as a result this is no longer directly configurable. The
 ``User-Agent`` string of ``akismet`` will now be based on the Python
 version and the version of ``akismet``, in accordance with the Akismet
