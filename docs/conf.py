@@ -4,7 +4,7 @@ import sys
 
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 
-extensions = []
+extensions = ['sphinx.ext.intersphinx']
 templates_path = ['_templates']
 source_suffix = '.rst'
 master_doc = 'index'
@@ -20,6 +20,11 @@ latex_documents = [
   ('index', 'akismet.tex', u'akismet Documentation',
    u'Michael Foord and James Bennett', 'manual'),
 ]
+
+intersphinx_mapping = {
+    'python': ('https://docs.python.org/3', None),
+}
+
 if not on_rtd:
     import sphinx_rtd_theme
     html_theme = 'sphinx_rtd_theme'
