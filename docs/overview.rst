@@ -179,6 +179,13 @@ several exception classes:
    or replaced with this exception.
 
 
+.. exception:: UnknownArgumentError
+
+   Subclass of :exc:`AkismetError` indicating an unexpected argument
+   was provided as part of a request. The message raised with this
+   exception will include the names of all the unknown arguments.
+
+
 .. exception:: ProtocolError
 
    Subclass of :exc:`AkismetError` indicating an unexpected or

@@ -387,3 +387,17 @@ class AkismetRequestTests(AkismetTests):
             'false',
             full_kwargs
         )
+
+    def test_unknown_kwargs(self):
+        """
+        Unknown Akismet arguments are correctly rejected.
+
+        """
+        bad_kwargs = {'bad_arg': 'bad_val'}
+        with self.assertRaises(akismet.UnknownArgumentError):
+            self._mock_request(
+                'comment_check',
+                akismet.Akismet.COMMENT_CHECK_URL,
+                'false',
+                bad_kwargs
+            )
