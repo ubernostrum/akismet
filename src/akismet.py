@@ -16,6 +16,14 @@ class AkismetError(Exception):
     pass
 
 
+class UnknownArgumentError(AkismetError):
+    """
+    Indicates an unknown argument was used as part of an api request.
+
+    """
+    pass
+
+
 class ProtocolError(AkismetError):
     """
     Indicates an unexpected or non-standard response was received from
@@ -78,12 +86,12 @@ class Akismet:
 
     SUBMIT_SUCCESS_RESPONSE = u'Thanks for making the web a better place.'
 
-    OPTIONAL_KEYS = (
+    OPTIONAL_KEYS = {
         u'referrer', u'permalink', u'comment_type', u'comment_author',
         u'comment_author_email', u'comment_author_url', u'comment_content',
         u'comment_date_gmt', u'comment_post_modified_gmt', u'blog_lang',
         u'blog_charset', u'user_role', u'is_test'
-    )
+    }
 
     user_agent_header = {
         u'User-Agent': 'Python/{} | akismet.py/{}'.format(
@@ -126,12 +134,17 @@ class Akismet:
         data.
 
         """
+        unknown_args = [k for k in kwargs if k not in self.OPTIONAL_KEYS]
+        if unknown_args:
+            raise UnknownArgumentError(
+                u'Unknown arguments while making request: {}.').format(
+                    ', '.join(unknown_args)
+                )
+
         data = {u'blog': self.blog_url,
                 u'user_ip': user_ip,
                 u'user_agent': user_agent}
-        for key in self.OPTIONAL_KEYS:
-            if key in kwargs:
-                data[key] = kwargs[key]
+        data.update(kwargs)
         response = requests.post(
             endpoint.format(self.api_key),
             data=data,
