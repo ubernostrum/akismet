@@ -18,7 +18,7 @@ class AkismetError(Exception):
 
 class UnknownArgumentError(AkismetError):
     """
-    Indicates an unknown argument was used as part of an api request.
+    Indicates an unknown argument was used as part of an API request.
 
     """
     pass
@@ -137,9 +137,10 @@ class Akismet:
         unknown_args = [k for k in kwargs if k not in self.OPTIONAL_KEYS]
         if unknown_args:
             raise UnknownArgumentError(
-                u'Unknown arguments while making request: {}.').format(
+                u'Unknown arguments while making request: {}.'.format(
                     ', '.join(unknown_args)
                 )
+            )
 
         data = {u'blog': self.blog_url,
                 u'user_ip': user_ip,
