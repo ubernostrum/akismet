@@ -105,7 +105,7 @@ Using `akismet`
       :type blog_url: str
       :rtype: bool
       :raises ConfigurationError: if `blog_url` is not a full URL
-         including the `http://` or `https://` protocol
+         including the `http://` or `https://` protocol.
 
 
    .. method:: comment_check(user_ip, user_agent, **kwargs)
@@ -125,6 +125,8 @@ Using `akismet`
          posting the comment.
       :type user_agent: str
       :rtype: bool
+      :raises UnknownArgumentError: if one or more unrecognized
+         arguments are passed in `kwargs`.
 
 
    .. method:: submit_spam(user_ip, user_agent, **kwargs)
@@ -144,8 +146,10 @@ Using `akismet`
          posting the comment.
       :type user_agent: str
       :rtype: bool
+      :raises UnknownArgumentError: if one or more unrecognized
+         arguments are passed in `kwargs`.
       :raises ProtocolError: if submission fails due to Akismet API
-         error
+         error.
 
 
    .. method:: submit_ham(user_ip, user_agent, **kwargs)
@@ -165,8 +169,10 @@ Using `akismet`
          posting the comment.
       :type user_agent: str
       :rtype: bool
+      :raises UnknownArgumentError: if one or more unrecognized
+         arguments are passed in `kwargs`.
       :raises ProtocolError: if submission fails due to Akismet API
-         error
+         error.
 
 
 Exceptions
