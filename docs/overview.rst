@@ -96,8 +96,8 @@ Using `akismet`
       automatically during instantiation, you can also use this method
       to check a different key and URL manually.
 
-      Returns `True` if the key/URL are valid, `False` if they are
-      invalid.
+      Returns :data:`True` if the key/URL are valid, :data:`False` if
+      they are invalid.
 
       :param key: The API key to verify.
       :type key: str
@@ -116,8 +116,8 @@ Using `akismet`
       to the Akismet API service <optional-arguments>` in addition to
       its two required arguments.
 
-      Returns `True` if the comment is classified as spam, `False`
-      if it is not.
+      Returns :data:`True` if the comment is classified as spam,
+      :data:`False` if it is not.
 
       :param user_ip: The IP address of the user posting the comment.
       :type user_ip: str
@@ -136,7 +136,7 @@ Using `akismet`
       to the Akismet API service <optional-arguments>` in addition to
       its two required arguments.
 
-      Returns `True` on a successful submission.
+      Returns :data:`True` on a successful submission.
 
       :param user_ip: The IP address of the user posting the comment.
       :type user_ip: str
@@ -157,7 +157,7 @@ Using `akismet`
       to the Akismet API service <optional-arguments>` in addition to
       its two required arguments.
 
-      Returns `True` on a successful submission.
+      Returns :data:`True` on a successful submission.
 
       :param user_ip: The IP address of the user posting the comment.
       :type user_ip: str
