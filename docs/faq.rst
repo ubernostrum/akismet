@@ -15,17 +15,13 @@ Python:
 
 * Python 2.7
 
-* Python 3.4
-
 * Python 3.5
 
 * Python 3.6
 
 * Python 3.7
 
-Older versions of Python are not supported; attempting to use
-`akismet` |release| on Python 2.6, or Python 3.0-3.2, will cause
-errors.
+Older versions of Python are not supported and will cause errors.
 
 
 Do I have to send all the optional arguments?
@@ -68,7 +64,13 @@ Running the test suite requires two environment variables to be set:
   API key.
 
 This allows the test suite to access the live Akismet web service to
-verify functionality.
+verify functionality. Then you can invoke the test suite for the
+version of Python you intend to use. For example, to test on Python
+3.7:
+
+.. code-block:: shell
+
+   $ tox -e py37
 
 If you want to manually perform your own tests, you can also
 instantiate the :class:`~akismet.Akismet` class and call its

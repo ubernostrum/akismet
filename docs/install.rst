@@ -9,8 +9,6 @@ on the following versions of Python:
 
 * Python 2.7
 
-* Python 3.4
-
 * Python 3.5
 
 * Python 3.6
@@ -28,7 +26,7 @@ instructions are available for `how to obtain and install it
 supported version of Python, `pip` came bundled with your installation
 of Python.
 
-Once you have `pip`, simply type::
+Once you have `pip`, type::
 
     pip install akismet
 
