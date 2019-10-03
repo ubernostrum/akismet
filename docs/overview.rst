@@ -53,6 +53,10 @@ The most commonly useful arguments are:
   typical site comments, set this to `"comment"`. For a contact form,
   use `"contact-form"`. For a user-account signup, use `"signup"`.
 
+If you call a method of :class:`Akismet` and pass one or more
+arguments not recognized by the Akismet web service, an
+:exc:`UnknownArgumentError` will be raised.
+
 
 Using `akismet`
 -----------------
