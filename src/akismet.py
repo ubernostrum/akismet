@@ -90,7 +90,7 @@ class Akismet:
         u'referrer', u'permalink', u'comment_type', u'comment_author',
         u'comment_author_email', u'comment_author_url', u'comment_content',
         u'comment_date_gmt', u'comment_post_modified_gmt', u'blog_lang',
-        u'blog_charset', u'user_role', u'is_test'
+        u'blog_charset', u'user_role', u'is_test', u'recheck_reason',
     }
 
     user_agent_header = {
