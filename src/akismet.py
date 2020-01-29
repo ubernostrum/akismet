@@ -5,7 +5,7 @@ import textwrap
 import requests
 
 
-__version__ = "1.1a"
+__version__ = "1.1a1"
 
 
 class AkismetError(Exception):
