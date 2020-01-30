@@ -13,13 +13,13 @@ What versions of Python are supported?
 The |release| release of `akismet` supports the following versions of
 Python:
 
-* Python 2.7
-
 * Python 3.5
 
 * Python 3.6
 
 * Python 3.7
+
+* Python 3.8
 
 Older versions of Python are not supported and will cause errors.
 
@@ -91,8 +91,8 @@ The Akismet web service documentation recommends sending a string
 identifying the application or platform with version, and Akismet
 plugin/implementation name with version. In accordance with this,
 `akismet` sends an HTTP `User-Agent` based on the versions of Python
-and `akismet` in use. For example, `akismet` 1.0 on Python 3.5 will
-send `Python/3.5 | akismet.py/1.0.1`.
+and `akismet` in use. For example, `akismet` 1.1 on Python 3.5 will
+send `Python/3.6 | akismet.py/1.1`.
 
 
 Does `akismet` support the "pro-tip" header?
