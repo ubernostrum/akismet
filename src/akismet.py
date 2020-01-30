@@ -116,9 +116,7 @@ class Akismet:
     }
 
     def __init__(self, key: Optional[str] = None, blog_url: Optional[str] = None):
-        maybe_key: str = key if key is not None else os.getenv(
-            "PYTHON_AKISMET_API_KEY", ""
-        )
+        maybe_key = key if key is not None else os.getenv("PYTHON_AKISMET_API_KEY", "")
         maybe_url = (
             blog_url
             if blog_url is not None

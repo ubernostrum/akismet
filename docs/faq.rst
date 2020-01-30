@@ -13,6 +13,8 @@ What versions of Python are supported?
 The |release| release of `akismet` supports the following versions of
 Python:
 
+* Python 3.5
+
 * Python 3.6
 
 * Python 3.7
