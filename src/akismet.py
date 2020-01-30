@@ -1,6 +1,7 @@
 import os
 import sys
 import textwrap
+from typing import Optional
 
 import requests
 
@@ -92,7 +93,7 @@ class Akismet:
 
     SUBMIT_SUCCESS_RESPONSE = "Thanks for making the web a better place."
 
-    OPTIONAL_KEYS = {
+    OPTIONAL_KEYS = [
         "referrer",
         "permalink",
         "comment_type",
@@ -106,7 +107,7 @@ class Akismet:
         "blog_charset",
         "user_role",
         "is_test",
-    }
+    ]
 
     user_agent_header = {
         "User-Agent": "Python/{} | akismet.py/{}".format(
@@ -114,12 +115,16 @@ class Akismet:
         )
     }
 
-    def __init__(self, key=None, blog_url=None):
-        maybe_key = key if key is not None else os.getenv("PYTHON_AKISMET_API_KEY")
-        maybe_url = (
-            blog_url if blog_url is not None else os.getenv("PYTHON_AKISMET_BLOG_URL")
+    def __init__(self, key: Optional[str] = None, blog_url: Optional[str] = None):
+        maybe_key: str = key if key is not None else os.getenv(
+            "PYTHON_AKISMET_API_KEY", ""
         )
-        if maybe_key in (None, "") or maybe_url in (None, ""):
+        maybe_url = (
+            blog_url
+            if blog_url is not None
+            else os.getenv("PYTHON_AKISMET_BLOG_URL", "")
+        )
+        if maybe_key == "" or maybe_url == "":
             raise ConfigurationError(
                 textwrap.dedent(
                     """
@@ -139,7 +144,9 @@ class Akismet:
         self.api_key = maybe_key
         self.blog_url = maybe_url
 
-    def _api_request(self, endpoint, user_ip, user_agent, **kwargs):
+    def _api_request(
+        self, endpoint: str, user_ip: str, user_agent: str, **kwargs: str
+    ) -> requests.Response:
         """
         Makes a request to the Akismet API.
 
@@ -157,14 +164,19 @@ class Akismet:
                 )
             )
 
-        data = {"blog": self.blog_url, "user_ip": user_ip, "user_agent": user_agent}
+        data = {
+            "blog": self.blog_url,
+            "user_ip": user_ip,
+            "user_agent": user_agent,
+        }
         data.update(kwargs)
-        response = requests.post(
+        return requests.post(
             endpoint.format(self.api_key), data=data, headers=self.user_agent_header
         )
-        return response
 
-    def _submission_request(self, operation, user_ip, user_agent, **kwargs):
+    def _submission_request(
+        self, operation: str, user_ip: str, user_agent: str, **kwargs: str
+    ) -> bool:
         """
         Submits spam or ham to the Akismet API.
 
@@ -176,11 +188,10 @@ class Akismet:
         response = self._api_request(endpoint, user_ip, user_agent, **kwargs)
         if response.text == self.SUBMIT_SUCCESS_RESPONSE:
             return True
-        else:
-            self._protocol_error(operation, response)
+        self._protocol_error(operation, response)
 
     @classmethod
-    def _protocol_error(cls, operation, response):
+    def _protocol_error(cls, operation: str, response: requests.Response) -> None:
         """
         Raises an appropriate exception for unexpected API responses.
 
@@ -200,7 +211,7 @@ class Akismet:
         )
 
     @classmethod
-    def verify_key(cls, key, blog_url):
+    def verify_key(cls, key: str, blog_url: str) -> bool:
         """
         Verifies an Akismet API key and URL.
 
@@ -230,7 +241,7 @@ class Akismet:
         else:
             cls._protocol_error("verify_key", response)
 
-    def comment_check(self, user_ip, user_agent, **kwargs):
+    def comment_check(self, user_ip: str, user_agent: str, **kwargs: str) -> bool:
         """
         Checks a comment to determine whether it is spam.
 
@@ -255,7 +266,7 @@ class Akismet:
         else:
             self._protocol_error("comment_check", response)
 
-    def submit_spam(self, user_ip, user_agent, **kwargs):
+    def submit_spam(self, user_ip: str, user_agent: str, **kwargs: str) -> bool:
         """
         Informs Akismet that a comment is spam.
 
@@ -271,7 +282,7 @@ class Akismet:
         """
         return self._submission_request("submit_spam", user_ip, user_agent, **kwargs)
 
-    def submit_ham(self, user_ip, user_agent, **kwargs):
+    def submit_ham(self, user_ip: str, user_agent: str, **kwargs: str) -> bool:
         """
         Informs Akismet that a comment is not spam.
 
