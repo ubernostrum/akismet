@@ -166,8 +166,8 @@ class Akismet:
             "blog": self.blog_url,
             "user_ip": user_ip,
             "user_agent": user_agent,
+            **kwargs,
         }
-        data.update(kwargs)
         return requests.post(
             endpoint.format(self.api_key), data=data, headers=self.user_agent_header
         )

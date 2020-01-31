@@ -146,11 +146,11 @@ class AkismetAPITests(AkismetTests):
         The comment_check method correctly identifies spam.
 
         """
-        check_kwargs = self.base_kwargs.copy()
-        check_kwargs.update(
+        check_kwargs = {
             # Akismet guarantees this will be classified spam.
-            comment_author="viagra-test-123"
-        )
+            "comment_author": "viagra-test-123",
+            **self.base_kwargs,
+        }
         self.assertTrue(self.api.comment_check(**check_kwargs))
 
     def test_comment_check_not_spam(self):
@@ -158,11 +158,11 @@ class AkismetAPITests(AkismetTests):
         The comment_check method correctly identifies non-spam.
 
         """
-        check_kwargs = self.base_kwargs.copy()
-        check_kwargs.update(
+        check_kwargs = {
             # Akismet guarantees this will not be classified spam.
-            user_role="administrator"
-        )
+            "user_role": "administrator",
+            **self.base_kwargs,
+        }
         self.assertFalse(self.api.comment_check(**check_kwargs))
 
     def test_submit_spam(self):
@@ -170,12 +170,12 @@ class AkismetAPITests(AkismetTests):
         The submit_spam method succeeds.
 
         """
-        spam_kwargs = self.base_kwargs.copy()
-        spam_kwargs.update(
-            comment_type="comment",
-            comment_author="viagra-test-123",
-            comment_content="viagra-test-123",
-        )
+        spam_kwargs = {
+            "comment_type": "comment",
+            "comment_author": "viagra-test-123",
+            "comment_content": "viagra-test-123",
+            **self.base_kwargs,
+        }
         self.assertTrue(self.api.submit_spam(**spam_kwargs))
 
     def test_submit_ham(self):
@@ -183,13 +183,13 @@ class AkismetAPITests(AkismetTests):
         The submit_ham method succeeds.
 
         """
-        ham_kwargs = self.base_kwargs.copy()
-        ham_kwargs.update(
-            comment_type="comment",
-            comment_author="Legitimate Author",
-            comment_content="This is a legitimate comment.",
-            user_role="administrator",
-        )
+        ham_kwargs = {
+            "comment_type": "comment",
+            "comment_author": "Legitimate Author",
+            "comment_content": "This is a legitimate comment.",
+            "user_role": "administrator",
+            **self.base_kwargs,
+        }
         self.assertTrue(self.api.submit_ham(**ham_kwargs))
 
     def test_unexpected_verify_key_response(self):
@@ -210,8 +210,7 @@ class AkismetAPITests(AkismetTests):
         post_mock = mock.MagicMock()
         with mock.patch("requests.post", post_mock):
             with self.assertRaises(akismet.ProtocolError):
-                check_kwargs = self.base_kwargs.copy()
-                check_kwargs.update(comment_author="viagra-test-123")
+                check_kwargs = {"comment_author": "viagra-test-123", **self.base_kwargs}
                 self.api.comment_check(**check_kwargs)
 
     def test_unexpected_submit_spam_response(self):
@@ -222,12 +221,12 @@ class AkismetAPITests(AkismetTests):
         post_mock = mock.MagicMock()
         with mock.patch("requests.post", post_mock):
             with self.assertRaises(akismet.ProtocolError):
-                spam_kwargs = self.base_kwargs.copy()
-                spam_kwargs.update(
-                    comment_type="comment",
-                    comment_author="viagra-test-123",
-                    comment_content="viagra-test-123",
-                )
+                spam_kwargs = {
+                    "comment_type": "comment",
+                    "comment_author": "viagra-test-123",
+                    "comment_content": "viagra-test-123",
+                    **self.base_kwargs,
+                }
                 self.api.submit_spam(**spam_kwargs)
 
     def test_unexpected_submit_ham_response(self):
@@ -238,13 +237,13 @@ class AkismetAPITests(AkismetTests):
         post_mock = mock.MagicMock()
         with mock.patch("requests.post", post_mock):
             with self.assertRaises(akismet.ProtocolError):
-                ham_kwargs = self.base_kwargs.copy()
-                ham_kwargs.update(
-                    comment_type="comment",
-                    comment_author="Legitimate Author",
-                    comment_content="This is a legitimate comment.",
-                    user_role="administrator",
-                )
+                ham_kwargs = {
+                    "comment_type": "comment",
+                    "comment_author": "Legitimate Author",
+                    "comment_content": "This is a legitimate comment.",
+                    "user_role": "administrator",
+                    **self.base_kwargs,
+                }
                 self.api.submit_ham(**ham_kwargs)
 
 
@@ -270,8 +269,7 @@ class AkismetRequestTests(AkismetTests):
 
         """
         method_kwargs.update(user_ip="127.0.0.1", user_agent="Mozilla", is_test=1)
-        expected_kwargs = method_kwargs.copy()
-        expected_kwargs.update(blog=self.blog_url)
+        expected_kwargs = {"blog": self.blog_url, **method_kwargs}
         post_mock = self._get_mock(text)
         with mock.patch("requests.post", post_mock):
             getattr(self.api, method)(**method_kwargs)
