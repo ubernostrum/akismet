@@ -352,6 +352,7 @@ class AkismetRequestTests(AkismetTests):
             "blog_lang": "en_us",
             "blog_charset": "utf-8",
             "user_role": "administrator",
+            "recheck_reason": "edit",
         }
         self._mock_request(
             "comment_check", akismet.Akismet.COMMENT_CHECK_URL, "false", full_kwargs

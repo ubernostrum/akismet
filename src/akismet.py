@@ -105,6 +105,7 @@ class Akismet:
         "comment_type",
         "is_test",
         "permalink",
+        "recheck_reason",
         "referrer",
         "user_role",
     ]
