@@ -94,19 +94,19 @@ class Akismet:
     SUBMIT_SUCCESS_RESPONSE = "Thanks for making the web a better place."
 
     OPTIONAL_KEYS = [
-        "referrer",
-        "permalink",
-        "comment_type",
+        "blog_charset",
+        "blog_lang",
         "comment_author",
         "comment_author_email",
         "comment_author_url",
         "comment_content",
         "comment_date_gmt",
         "comment_post_modified_gmt",
-        "blog_lang",
-        "blog_charset",
-        "user_role",
+        "comment_type",
         "is_test",
+        "permalink",
+        "referrer",
+        "user_role",
     ]
 
     user_agent_header = {
