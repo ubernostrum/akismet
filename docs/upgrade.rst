@@ -3,6 +3,27 @@
 Upgrading from previous versions
 ================================
 
+Changes within the 1.x release series
+-------------------------------------
+
+Version 1.1
+~~~~~~~~~~~
+
+* `akismet` tracks versions of Python supported upstream by the Python
+  core team. Since `akismet` 1.1 was released after the Python core
+  team dropped support for Python 2, `akismet` 1.1 and later do not
+  support Python 2. The new minimum Python version supported by
+  `akismet` is 3.5.
+
+* Support was added for the optional key `recheck_reason`, used when a
+  comment or other content is being submitted a second or later time,
+  and indicating the reason (such as `"edit"` when resubmitting a
+  comment after the user edited it).
+
+
+Changes from older releases to the 1.x release series
+-----------------------------------------------------
+
 Prior to the 1.0 release, the last release of `akismet` was in
 2009. If you were still using that release (0.2.0), there are some
 changes you'll need to be aware of when upgrading to 1.0 or later.
