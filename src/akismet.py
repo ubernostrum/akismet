@@ -6,7 +6,7 @@ from typing import Optional
 import requests
 
 
-__version__ = "1.1a1"
+__version__ = "1.1"
 
 
 class AkismetError(Exception):
