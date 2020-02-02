@@ -1,7 +1,7 @@
 akismet |release|
 =================
 
-`akismet` is a Python library wrapping `the Wordpress Akismet
+`akismet` is a Python (3.5+) library wrapping `the Wordpress Akismet
 spam-filtering service <https://akismet.com/>`_. All methods of the
 Akismet API are supported:
 

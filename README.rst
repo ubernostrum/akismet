@@ -3,7 +3,7 @@
 .. image:: https://travis-ci.org/ubernostrum/akismet.svg?branch=master
     :target: https://travis-ci.org/ubernostrum/akismet
 
-``akismet`` is a Python library wrapping `the Wordpress Akismet
+``akismet`` is a Python (3.5+) library wrapping `the Wordpress Akismet
 spam-detection service <https://akismet.com/>`_. All methods of the
 Akismet API are supported:
 
