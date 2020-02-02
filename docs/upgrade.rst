@@ -15,10 +15,11 @@ Version 1.1
   support Python 2. The new minimum Python version supported by
   `akismet` is 3.5.
 
-* Support was added for the optional key `recheck_reason`, used when a
-  comment or other content is being submitted a second or later time,
-  and indicating the reason (such as `"edit"` when resubmitting a
-  comment after the user edited it).
+* Support was added for the :ref:`optional argument
+  <optional-arguments>` `recheck_reason`, used when a comment or other
+  content is being submitted a second or later time, and indicating
+  the reason (such as `"edit"` when resubmitting a comment after the
+  user edited it).
 
 
 Changes from older releases to the 1.x release series
