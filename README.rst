@@ -2,6 +2,7 @@
 
 .. image:: https://github.com/ubernostrum/akismet/workflows/CI/badge.svg
    :alt: CI status image
+   :target: https://github.com/ubernostrum/akismet/actions?query=workflow%3ACI
 
 ``akismet`` is a Python (3.5+) library wrapping `the Wordpress Akismet
 spam-detection service <https://akismet.com/>`_. All methods of the
