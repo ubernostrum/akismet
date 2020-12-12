@@ -5,7 +5,6 @@ from typing import Optional
 
 import requests
 
-
 __version__ = "1.1"
 
 

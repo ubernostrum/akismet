@@ -14,7 +14,6 @@ version = "1.1"
 release = "1.1"
 exclude_trees = ["_build"]
 pygments_style = "sphinx"
-html_static_path = ["_static"]
 htmlhelp_basename = "akismetdoc"
 latex_documents = [
     (

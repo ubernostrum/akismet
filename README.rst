@@ -1,7 +1,7 @@
 .. -*-restructuredtext-*-
 
-.. image:: https://travis-ci.org/ubernostrum/akismet.svg?branch=master
-    :target: https://travis-ci.org/ubernostrum/akismet
+.. image:: https://github.com/ubernostrum/akismet/workflows/CI/badge.svg
+   :alt: CI status image
 
 ``akismet`` is a Python (3.5+) library wrapping `the Wordpress Akismet
 spam-detection service <https://akismet.com/>`_. All methods of the
