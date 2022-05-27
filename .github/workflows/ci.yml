@@ -2,6 +2,10 @@ name: CI
 
 on: [push]
 
+env:
+  TEST_AKISMET_API_KEY: ${{ secrets.TEST_AKISMET_API_KEY }}
+  TEST_AKISMET_BLOG_URL: ${{ secrets.TEST_AKISMET_BLOG_URL }}
+
 jobs:
   tests:
     name: tox on ${{ matrix.python-version }}
@@ -18,9 +22,6 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - name: "Install dependencies"
-        env:
-          TEST_AKISMET_API_KEY: ${{ secrets.TEST_AKISMET_API_KEY }}
-          TEST_AKISMET_BLOG_URL: ${{ secrets.TEST_AKISMET_BLOG_URL }}
         run: |
           python -VV
           python -m pip install --upgrade pip setuptools wheel
