@@ -1,7 +1,6 @@
 import os
 import sys
 
-
 on_rtd = os.environ.get("READTHEDOCS", None) == "True"
 
 extensions = ["sphinx.ext.intersphinx"]
@@ -9,9 +8,9 @@ templates_path = ["_templates"]
 source_suffix = ".rst"
 master_doc = "index"
 project = "akismet"
-copyright = "2005-2020, Michael Foord and James Bennett"
-version = "1.1"
-release = "1.1"
+copyright = "2005-2022, Michael Foord and James Bennett"
+version = "1.2"
+release = "1.2"
 exclude_trees = ["_build"]
 pygments_style = "sphinx"
 htmlhelp_basename = "akismetdoc"

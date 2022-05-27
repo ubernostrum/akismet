@@ -6,6 +6,12 @@ Upgrading from previous versions
 Changes within the 1.x release series
 -------------------------------------
 
+Version 1.2
+-----------
+
+* The supported Python versions are now 3.7, 3.8, 3.9, and
+  3.10. Support for earlier Python 3 versions is dropped.
+
 Version 1.1
 ~~~~~~~~~~~
 

@@ -13,13 +13,13 @@ What versions of Python are supported?
 The |release| release of `akismet` supports the following versions of
 Python:
 
-* Python 3.5
-
-* Python 3.6
-
 * Python 3.7
 
 * Python 3.8
+
+* Python 3.9
+
+* Python 3.10
 
 Older versions of Python are not supported and will cause errors.
 
