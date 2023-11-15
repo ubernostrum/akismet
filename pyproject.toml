@@ -47,7 +47,7 @@ docs = [
   "sphinxext-opengraph",
 ]
 tests = [
-  "coverage",
+  "coverage[toml]",
 ]
 
 [tool.bandit]
