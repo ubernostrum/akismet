@@ -1,0 +1,75 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+authors = [
+  {name = "James Bennett", email = "james@b-list.org"},
+  {name = "Michael Foord"},
+]
+classifiers = [
+  "Development Status :: 5 - Production/Stable",
+  "Environment :: Web Environment",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: BSD License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Utilities",
+]
+name = "akismet"
+description = "A Python interface to the Akismet spam-filtering API."
+dependencies = [
+  "httpx",
+]
+dynamic = ["version"]
+keywords = ["spam"]
+license = {text = "BSD-3-Clause"}
+readme = "README.rst"
+requires-python = ">=3.8"
+
+[project.urls]
+documentation = "https://akismet.readthedocs.io"
+homepage = "https://github.com/ubernostrum/akismet"
+
+[project.optional-dependencies]
+docs = [
+  "furo",
+  "sphinx",
+  "sphinx-copybutton",
+  "sphinx-inline-tabs",
+  "sphinx-notfound-page",
+  "sphinxext-opengraph",
+]
+tests = [
+  "coverage",
+]
+
+[tool.bandit]
+skips = ["B101"]
+
+[tool.black]
+target-version = ["py38"]
+
+[tool.coverage.report]
+fail_under = 100
+
+[tool.interrogate]
+ignore-init-module = true
+
+[tool.isort]
+profile = "black"
+
+[tool.pylint]
+disable = [
+  "duplicate-code",
+  "protected-access",
+]
+
+[tool.setuptools.dynamic]
+version = {attr = "akismet._version.LIBRARY_VERSION"}

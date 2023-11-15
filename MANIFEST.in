@@ -1,6 +1,13 @@
 include LICENSE
 include MANIFEST.in
-include README.rst
+include .editorconfig
+include *.yaml
+include docs/*.rst docs/*.txt docs/*.py docs/*.bat docs/Makefile
+include .flake8
+include pyproject.toml
+include noxfile.py
 include tox.ini
-recursive-include docs *
+graft src
 graft tests
+global-exclude *.pyc
+prune docs/_build

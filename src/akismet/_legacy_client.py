@@ -1,93 +1,52 @@
+"""
+Legacy/deprecated Akismet client.
+
+"""
+# SPDX-License-Identifier: BSD-3-Clause
+
 import os
-import sys
 import textwrap
+import warnings
 from typing import Optional
 
-import requests
+import httpx
 
-__version__ = "1.1"
-
-
-class AkismetError(Exception):
-    """
-    Base exception class for Akismet errors.
-
-    """
-
-    pass
-
-
-class UnknownArgumentError(AkismetError):
-    """
-    Indicates an unknown argument was used as part of an API request.
-
-    """
-
-    pass
-
-
-class ProtocolError(AkismetError):
-    """
-    Indicates an unexpected or non-standard response was received from
-    Akismet.
-
-    """
-
-    pass
-
-
-class ConfigurationError(AkismetError):
-
-    """
-    Indicates an Akismet configuration error (config missing or invalid).
-
-    """
-
-    pass
-
-
-class APIKeyError(ConfigurationError):
-    """
-    Indicates the supplied Akismet API key/URL are invalid.
-
-    """
-
-    pass
+from . import _common, _exceptions
 
 
 class Akismet:
     """
-    A Python wrapper for the Akismet web API.
+    Legacy class-based Akismet client.
 
-    Two configuration parameters -- your Akismet API key and
-    registered URL -- are required; they can be passed when
-    instantiating, or set in the environment variables
-    PYTHON_AKISMET_API_KEY and PYTHON_AKISMET_BLOG_URL.
+    This class is deprecated.
 
-    All the operations of the Akismet API are exposed here:
+    Two configuration parameters -- your Akismet API key and registered URL -- are
+    required; they can be passed when instantiating, or set in the environment variables
+    ``PYTHON_AKISMET_API_KEY`` and ``PYTHON_AKISMET_BLOG_URL``.
 
-    * verify_key
+    The following operations of the Akismet API are exposed here:
 
-    * comment_check
+    * :meth:`verify_key`
 
-    * submit_spam
+    * :meth:`comment_check`
 
-    * submit_ham
+    * :meth:`submit_spam`
+
+    * :meth:`submit_ham`
 
     For full details of the Akismet API, see the Akismet documentation:
 
     https://akismet.com/development/api/#detailed-docs
 
-    The verify_key operation will be automatically called for you as
-    this class is instantiated; ConfigurationError will be raised if
-    the configuration cannot be found or if the supplied key/URL are
-    invalid.
+    The verify_key operation will be automatically called for you as this class is
+    instantiated; :exc:`~akismet.ConfigurationError` will be raised if the configuration
+    cannot be found or if the supplied key/URL are invalid.
 
     """
 
-    COMMENT_CHECK_URL = "https://{}.rest.akismet.com/1.1/comment-check"
-    SUBMIT_HAM_URL = "https://{}.rest.akismet.com/1.1/submit-ham"
-    SUBMIT_SPAM_URL = "https://{}.rest.akismet.com/1.1/submit-spam"
+    COMMENT_CHECK_URL = "https://rest.akismet.com/1.1/comment-check"
+    SUBMIT_HAM_URL = "https://rest.akismet.com/1.1/submit-ham"
+    SUBMIT_SPAM_URL = "https://rest.akismet.com/1.1/submit-spam"
     VERIFY_KEY_URL = "https://rest.akismet.com/1.1/verify-key"
 
     SUBMIT_SUCCESS_RESPONSE = "Thanks for making the web a better place."
@@ -109,44 +68,52 @@ class Akismet:
         "user_role",
     ]
 
-    user_agent_header = {
-        "User-Agent": "Python/{} | akismet.py/{}".format(
-            "{}.{}".format(*sys.version_info[:2]), __version__
-        )
-    }
+    user_agent_header = {"User-Agent": _common.USER_AGENT}
 
-    def __init__(self, key: Optional[str] = None, blog_url: Optional[str] = None):
-        maybe_key = key if key is not None else os.getenv("PYTHON_AKISMET_API_KEY", "")
+    def __init__(
+        self,
+        key: Optional[str] = None,
+        blog_url: Optional[str] = None,
+        client: Optional[httpx.Client] = None,
+    ):
+        warnings.warn(
+            textwrap.dedent(
+                """
+            The akismet.Akismet API client is deprecated and will be removed in version
+            2.0. Please migrate to either akismet.SyncClient or akismet.AsyncClient.
+                """,
+            ),
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        maybe_key = key if key is not None else os.getenv(_common._KEY_ENV_VAR, "")
         maybe_url = (
-            blog_url
-            if blog_url is not None
-            else os.getenv("PYTHON_AKISMET_BLOG_URL", "")
+            blog_url if blog_url is not None else os.getenv(_common._URL_ENV_VAR, "")
         )
         if maybe_key == "" or maybe_url == "":
-            raise ConfigurationError(
+            raise _exceptions.ConfigurationError(
                 textwrap.dedent(
-                    """
+                    f"""
                 Could not find full Akismet configuration.
 
-                Found API key: {}
-                Found blog URL: {}
-                """.format(
-                        maybe_key, maybe_url
-                    )
+                Found API key: {maybe_key}
+                Found blog URL: {maybe_url}
+                """
                 )
             )
-        if not self.verify_key(maybe_key, maybe_url):
-            raise APIKeyError(
-                "Akismet key ({}, {}) is invalid.".format(maybe_key, maybe_url)
+        self.client = client or _common._get_sync_http_client()
+        if not self.verify_key(maybe_key, maybe_url, self.client):
+            raise _exceptions.APIKeyError(
+                f"Akismet key ({maybe_key}, {maybe_url}) is invalid."
             )
         self.api_key = maybe_key
         self.blog_url = maybe_url
 
     def _api_request(
         self, endpoint: str, user_ip: str, user_agent: str, **kwargs: str
-    ) -> requests.Response:
+    ) -> httpx.Response:
         """
-        Makes a request to the Akismet API.
+        Make a request to the Akismet API.
 
         This method is used for all API calls except key verification,
         since all endpoints other than key verification must
@@ -156,27 +123,24 @@ class Akismet:
         """
         unknown_args = [k for k in kwargs if k not in self.OPTIONAL_KEYS]
         if unknown_args:
-            raise UnknownArgumentError(
-                "Unknown arguments while making request: {}.".format(
-                    ", ".join(unknown_args)
-                )
+            raise _exceptions.UnknownArgumentError(
+                "Unknown arguments while making request: {', '.join(unknown_args)}."
             )
 
         data = {
+            "api_key": self.api_key,
             "blog": self.blog_url,
             "user_ip": user_ip,
             "user_agent": user_agent,
             **kwargs,
         }
-        return requests.post(
-            endpoint.format(self.api_key), data=data, headers=self.user_agent_header
-        )
+        return self.client.post(endpoint, data=data)
 
-    def _submission_request(
+    def _submission_request(  # pylint: disable=inconsistent-return-statements
         self, operation: str, user_ip: str, user_agent: str, **kwargs: str
     ) -> bool:
         """
-        Submits spam or ham to the Akismet API.
+        Submit spam or ham to the Akismet API.
 
         """
         endpoint = {
@@ -189,66 +153,68 @@ class Akismet:
         self._protocol_error(operation, response)
 
     @classmethod
-    def _protocol_error(cls, operation: str, response: requests.Response) -> None:
+    def _protocol_error(cls, operation: str, response: httpx.Response) -> None:
         """
-        Raises an appropriate exception for unexpected API responses.
+        Raise an appropriate exception for unexpected API responses.
 
         """
-        raise ProtocolError(
+        raise _exceptions.ProtocolError(
             textwrap.dedent(
-                """
+                f"""
             Received unexpected or non-standard response from Akismet API.
 
-            API operation was: {}
-            API response received was: {}
-            Debug header value was: {}
+            API operation was: {operation}
+            API response received was: {response.text}
+            Debug header value was: {response.headers.get('X-akismet-debug-help')}
             """
-            ).format(
-                operation, response.text, response.headers.get("X-akismet-debug-help")
             )
         )
 
     @classmethod
-    def verify_key(cls, key: str, blog_url: str) -> bool:
+    def verify_key(  # pylint: disable=inconsistent-return-statements
+        cls, key: str, blog_url: str, client: Optional[httpx.Client] = None
+    ) -> bool:
         """
-        Verifies an Akismet API key and URL.
+        Verify an Akismet API key and URL.
 
-        Returns True if the key and URL are valid, False otherwise.
+        Returns :data:`True` if the key and URL are valid, :data:`False` otherwise.
 
         """
         if not blog_url.startswith(("http://", "https://")):
-            raise ConfigurationError(
+            raise _exceptions.ConfigurationError(
                 textwrap.dedent(
-                    """
-                Invalid site URL specified: {}
+                    f"""
+                Invalid site URL specified: {blog_url}
 
                 Akismet requires the full URL including the leading
                 'http://' or 'https://'.
                 """
-                ).format(blog_url)
+                )
             )
-        response = requests.post(
+        if client is None:
+            client = _common._get_sync_http_client()
+        response = client.post(
             cls.VERIFY_KEY_URL,
             data={"key": key, "blog": blog_url},
-            headers=cls.user_agent_header,
         )
         if response.text == "valid":
             return True
-        elif response.text == "invalid":
+        if response.text == "invalid":
             return False
-        else:
-            cls._protocol_error("verify_key", response)
+        cls._protocol_error("verify_key", response)
 
-    def comment_check(self, user_ip: str, user_agent: str, **kwargs: str) -> bool:
+    def comment_check(  # pylint: disable=inconsistent-return-statements
+        self, user_ip: str, user_agent: str, **kwargs: str
+    ) -> bool:
         """
-        Checks a comment to determine whether it is spam.
+        Check a comment to determine whether it is spam.
 
         The IP address and user-agent string of the remote user are
         required. All other arguments documented by Akismet (other
         than the PHP server information) are also optionally accepted.
         See the Akismet API documentation for a full list:
 
-        https://akismet.com/development/api/#comment-check
+        https://akismet.com/developers/comment-check/
 
         Like the Akismet web API, returns True for a comment that is
         spam, and False for a comment that is not spam.
@@ -259,21 +225,20 @@ class Akismet:
         )
         if response.text == "true":
             return True
-        elif response.text == "false":
+        if response.text == "false":
             return False
-        else:
-            self._protocol_error("comment_check", response)
+        self._protocol_error("comment_check", response)
 
     def submit_spam(self, user_ip: str, user_agent: str, **kwargs: str) -> bool:
         """
-        Informs Akismet that a comment is spam.
+        Inform Akismet that a comment is spam.
 
         The IP address and user-agent string of the remote user are
         required. All other arguments documented by Akismet (other
         than the PHP server information) are also optionally accepted.
         See the Akismet API documentation for a full list:
 
-        https://akismet.com/development/api/#submit-spam
+        https://akismet.com/developers/submit-spam-missed-spam/
 
         Returns True on success (the only expected response).
 
@@ -282,14 +247,14 @@ class Akismet:
 
     def submit_ham(self, user_ip: str, user_agent: str, **kwargs: str) -> bool:
         """
-        Informs Akismet that a comment is not spam.
+        Inform Akismet that a comment is not spam.
 
         The IP address and user-agent string of the remote user are
         required. All other arguments documented by Akismet (other
         than the PHP server information) are also optionally accepted.
         See the Akismet API documentation for a full list:
 
-        https://akismet.com/development/api/#submit-ham
+        https://akismet.com/developers/submit-ham-false-positives/
 
         Returns True on success (the only expected response).
 

@@ -1,8 +1,5 @@
-akismet |release|
-=================
-
-This is a Python interface to `the Akismet spam-filtering service
-<https://akismet.com>`_.
+"""
+A Python interface to `the Akismet spam-filtering service <https://akismet.com>`_.
 
 Two API clients are available from this library:
 
@@ -55,32 +52,46 @@ Or using the asynchronous client:
    ):
        # This piece of content was classified as spam; handle it appropriately.
 
-Note that in both cases the client instance is created via the alternate
-constructor ``client()``. Instances of the clients generally should not be
-constructed manually (i.e., via directly calling ``akismet.SyncClient()`` or
-``akismet.AsyncClient()``); the ``client()`` constructor will perform automatic
-discovery of the environment-variable configuration and validate the
-configuration with the Akismet web service before returning the client, while
-directly constructing an instance will not (and if you do directly construct an
-instance, you must manually provide and validate its configuration).
+Note that in both cases the client instance is created via the alternate constructor
+``client()``. Instances of the clients generally should not be constructed manually
+(i.e., via directly calling ``akismet.SyncClient()`` or ``akismet.AsyncClient()``); the
+``client()`` constructor will perform automatic discovery of the environment-variable
+configuration and validate the configuration with the Akismet web service before
+returning the client, while directly constructing an instance will not (and if you do
+directly construct an instance, you must manually provide and validate its
+configuration).
 
+"""
+# SPDX-License-Identifier: BSD-3-Clause
 
-Documentation contents
-----------------------
+from ._async_client import AsyncClient
+from ._common import USER_AGENT, CheckResponse, Config
+from ._exceptions import (
+    AkismetError,
+    APIKeyError,
+    ConfigurationError,
+    ProtocolError,
+    RequestError,
+    UnknownArgumentError,
+)
+from ._legacy_client import Akismet
+from ._sync_client import SyncClient
+from ._version import LIBRARY_VERSION
 
-.. toctree::
-   :maxdepth: 1
+__version__ = LIBRARY_VERSION
 
-   install
-   sync_client
-   async_client
-   exceptions
-   misc
-   upgrade
-   faq
-
-.. seealso::
-
-   `The developer documentation for the Akismet web service
-   <https://akismet.com/developers/>`_ is useful for familiarizing yourself
-   with the available API operations and features.
+__all__ = [
+    "APIKeyError",
+    "Akismet",
+    "AkismetError",
+    "AsyncClient",
+    "CheckResponse",
+    "Config",
+    "ConfigurationError",
+    "ProtocolError",
+    "RequestError",
+    "SyncClient",
+    "UnknownArgumentError",
+    "USER_AGENT",
+    "__version__",
+]

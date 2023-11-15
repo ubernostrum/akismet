@@ -1,10 +1,16 @@
 Akismet
+CSV
+async
 blog
+bugfixes
+config
+docstrings
 instantiation
 online
 plugin
 signup
 signups
 spam
+truthy
 username
 virtualenvs
