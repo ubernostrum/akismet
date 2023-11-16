@@ -145,7 +145,9 @@ class LegacyAkismetConfigurationTests(base.AkismetTests):
                 http_client=self.custom_response_sync_client(config_valid=False),
             )
         with self.assertRaises(akismet.ConfigurationError):
-            akismet.Akismet(self.custom_response_sync_client(config_valid=False))
+            akismet.Akismet(
+                http_client=self.custom_response_sync_client(config_valid=False)
+            )
 
     def test_user_agent(self):
         """

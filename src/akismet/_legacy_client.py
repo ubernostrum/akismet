@@ -102,7 +102,7 @@ class Akismet:
                 )
             )
         self.http_client = http_client or _common._get_sync_http_client()
-        if not self.verify_key(maybe_key, maybe_url, self.http_client):
+        if not self.verify_key(maybe_key, maybe_url, http_client=self.http_client):
             raise _exceptions.APIKeyError(
                 f"Akismet key ({maybe_key}, {maybe_url}) is invalid."
             )
