@@ -87,12 +87,12 @@ class SyncClient:
            (does not begin with ``http://`` or ``https://``).
 
         """
-        # Technically, the validation of the config could be performed in
+        # Technically, the discovery and validation of the config could be performed in
         # __init__(). However, we want to ensure parity between this class' API and the
         # async client's API, and the async client would not be able to perform config
-        # validation in __init__() -- the async client would need to call an async HTTP
+        # validation in __init__(): the async client would need to call an async HTTP
         # request method, which would require the client's __init__() to become async,
-        # and Python does not currently allow __init__() to be (usefully) async. But a
+        # and Python does not currently allow __init__() to be usefully async. But a
         # classmethod *can* be async, so we define and encourage the use of an alternate
         # constructor in order to achieve API consistency.
         config = _common._try_discover_config()

@@ -91,13 +91,13 @@ class AsyncClient:
            (does not begin with ``http://`` or ``https://``).
 
         """
-        # While the synchronous version of the client could perform the config
-        # validation in __init__(), here we cannot because this client's verify_key()
-        # method is async, and its underlying HTTP client is async. So calling into them
-        # would rquire making __init__ into an async method, and Python does not
-        # currently allow __init__() to be usefully async. But a classmethod *can* be
-        # async, so we define and encourage the use of an alternative constructor in
-        # order to achieve API consistency.
+        # While the synchronous version of the client could perform the config discovery
+        # and validation in __init__(), here we cannot because this client's
+        # verify_key() method is async, and its underlying HTTP client is async. So
+        # calling into them would require making __init__ into an async method, and
+        # Python does not currently allow __init__() to be usefully async. But a
+        # classmethod *can* be async, so we define and encourage the use of an
+        # alternative constructor in order to achieve API consistency.
         config = _common._try_discover_config()
         instance = cls(config=config, http_client=http_client)
         if not await instance.verify_key(config.key, config.url):
