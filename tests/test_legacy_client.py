@@ -34,7 +34,7 @@ class LegacyAkismetConfigurationTests(base.AkismetTests):
         api = akismet.Akismet(
             key=self.api_key,
             blog_url=self.site_url,
-            client=self.custom_response_sync_client(),
+            http_client=self.custom_response_sync_client(),
         )
         self.assertEqual(self.api_key, api.api_key)
         self.assertEqual(self.site_url, api.blog_url)
@@ -48,7 +48,7 @@ class LegacyAkismetConfigurationTests(base.AkismetTests):
             akismet.Akismet(
                 key="invalid",
                 blog_url="http://invalid",
-                client=self.custom_response_sync_client(config_valid=False),
+                http_client=self.custom_response_sync_client(config_valid=False),
             )
 
     def test_config_from_env(self):
@@ -59,12 +59,12 @@ class LegacyAkismetConfigurationTests(base.AkismetTests):
         api = akismet.Akismet(
             key=None,
             blog_url=None,
-            client=self.custom_response_sync_client(),
+            http_client=self.custom_response_sync_client(),
         )
         self.assertEqual(self.api_key, api.api_key)
         self.assertEqual(self.site_url, api.blog_url)
 
-        api = akismet.Akismet(client=self.custom_response_sync_client())
+        api = akismet.Akismet(http_client=self.custom_response_sync_client())
         self.assertEqual(self.api_key, api.api_key)
         self.assertEqual(self.site_url, api.blog_url)
 
@@ -78,7 +78,7 @@ class LegacyAkismetConfigurationTests(base.AkismetTests):
             os.environ[_common._URL_ENV_VAR] = "http://invalid"
             with self.assertRaises(akismet.APIKeyError):
                 akismet.Akismet(
-                    client=self.custom_response_sync_client(config_valid=False)
+                    http_client=self.custom_response_sync_client(config_valid=False)
                 )
         finally:
             os.environ[_common._KEY_ENV_VAR] = self.api_key
@@ -93,7 +93,7 @@ class LegacyAkismetConfigurationTests(base.AkismetTests):
             del os.environ[_common._KEY_ENV_VAR]
             with self.assertRaises(akismet.ConfigurationError):
                 akismet.Akismet(
-                    client=self.custom_response_sync_client(config_valid=False)
+                    http_client=self.custom_response_sync_client(config_valid=False)
                 )
         finally:
             os.environ[_common._KEY_ENV_VAR] = self.api_key
@@ -108,7 +108,7 @@ class LegacyAkismetConfigurationTests(base.AkismetTests):
             del os.environ[_common._URL_ENV_VAR]
             with self.assertRaises(akismet.ConfigurationError):
                 akismet.Akismet(
-                    client=self.custom_response_sync_client(config_valid=False)
+                    http_client=self.custom_response_sync_client(config_valid=False)
                 )
         finally:
             os.environ[_common._URL_ENV_VAR] = self.site_url
@@ -130,7 +130,7 @@ class LegacyAkismetConfigurationTests(base.AkismetTests):
                 akismet.Akismet(
                     key=self.api_key,
                     blog_url=url,
-                    client=self.custom_response_sync_client(config_valid=False),
+                    http_client=self.custom_response_sync_client(config_valid=False),
                 )
 
     def test_missing_config(self):
@@ -142,7 +142,7 @@ class LegacyAkismetConfigurationTests(base.AkismetTests):
             akismet.Akismet(
                 key=None,
                 blog_url=None,
-                client=self.custom_response_sync_client(config_valid=False),
+                http_client=self.custom_response_sync_client(config_valid=False),
             )
         with self.assertRaises(akismet.ConfigurationError):
             akismet.Akismet(self.custom_response_sync_client(config_valid=False))
@@ -155,7 +155,7 @@ class LegacyAkismetConfigurationTests(base.AkismetTests):
         api = akismet.Akismet(
             key=self.api_key,
             blog_url=self.site_url,
-            client=self.custom_response_sync_client(),
+            http_client=self.custom_response_sync_client(),
         )
         self.assertEqual(api.user_agent_header["User-Agent"], _common.USER_AGENT)
 
@@ -176,24 +176,24 @@ class LegacyAkismetAPITests(base.AkismetTests):
         The verify_key operation succeeds with a valid key and URL.
 
         """
-        api = akismet.Akismet(
-            client=self.custom_response_sync_client(),
+        self.assertTrue(
+            akismet.Akismet.verify_key(
+                self.api_key,
+                self.site_url,
+                http_client=self.custom_response_sync_client(),
+            )
         )
-        self.assertTrue(api.verify_key(self.api_key, self.site_url))
 
     def test_verify_key_invalid(self):
         """
         The verify_key operation fails with an invalid key and URL.
 
         """
-        api = akismet.Akismet(
-            client=self.custom_response_sync_client(),
-        )
         self.assertFalse(
-            api.verify_key(
+            akismet.Akismet.verify_key(
                 "invalid",
                 "http://invalid",
-                client=self.custom_response_sync_client(config_valid=False),
+                http_client=self.custom_response_sync_client(config_valid=False),
             )
         )
 
@@ -208,7 +208,7 @@ class LegacyAkismetAPITests(base.AkismetTests):
             **self.base_kwargs,
         }
         api = akismet.Akismet(
-            client=self.custom_response_sync_client(response_text="true"),
+            http_client=self.custom_response_sync_client(response_text="true"),
         )
         self.assertTrue(api.comment_check(**check_kwargs))
 
@@ -223,7 +223,7 @@ class LegacyAkismetAPITests(base.AkismetTests):
             **self.base_kwargs,
         }
         api = akismet.Akismet(
-            client=self.custom_response_sync_client(response_text="false"),
+            http_client=self.custom_response_sync_client(response_text="false"),
         )
         self.assertFalse(api.comment_check(**check_kwargs))
 
@@ -239,7 +239,7 @@ class LegacyAkismetAPITests(base.AkismetTests):
             **self.base_kwargs,
         }
         api = akismet.Akismet(
-            client=self.custom_response_sync_client(
+            http_client=self.custom_response_sync_client(
                 response_text=_common._SUBMISSION_RESPONSE
             ),
         )
@@ -258,7 +258,7 @@ class LegacyAkismetAPITests(base.AkismetTests):
             **self.base_kwargs,
         }
         api = akismet.Akismet(
-            client=self.custom_response_sync_client(
+            http_client=self.custom_response_sync_client(
                 response_text=_common._SUBMISSION_RESPONSE
             ),
         )
@@ -280,13 +280,13 @@ class LegacyAkismetAPITests(base.AkismetTests):
             return httpx.Response(status_code=HTTPStatus.OK, content="bad")
 
         api = akismet.Akismet(
-            client=self.custom_response_sync_client(),
+            http_client=self.custom_response_sync_client(),
         )
         with self.assertRaises(akismet.ProtocolError):
             api.verify_key(
                 self.api_key,
                 self.site_url,
-                client=httpx.Client(transport=httpx.MockTransport(_handler)),
+                http_client=httpx.Client(transport=httpx.MockTransport(_handler)),
             )
 
     def test_unexpected_comment_check_response(self):
@@ -295,7 +295,7 @@ class LegacyAkismetAPITests(base.AkismetTests):
 
         """
         api = akismet.Akismet(
-            client=self.custom_response_sync_client(response_text="bad"),
+            http_client=self.custom_response_sync_client(response_text="bad"),
         )
         with self.assertRaises(akismet.ProtocolError):
             check_kwargs = {"comment_author": "viagra-test-123", **self.base_kwargs}
@@ -307,7 +307,7 @@ class LegacyAkismetAPITests(base.AkismetTests):
 
         """
         api = akismet.Akismet(
-            client=self.custom_response_sync_client(response_text="bad"),
+            http_client=self.custom_response_sync_client(response_text="bad"),
         )
         with self.assertRaises(akismet.ProtocolError):
             spam_kwargs = {
@@ -324,7 +324,7 @@ class LegacyAkismetAPITests(base.AkismetTests):
 
         """
         api = akismet.Akismet(
-            client=self.custom_response_sync_client(response_text="bad"),
+            http_client=self.custom_response_sync_client(response_text="bad"),
         )
         with self.assertRaises(akismet.ProtocolError):
             ham_kwargs = {
@@ -343,7 +343,7 @@ class LegacyAkismetAPITests(base.AkismetTests):
         """
         bad_kwargs = {"bad_arg": "bad_val", **self.base_kwargs}
         api = akismet.Akismet(
-            client=self.custom_response_sync_client(),
+            http_client=self.custom_response_sync_client(),
         )
         with self.assertRaises(akismet.UnknownArgumentError):
             api.comment_check(**bad_kwargs)

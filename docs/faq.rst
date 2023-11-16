@@ -46,6 +46,44 @@ including comments, contact-form submissions, user signups and more. See
 <https://akismet.com/developers/comment-check/>`_ for details.
 
 
+.. _alt-constructor:
+
+Why do I need to use this alternate constructor?
+------------------------------------------------
+
+Both of the API clients provide a ``classmethod`` which serves as an alternate
+constructor: :meth:`akismet.SyncClient.client` and
+:meth:`akismet.AsyncClient.client`, and you're strongly encouraged to use the
+alternate constructor when you need an instance of one of the clients.
+
+The short explanation for this is that the ``client()`` constructor will
+automatically read your Akismet API key and site URL from environment variables
+(``PYTHON_AKISMET_API_KEY`` and ``PYTHON_AKISMET_BLOG_URL``) and validate them
+via the ``verify_key`` operation before returning the API client instance to
+you, and this is highly useful behavior.
+
+If you don't use the ``client()`` constructor, you'll need to construct your
+own :class:`~akismet.Config` to pass in to the default constructor, and you'll
+want to ensure you call the verify-key operation to validate that
+configuration.
+
+The longer explanation is that the ``client()`` constructor allows both the
+sync and async clients to provide the same overall
+interface. :class:`~akismet.SyncClient` could easily just read the
+configuration and do the validation in its own ``__init__()`` method. But
+:class:`~akismet.AsyncClient` cannot do this, because its
+:meth:`~akismet.AsyncClient.verify_key` method is asynchronous; calling it in
+``__init__()`` would require making the ``__init__()`` method asynchronous too,
+and an async ``__init__()`` is not currently supported by Python.
+
+This limitation does not apply to classmethods used as alternate constructors,
+so to provide a useful constructor that does automatic discovery and validation
+of your Akismet configuration, :class:`~akismet.AsyncClient` defines the
+alternate constructor :meth:`~akismet.AsyncClient.client`. And to ensure both
+client classes have the same interface, :class:`~akismet.SyncClient` also
+provides a :meth:`~akismet.SyncClient.client` constructor.
+
+
 How can I test that it's working?
 ---------------------------------
 

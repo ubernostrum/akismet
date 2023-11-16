@@ -34,15 +34,18 @@ class SyncClient:
     variables ``PYTHON_AKISMET_API_KEY`` and ``PYTHON_AKISMET_BLOG_URL``, and they will
     be automatically detected and used.
 
-    .. warning:: **Always use the** ``client()`` **constructor!**
+    .. admonition:: **Always use the** ``client()`` **constructor!**
 
-       This class should never be directly instantiated via the default constructor
-       (``SyncClient()``) -- instead, call :meth:`client` to ensure the Akismet
-       configuration is appropriately discovered and validated.
+       This class should generally *not* be directly instantiated via the default
+       constructor (``SyncClient()``) -- instead, call :meth:`client` to ensure the
+       Akismet configuration is appropriately auto-discovered and validated for you.
 
        If you *must* instantiate this class directly, it then becomes your
        responsibility to manually provide and perform validation of the Akismet
        configuration.
+
+       See :ref:`the FAQ <alt-constructor>` for an explanation of the technical reasons
+       for this.
 
     """
 

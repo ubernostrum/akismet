@@ -3,6 +3,7 @@ CSV
 async
 blog
 bugfixes
+classmethods
 config
 docstrings
 instantiation

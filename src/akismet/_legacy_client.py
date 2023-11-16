@@ -74,7 +74,7 @@ class Akismet:
         self,
         key: Optional[str] = None,
         blog_url: Optional[str] = None,
-        client: Optional[httpx.Client] = None,
+        http_client: Optional[httpx.Client] = None,
     ):
         warnings.warn(
             textwrap.dedent(
@@ -101,8 +101,8 @@ class Akismet:
                 """
                 )
             )
-        self.client = client or _common._get_sync_http_client()
-        if not self.verify_key(maybe_key, maybe_url, self.client):
+        self.http_client = http_client or _common._get_sync_http_client()
+        if not self.verify_key(maybe_key, maybe_url, self.http_client):
             raise _exceptions.APIKeyError(
                 f"Akismet key ({maybe_key}, {maybe_url}) is invalid."
             )
@@ -134,7 +134,7 @@ class Akismet:
             "user_agent": user_agent,
             **kwargs,
         }
-        return self.client.post(endpoint, data=data)
+        return self.http_client.post(endpoint, data=data)
 
     def _submission_request(  # pylint: disable=inconsistent-return-statements
         self, operation: str, user_ip: str, user_agent: str, **kwargs: str
@@ -172,7 +172,7 @@ class Akismet:
 
     @classmethod
     def verify_key(  # pylint: disable=inconsistent-return-statements
-        cls, key: str, blog_url: str, client: Optional[httpx.Client] = None
+        cls, key: str, blog_url: str, http_client: Optional[httpx.Client] = None
     ) -> bool:
         """
         Verify an Akismet API key and URL.
@@ -191,9 +191,9 @@ class Akismet:
                 """
                 )
             )
-        if client is None:
-            client = _common._get_sync_http_client()
-        response = client.post(
+        if http_client is None:  # pragma: no cover
+            http_client = _common._get_sync_http_client()
+        response = http_client.post(
             cls.VERIFY_KEY_URL,
             data={"key": key, "blog": blog_url},
         )

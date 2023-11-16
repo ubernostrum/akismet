@@ -4,6 +4,7 @@ Common definitions used by both the sync and async Akismet implementations.
 """
 # SPDX-License-Identifier: BSD-3-Clause
 
+import dataclasses
 import enum
 import os
 import sys
@@ -73,9 +74,10 @@ class CheckResponse(enum.IntEnum):
     DISCARD = 2
 
 
-class Config(typing.NamedTuple):
+@dataclasses.dataclass
+class Config:
     """
-    A :class:`~typing.NamedTuple` representing Akismet configuration, consisting of
+    A :func:`~dataclasses.dataclass` representing Akismet configuration, consisting of
     a key and a URL.
 
     """
