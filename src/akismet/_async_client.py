@@ -92,7 +92,7 @@ class AsyncClient:
 
         """
         # While the synchronous version of the client could perform the config
-        # validation in __init__(), here we cannot becuase this client's verify_key()
+        # validation in __init__(), here we cannot because this client's verify_key()
         # method is async, and its underlying HTTP client is async. So calling into them
         # would rquire making __init__ into an async method, and Python does not
         # currently allow __init__() to be usefully async. But a classmethod *can* be
