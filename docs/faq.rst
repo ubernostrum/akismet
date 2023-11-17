@@ -48,12 +48,12 @@ including comments, contact-form submissions, user signups and more. See
 
 .. _alt-constructor:
 
-Why do I need to use this alternate constructor?
-------------------------------------------------
+Why is there an alternate constructor?
+--------------------------------------
 
 Both of the API clients provide a ``classmethod`` which serves as an alternate
-constructor: :meth:`akismet.SyncClient.client` and
-:meth:`akismet.AsyncClient.client`, and you're strongly encouraged to use the
+constructor: :meth:`akismet.SyncClient.validated_client` and
+:meth:`akismet.AsyncClient.validated_client`, and you're encouraged to use the
 alternate constructor when you need an instance of one of the clients.
 
 The short explanation for this is that the ``client()`` constructor will
@@ -79,69 +79,17 @@ and an async ``__init__()`` is not currently supported by Python.
 This limitation does not apply to classmethods used as alternate constructors,
 so to provide a useful constructor that does automatic discovery and validation
 of your Akismet configuration, :class:`~akismet.AsyncClient` defines the
-alternate constructor :meth:`~akismet.AsyncClient.client`. And to ensure both
-client classes have the same interface, :class:`~akismet.SyncClient` also
-provides a :meth:`~akismet.SyncClient.client` constructor.
+alternate constructor :meth:`~akismet.AsyncClient.validated_client`. And to
+ensure both client classes have the same interface,
+:class:`~akismet.SyncClient` also provides a
+:meth:`~akismet.SyncClient.validated_client` constructor.
 
 
 How can I test that it's working?
 ---------------------------------
 
-``akismet``'s tests are run using `nox <https://nox.thea.codes/>`_, but typical
-installation of ``akismet`` (via ``pip install akismet``) will not install the
-tests.
-
-To run the tests, download the source (``.tar.gz``) distribution of ``akismet``
-|release| from `its page on the Python Package Index
-<https://pypi.org/project/akismet/>`_, unpack it (``tar zxvf
-akismet-|version|.tar.gz`` on most Unix-like operating systems), and in the
-unpacked directory run the following at a command prompt:
-
-.. tab:: macOS/Linux/other Unix
-
-   .. code-block:: shell
-
-      python -m pip install nox
-      python -m nox
-
-.. tab:: Windows
-
-   .. code-block:: shell
-
-      py -m pip install nox
-      py -m nox
-
-Note that to run the full test matrix you will need to have each supported
-version of Python available. To run only specific test tasks, you can invoke
-``nox`` with the ``-s`` flag to select a single test task, ``-t`` to run all
-tasks matching a particular tag (like ``docs``), or ``--python`` passing a
-Python version to run only tasks for that version. For example, to run tests
-for Python 3.10 only, you could run:
-
-.. tab:: macOS/Linux/other Unix
-
-   .. code-block:: shell
-
-      python -m nox --python "3.10"
-
-.. tab:: Windows
-
-   .. code-block:: shell
-
-      py -m nox --python "3.10"
-
-By default, ``nox`` will only run the tasks whose associated Python versions
-are available on your system. For example, if you have only Python 3.8 and 3.9
-installed, test runs for Python 3.7, 3.10, and 3.11 would be skipped.
-
-Running the test suite also requires two environment variables to be set:
-
-* ``TEST_AKISMET_API_KEY`` containing your Akismet API key, and
-
-* ``TEST_AKISMET_BLOG_URL`` containing the URL associated with your API key.
-
-This allows the test suite to access the live Akismet web service to verify
-functionality.
+The installation guide :ref:`includes a section <testing>` on how to run
+``akismet``'s unit test suite.
 
 If you want to manually perform your own tests, you can also instantiate an
 Akismet client class and call its methods. When doing so, it is recommended

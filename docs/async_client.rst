@@ -10,7 +10,7 @@ Using the asynchronous Akismet client
 
 .. autoclass:: AsyncClient
 
-   .. automethod:: client
+   .. automethod:: validated_client
    .. automethod:: comment_check
    .. automethod:: key_sites
    .. automethod:: submit_ham

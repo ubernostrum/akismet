@@ -30,22 +30,45 @@ class AsyncClient:
 
     Use of this client requires an Akismet API key; see <https://akismet.com> for
     instructions on how to obtain one. Once you have an Akismet API key and
-    corresponding registered site URL to use with it, place them in the environment
-    variables ``PYTHON_AKISMET_API_KEY`` and ``PYTHON_AKISMET_BLOG_URL``, and they will
-    be automatically detected and used.
+    corresponding registered site URL to use with it, you can create an API client in
+    either of two ways.
 
-    .. admonition:: **Always use the** ``client()`` **constructor!**
+    *Recommended for most uses:* Place your Akismet API key and site URL in the
+    environment variables ``PYTHON_AKISMET_API_KEY`` and ``PYTHON_AKISMET_BLOG_URL``,
+    and then use the :meth:`validated_client` constructor:
 
-       This class should generally *not* be directly instantiated via the default
-       constructor (``AyncClient()``) -- instead, call :meth:`client` to ensure the
-       Akismet configuration is appropriately auto-discovered and validated for you.
+    .. code-block:: python
 
-       If you *must* instantiate this class directly, it then becomes your
-       responsibility to manually provide and perform validation of the Akismet
-       configuration.
+       import akismet
+       akismet_client = await akismet.AsyncClient.validated_client()
 
-       See :ref:`the FAQ <alt-constructor>` for an explanation of the technical reasons
-       for this.
+    This will automatically read the API key and site URL from the environment
+    variables, instantiate a client, and use its :meth:`verify_key` method to ensure the
+    key and URL are valid before returning the client instance to you. See :ref:`the FAQ
+    <alt-constructor>` for the technical reasons why the default constructor does not
+    have this behavior.
+
+    *Advanced/unusual use cases:* Instantiate the client directly. You must construct a
+    :class:`~akismet.Config` instance with your API key and site URL, and they will
+    *not* be automatically validated for you.
+
+    .. code-block:: python
+
+       import akismet
+       config = akismet.Config(key=your_api_key, url=your_site_url)
+       akismet_client = akismet.AsyncClient(config=config)
+
+    If you want to modify the HTTP request behavior -- for example, to support a
+    required HTTP proxy -- you can construct a custom ``httpx.AsyncClient`` and pass it
+    as the keyword argument ``http_client`` to either :meth:`validated_client` or the
+    default constructor. See :data:`akismet.USER_AGENT` for the default user-agent
+    string used by the Akismet API clients, and <https://www.python-httpx.org> for the
+    full documentation of the HTTPX module.
+
+    Note that if you only want to set a custom request timeout threshold (the default is
+    1 second), you can specify it by setting the environment variable
+    ``PYTHON_AKISMET_TIMEOUT`` to a value that can be parsed into a :class:`float` or
+    :class:`int`.
 
     """
 
@@ -60,20 +83,26 @@ class AsyncClient:
         config: _common.Config,
         http_client: typing.Optional[httpx.AsyncClient] = None,
     ) -> None:
+        """
+        Default constructor.
+
+        You will almost always want to use :meth:`validated_client` instead.
+
+        """
         self._http_client = http_client or _common._get_async_http_client()
         self._config = config
 
     @classmethod
-    async def client(
+    async def validated_client(
         cls, http_client: typing.Optional[httpx.AsyncClient] = None
     ) -> "AsyncClient":
         """
         Constructor of :class:`AsyncClient`.
 
-        This is always preferred over the default ``AsyncClient()`` constructor, because
-        this constructor will discover and validate the Akismet configuration (API key
-        and URL) prior to returning the client instance. The Akismet API key will be
-        read from the environment variable ``PYTHON_AKISMET_API_KEY``, and the
+        This is usually preferred over the default ``AsyncClient()`` constructor,
+        because this constructor will discover and validate the Akismet configuration
+        (API key and URL) prior to returning the client instance. The Akismet API key
+        will be read from the environment variable ``PYTHON_AKISMET_API_KEY``, and the
         registered site URL from the environment variable ``PYTHON_AKISMET_BLOG_URL``.
 
         :param http_client: An optional HTTP client instance to use. If not supplied,
@@ -346,7 +375,7 @@ class AsyncClient:
         :param url_filter: A full or partial site URL to filter results by. If not
            supplied, results for all sites under the current API key will be returned.
         :param result_format: The format in which to return results. Supported options
-           are ``"json"`` and ``"csv"`` Defaults to ``"json"`` if not supplied.
+           are ``"json"`` and ``"csv"``. Defaults to ``"json"`` if not supplied.
         :param order: For CSV-formatted results, the column by which the results should
            be sorted.
         :param limit: The maximum number of results to return. If not supplied, defaults

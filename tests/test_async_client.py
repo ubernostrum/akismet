@@ -27,7 +27,7 @@ class AsyncAkismetConstructorTests(AsyncAkismetTests):
         With a valid configuration, constructing a client succeeds.
 
         """
-        await akismet.AsyncClient.client(
+        await akismet.AsyncClient.validated_client(
             http_client=self.custom_response_async_client()
         )
 
@@ -37,7 +37,7 @@ class AsyncAkismetConstructorTests(AsyncAkismetTests):
 
         """
         with self.assertRaises(akismet.APIKeyError):
-            await akismet.AsyncClient.client(
+            await akismet.AsyncClient.validated_client(
                 http_client=self.custom_response_async_client(config_valid=False)
             )
 
@@ -49,7 +49,7 @@ class AsyncAkismetConstructorTests(AsyncAkismetTests):
         try:
             os.environ[_common._URL_ENV_VAR] = "ftp://example.com"
             with self.assertRaises(akismet.ConfigurationError):
-                await akismet.AsyncClient.client()
+                await akismet.AsyncClient.validated_client()
         finally:
             os.environ[_common._URL_ENV_VAR] = self.site_url
 
@@ -63,7 +63,7 @@ class AsyncAkismetConstructorTests(AsyncAkismetTests):
             if _common._KEY_ENV_VAR in os.environ:
                 del os.environ[_common._KEY_ENV_VAR]
             with self.assertRaises(akismet.ConfigurationError):
-                await akismet.AsyncClient.client(
+                await akismet.AsyncClient.validated_client(
                     http_client=self.custom_response_async_client()
                 )
         finally:
@@ -79,7 +79,7 @@ class AsyncAkismetConstructorTests(AsyncAkismetTests):
             if _common._URL_ENV_VAR in os.environ:
                 del os.environ[_common._URL_ENV_VAR]
             with self.assertRaises(akismet.ConfigurationError):
-                await akismet.AsyncClient.client(
+                await akismet.AsyncClient.validated_client(
                     http_client=self.custom_response_async_client()
                 )
         finally:
@@ -97,7 +97,7 @@ class AsyncAkismetConstructorTests(AsyncAkismetTests):
             if _common._URL_ENV_VAR in os.environ:
                 del os.environ[_common._URL_ENV_VAR]
             with self.assertRaises(akismet.ConfigurationError):
-                await akismet.AsyncClient.client(
+                await akismet.AsyncClient.validated_client(
                     http_client=self.custom_response_async_client()
                 )
         finally:

@@ -34,14 +34,14 @@ class SyncAkismetEndToEndTests(AkismetTests):
         Create a default client instance for use in testing.
 
         """
-        self.client = akismet.SyncClient.client()
+        self.client = akismet.SyncClient.validated_client()
 
     def test_construct_config_valid(self):
         """
         With a valid configuration, constructing a client succeeds.
 
         """
-        akismet.SyncClient.client()
+        akismet.SyncClient.validated_client()
 
     def test_construct_config_invalid_key(self):
         """
@@ -53,7 +53,7 @@ class SyncAkismetEndToEndTests(AkismetTests):
             os.environ[_common._KEY_ENV_VAR] = BAD_KEY
             os.environ[_common._URL_ENV_VAR] = BAD_URL
             with self.assertRaises(akismet.APIKeyError):
-                akismet.SyncClient.client()
+                akismet.SyncClient.validated_client()
         finally:
             os.environ[_common._KEY_ENV_VAR] = self.api_key
             os.environ[_common._URL_ENV_VAR] = self.site_url
@@ -130,14 +130,14 @@ class AsyncAkismetEndToEndTests(AsyncAkismetTests):
         Create a default client instance for use in testing.
 
         """
-        self.client = await akismet.AsyncClient.client()
+        self.client = await akismet.AsyncClient.validated_client()
 
     async def test_construct_config_valid(self):
         """
         With a valid configuration, constructing a client succeeds.
 
         """
-        await akismet.AsyncClient.client()
+        await akismet.AsyncClient.validated_client()
 
     async def test_construct_config_invalid_key(self):
         """
@@ -149,7 +149,7 @@ class AsyncAkismetEndToEndTests(AsyncAkismetTests):
             os.environ[_common._KEY_ENV_VAR] = BAD_KEY
             os.environ[_common._URL_ENV_VAR] = BAD_URL
             with self.assertRaises(akismet.APIKeyError):
-                await akismet.AsyncClient.client()
+                await akismet.AsyncClient.validated_client()
         finally:
             os.environ[_common._KEY_ENV_VAR] = self.api_key
             os.environ[_common._URL_ENV_VAR] = self.site_url

@@ -26,7 +26,7 @@ submitted forum post for spam:
 
    import akismet
 
-   akismet_client = akismet.SyncClient.client()
+   akismet_client = akismet.SyncClient.validated_client()
 
    if akismet_client.comment_check(
        user_ip=submitter_ip,
@@ -42,7 +42,7 @@ Or using the asynchronous client:
 
    import akismet
 
-   akismet_client = await akismet.AsyncClient.client()
+   akismet_client = await akismet.AsyncClient.validated_client()
 
    if await akismet_client.comment_check(
        user_ip=submitter_ip,
@@ -53,12 +53,12 @@ Or using the asynchronous client:
        # This piece of content was classified as spam; handle it appropriately.
 
 Note that in both cases the client instance is created via the alternate constructor
-``client()``. Instances of the clients generally should not be constructed manually
-(i.e., via directly calling ``akismet.SyncClient()`` or ``akismet.AsyncClient()``); the
-``client()`` constructor will perform automatic discovery of the environment-variable
-configuration and validate the configuration with the Akismet web service before
-returning the client, while directly constructing an instance will not (and if you do
-directly construct an instance, you must manually provide and validate its
+``validated_client()``. This is recommended instead of using the default constructor
+(i.e., directly calling ``akismet.SyncClient()`` or ``akismet.AsyncClient()``); the
+``validated_client()`` constructor will perform automatic discovery of the
+environment-variable configuration and validate the configuration with the Akismet web
+service before returning the client, while directly constructing an instance will not
+(so if you do directly construct an instance, you must manually provide and validate its
 configuration).
 
 """

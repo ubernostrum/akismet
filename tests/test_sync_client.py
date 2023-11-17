@@ -27,7 +27,9 @@ class SyncAkismetConstructorTests(AkismetTests):
         With a valid configuration, constructing a client succeeds.
 
         """
-        akismet.SyncClient.client(http_client=self.custom_response_sync_client())
+        akismet.SyncClient.validated_client(
+            http_client=self.custom_response_sync_client()
+        )
 
     def test_construct_config_invalid_key(self):
         """
@@ -35,7 +37,7 @@ class SyncAkismetConstructorTests(AkismetTests):
 
         """
         with self.assertRaises(akismet.APIKeyError):
-            akismet.SyncClient.client(
+            akismet.SyncClient.validated_client(
                 http_client=self.custom_response_sync_client(config_valid=False)
             )
 
@@ -47,7 +49,7 @@ class SyncAkismetConstructorTests(AkismetTests):
         try:
             os.environ[_common._URL_ENV_VAR] = "ftp://example.com"
             with self.assertRaises(akismet.ConfigurationError):
-                akismet.SyncClient.client()
+                akismet.SyncClient.validated_client()
         finally:
             os.environ[_common._URL_ENV_VAR] = self.site_url
 
@@ -61,7 +63,7 @@ class SyncAkismetConstructorTests(AkismetTests):
             if _common._KEY_ENV_VAR in os.environ:
                 del os.environ[_common._KEY_ENV_VAR]
             with self.assertRaises(akismet.ConfigurationError):
-                akismet.SyncClient.client(
+                akismet.SyncClient.validated_client(
                     http_client=self.custom_response_sync_client()
                 )
         finally:
@@ -77,7 +79,7 @@ class SyncAkismetConstructorTests(AkismetTests):
             if _common._URL_ENV_VAR in os.environ:
                 del os.environ[_common._URL_ENV_VAR]
             with self.assertRaises(akismet.ConfigurationError):
-                akismet.SyncClient.client(
+                akismet.SyncClient.validated_client(
                     http_client=self.custom_response_sync_client()
                 )
         finally:
@@ -95,7 +97,7 @@ class SyncAkismetConstructorTests(AkismetTests):
             if _common._URL_ENV_VAR in os.environ:
                 del os.environ[_common._URL_ENV_VAR]
             with self.assertRaises(akismet.ConfigurationError):
-                akismet.SyncClient.client(
+                akismet.SyncClient.validated_client(
                     http_client=self.custom_response_sync_client()
                 )
         finally:
