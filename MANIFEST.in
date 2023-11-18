@@ -2,6 +2,7 @@ include LICENSE
 include MANIFEST.in
 include .editorconfig
 include *.yaml
+include *.rst
 include docs/*.rst docs/*.txt docs/*.py docs/*.bat docs/Makefile
 include .flake8
 include pyproject.toml
