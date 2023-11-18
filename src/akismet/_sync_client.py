@@ -33,10 +33,6 @@ class SyncClient:
     corresponding registered site URL to use with it, you can create an API client in
     either of two ways.
 
-    place them in the environment
-    variables ``PYTHON_AKISMET_API_KEY`` and ``PYTHON_AKISMET_BLOG_URL``, and they will
-    be automatically detected and used.
-
     *Recommended for most uses:* Place your Akismet API key and site URL in the
     environment variables ``PYTHON_AKISMET_API_KEY`` and ``PYTHON_AKISMET_BLOG_URL``,
     and then use the :meth:`validated_client` constructor:
