@@ -12,8 +12,6 @@ on:
 env:
   FORCE_COLOR: "1"
   PIP_DISABLE_VERSION_CHECK: "1"
-  TEST_AKISMET_API_KEY: ${{ secrets.TEST_AKISMET_API_KEY }}
-  TEST_AKISMET_BLOG_URL: ${{ secrets.TEST_AKISMET_BLOG_URL }}
 
 permissions:
   contents: read
