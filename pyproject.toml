@@ -23,7 +23,7 @@ classifiers = [
   "Topic :: Utilities",
 ]
 name = "akismet"
-description = "A Python interface to the Akismet spam-filtering API."
+description = "A Python interface to the Akismet spam-filtering service."
 dependencies = [
   "httpx",
 ]
