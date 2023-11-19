@@ -12,7 +12,7 @@ class AkismetError(Exception):
     """
 
 
-class UnknownArgumentError(AkismetError):
+class UnknownArgumentError(TypeError, AkismetError):
     """
     Raised when an unknown argument was used as part of an API request.
 
