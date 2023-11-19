@@ -144,6 +144,25 @@ class SyncAkismetAPITests(AsyncAkismetTests):
         )
         assert not await client.verify_key(key=self.api_key, url=self.site_url)
 
+    async def test_request_with_invalid_key(self):
+        """
+        The request methods other than ``verify_key()`` raise
+        ``akismet.APIKeyError`` if called with an invalid API key/URL.
+
+        """
+        client = akismet.AsyncClient(
+            config=self.config,
+            http_client=self.custom_response_async_client(response_text="invalid"),
+        )
+        for method in ("comment_check", "submit_ham", "submit_spam"):
+            with self.subTest(method=method):
+                with self.assertRaises(akismet.APIKeyError):
+                    await getattr(client, method)(**self.common_kwargs)
+        for method in ("key_sites", "usage_limit"):
+            with self.subTest(method=method):
+                with self.assertRaises(akismet.APIKeyError):
+                    await getattr(client, method)()
+
     async def test_comment_check_spam(self):
         """
         ``comment_check()`` returns the SPAM value when Akismet declares the content

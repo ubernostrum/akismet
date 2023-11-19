@@ -197,6 +197,13 @@ class AsyncClient:
             raise _exceptions.RequestError("Error making request to Akismet.") from exc
         except Exception as exc:
             raise _exceptions.RequestError("Error making request to Akismet.") from exc
+        # Since it's possible to construct a client without performing up-front API key
+        # validation, we have to watch out here for the possibility that we're making
+        # requests with an invalid key, and raise the appropriate exception.
+        if endpoint != _common._VERIFY_KEY and response.text == "invalid":
+            raise _exceptions.APIKeyError(
+                "Akismet API key and/or site URL are invalid."
+            )
         return response
 
     async def _get_request(
@@ -212,6 +219,9 @@ class AsyncClient:
         :param endpoint: The Akismet API endpoint to post to.
 
         :param params: The querystring parameters to include in the request.
+
+        :raises akismet.APIKeyError: When the configured API key and/or site URL are
+           invalid.
 
         """
         return await self._request("GET", version, endpoint, params)
@@ -229,6 +239,9 @@ class AsyncClient:
         :param endpoint: The Akismet API endpoint to post to.
 
         :param user_ip: The IP address of the user who submitted the content.
+
+        :raises akismet.APIKeyError: When the configured API key and/or site URL are
+           invalid.
 
         :raises akismet.UnknownArgumentError: When one or more unexpected optional
            argument names are supplied. See `the Akismet documentation

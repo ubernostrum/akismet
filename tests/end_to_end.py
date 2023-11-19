@@ -72,6 +72,24 @@ class SyncAkismetEndToEndTests(AkismetTests):
         """
         assert not self.client.verify_key(BAD_KEY, BAD_URL)
 
+    def test_request_with_invalid_key(self):
+        """
+        The request methods other than ``verify_key()`` raise
+        ``akismet.APIKeyError`` if called with an invalid API key/URL.
+
+        """
+        client = akismet.SyncClient(
+            config=self.config,
+        )
+        for method in ("comment_check", "submit_ham", "submit_spam"):
+            with self.subTest(method=method):
+                with self.assertRaises(akismet.APIKeyError):
+                    getattr(client, method)(**self.common_kwargs)
+        for method in ("key_sites", "usage_limit"):
+            with self.subTest(method=method):
+                with self.assertRaises(akismet.APIKeyError):
+                    getattr(client, method)()
+
     def test_comment_check_spam(self):
         """
         ``comment_check()`` returns the SPAM value when Akismet declares the content
@@ -167,6 +185,25 @@ class AsyncAkismetEndToEndTests(AsyncAkismetTests):
 
         """
         assert not await self.client.verify_key(BAD_KEY, BAD_URL)
+
+    async def test_request_with_invalid_key(self):
+        """
+        The HTTP POST request methods -- ``comment_check()``, ``submit_ham()``, and
+        ``submit_spam()`` -- raise ``APIKeyError`` when called with an invalid API key
+        and/or site URL.
+
+        """
+        client = akismet.AsyncClient(
+            config=self.config,
+        )
+        for method in ("comment_check", "submit_ham", "submit_spam"):
+            with self.subTest(method=method):
+                with self.assertRaises(akismet.APIKeyError):
+                    await getattr(client, method)(**self.common_kwargs)
+        for method in ("key_sites", "usage_limit"):
+            with self.subTest(method=method):
+                with self.assertRaises(akismet.APIKeyError):
+                    await getattr(client, method)()
 
     async def test_comment_check_spam(self):
         """
