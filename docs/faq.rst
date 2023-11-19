@@ -85,6 +85,42 @@ ensure both client classes have the same interface,
 :meth:`~akismet.SyncClient.validated_client` constructor.
 
 
+How do I check my key?
+----------------------
+
+The simplest way is to set your key and site URL in the standard environment
+variables (``PYTHON_AKISMET_API_KEY`` / ``PYTHON_AKISMET_BLOG_URL``), and then
+call either :meth:`akismet.SyncClient.validated_client` or
+:meth:`akismet.AsyncClient.validated_client`; the ``validated_client()``
+constructor automatically verifies the key and URL for you, and will raise
+:exc:`~akismet.APIKeyError` if the key is invalid.
+
+If you're not able to do this, you can also manually instantiate a client and
+then call its ``verify_key()`` method, passing the key and URL you want to
+check as the arguments. For example:
+
+.. code-block:: python
+
+   import akismet
+
+   config = akismet.Config(key=key_to_test, url=url_to_test)
+   client = akismet.SyncClient(config=config)
+   if not client.verify_key(key_to_test, url_to_test):
+       # The key/URL were invalid.
+
+The same :meth:`~akismet.AsyncClient.verify_key` method also exists on the
+async client:
+
+.. code-block:: python
+
+   import akismet
+
+   config = akismet.Config(key=key_to_test, url=url_to_test)
+   client = akismet.AyncClient(config=config)
+   if not await client.verify_key(key_to_test, url_to_test):
+       # The key/URL were invalid.
+
+
 How can I test that it's working?
 ---------------------------------
 
