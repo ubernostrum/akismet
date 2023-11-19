@@ -15,7 +15,9 @@ import httpx
 
 from . import _exceptions, _version
 
-# Akismet API URLs, versions, endpoints, and other information.
+# Private constants.
+# -------------------------------------------------------------------------------
+
 _API_URL = "https://rest.akismet.com"
 _API_V11 = "1.1"
 _API_V12 = "1.2"
@@ -27,7 +29,6 @@ _SUBMIT_SPAM = "submit-spam"
 _USAGE_LIMIT = "usage-limit"
 _VERIFY_KEY = "verify-key"
 
-# Environment variables which will be read for configuration.
 _KEY_ENV_VAR = "PYTHON_AKISMET_API_KEY"
 _URL_ENV_VAR = "PYTHON_AKISMET_BLOG_URL"
 
@@ -35,7 +36,6 @@ _TIMEOUT = float(
     os.getenv("PYTHON_AKISMET_TIMEOUT", 1.0)  # pylint: disable=invalid-envvar-default
 )
 
-# Optional arguments which can be passed to most Akismet API calls.
 _OPTIONAL_KEYS = [
     "blog_charset",
     "blog_lang",
@@ -56,10 +56,18 @@ _OPTIONAL_KEYS = [
     "user_role",
 ]
 
+
+# Public constants.
+# -------------------------------------------------------------------------------
+
 USER_AGENT = (
     f"akismet/{_version.LIBRARY_VERSION} | Python/"
     f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
 )
+
+
+# Public classes.
+# -------------------------------------------------------------------------------
 
 
 class CheckResponse(enum.IntEnum):
@@ -77,13 +85,32 @@ class CheckResponse(enum.IntEnum):
 @dataclasses.dataclass
 class Config:
     """
-    A :func:`~dataclasses.dataclass` representing Akismet configuration, consisting of
-    a key and a URL.
+    An Akismet configuration, consisting of a key and a URL.
 
     """
 
     key: str
     url: str
+
+
+# Private helper functions.
+# -------------------------------------------------------------------------------
+
+
+def _get_async_http_client() -> httpx.AsyncClient:
+    """
+    Return an asynchronous HTTP client for interacting with the Akismet API.
+
+    """
+    return httpx.AsyncClient(headers={"User-Agent": USER_AGENT}, timeout=_TIMEOUT)
+
+
+def _get_sync_http_client() -> httpx.Client:
+    """
+    Return a synchronous HTTP client for interacting with the Akismet API.
+
+    """
+    return httpx.Client(headers={"User-Agent": USER_AGENT}, timeout=_TIMEOUT)
 
 
 def _protocol_error(operation: str, response: httpx.Response) -> typing.NoReturn:
@@ -104,22 +131,6 @@ def _protocol_error(operation: str, response: httpx.Response) -> typing.NoReturn
     )
 
 
-def _get_async_http_client() -> httpx.AsyncClient:
-    """
-    Return an asynchronous HTTP client for interactiing with the Akismet API.
-
-    """
-    return httpx.AsyncClient(headers={"User-Agent": USER_AGENT}, timeout=_TIMEOUT)
-
-
-def _get_sync_http_client() -> httpx.Client:
-    """
-    Return a synchronous HTTP client for interactiing with the Akismet API.
-
-    """
-    return httpx.Client(headers={"User-Agent": USER_AGENT}, timeout=_TIMEOUT)
-
-
 def _try_discover_config() -> Config:
     """
     Attempt to discover and return an Akismet configuration from the environment.
@@ -127,8 +138,6 @@ def _try_discover_config() -> Config:
     :raises akismet.ConfigurationError: When either or both of the API key and
        URL are missing, or if the URL does not begin with ``"http://"`` or
        ``https://``.
-    :raises akismet.APIKeyError: When verification of the API key and blog URL
-       fail.
 
     """
     key = os.getenv(_KEY_ENV_VAR, None)

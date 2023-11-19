@@ -7,9 +7,9 @@
 Exception classes
 =================
 
-.. autoclass:: AkismetError
-.. autoclass:: ConfigurationError
-.. autoclass:: APIKeyError
-.. autoclass:: RequestError
-.. autoclass:: ProtocolError
-.. autoclass:: UnknownArgumentError
+.. autoexception:: AkismetError
+.. autoexception:: APIKeyError
+.. autoexception:: ConfigurationError
+.. autoexception:: RequestError
+.. autoexception:: ProtocolError
+.. autoexception:: UnknownArgumentError

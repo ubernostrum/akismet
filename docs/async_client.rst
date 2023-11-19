@@ -4,8 +4,8 @@
   :noindex:
 
 
-Using the asynchronous Akismet client
-=====================================
+The asynchronous Akismet client
+===============================
 
 
 .. autoclass:: AsyncClient

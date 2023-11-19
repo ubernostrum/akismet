@@ -40,6 +40,7 @@ homepage = "https://github.com/ubernostrum/akismet"
 [project.optional-dependencies]
 docs = [
   "furo",
+  "matplotlib",
   "sphinx",
   "sphinx-copybutton",
   "sphinx-inline-tabs",

@@ -56,19 +56,19 @@ constructor: :meth:`akismet.SyncClient.validated_client` and
 :meth:`akismet.AsyncClient.validated_client`, and you're encouraged to use the
 alternate constructor when you need an instance of one of the clients.
 
-The short explanation for this is that the ``client()`` constructor will
-automatically read your Akismet API key and site URL from environment variables
-(``PYTHON_AKISMET_API_KEY`` and ``PYTHON_AKISMET_BLOG_URL``) and validate them
-via the ``verify_key`` operation before returning the API client instance to
-you, and this is highly useful behavior.
+The short explanation for this is that the ``validated_client()`` constructor
+will automatically read your Akismet API key and site URL from environment
+variables (``PYTHON_AKISMET_API_KEY`` and ``PYTHON_AKISMET_BLOG_URL``) and
+validate them via the ``verify_key`` operation before returning the API client
+instance to you, and this is highly useful behavior.
 
-If you don't use the ``client()`` constructor, you'll need to construct your
-own :class:`~akismet.Config` to pass in to the default constructor, and you'll
-want to ensure you call the verify-key operation to validate that
-configuration.
+If you don't use the ``validated_client()`` constructor, you'll need to
+construct your own :class:`~akismet.Config` to pass in to the default
+constructor, and you'll want to ensure you call the verify-key operation to
+validate that configuration.
 
-The longer explanation is that the ``client()`` constructor allows both the
-sync and async clients to provide the same overall
+The longer explanation is that the ``validated_client()`` constructor allows
+both the sync and async clients to provide the same overall
 interface. :class:`~akismet.SyncClient` could easily just read the
 configuration and do the validation in its own ``__init__()`` method. But
 :class:`~akismet.AsyncClient` cannot do this, because its
@@ -88,7 +88,7 @@ ensure both client classes have the same interface,
 How can I test that it's working?
 ---------------------------------
 
-The installation guide :ref:`includes a section <testing>` on how to run
+The documentation :ref:`includes a section <testing>` on how to run
 ``akismet``'s unit test suite.
 
 If you want to manually perform your own tests, you can also instantiate an

@@ -4,8 +4,8 @@
   :noindex:
 
 
-Using the synchronous Akismet client
-====================================
+The synchronous Akismet client
+==============================
 
 
 .. autoclass:: SyncClient

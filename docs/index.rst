@@ -7,14 +7,32 @@ akismet |release|
 Documentation contents
 ----------------------
 
+
 .. toctree::
-   :maxdepth: 1
+   :caption: Installation and configuration
+   :maxdepth: 2
 
    install
+
+.. toctree::
+   :caption: The Akismet API clients
+   :maxdepth: 1
+
    sync_client
    async_client
+
+.. toctree::
+   :caption: Supporting code
+   :maxdepth: 1
+
    exceptions
    misc
+
+.. toctree::
+   :caption: Other documentation
+   :maxdepth: 1
+
+   testing
    upgrade
    faq
 

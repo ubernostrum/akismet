@@ -1,13 +1,13 @@
 """
 Automated testing via nox (https://nox.thea.codes/).
 
-Combined with a working installation of nox (``pip install nox``), this file specifies a
-matrix of tests, linters, and other quality checks which can be run individually or as a
-suite.
+Combined with a working installation of nox (see ``nox`` documentation), this file
+specifies a matrix of tests, linters, and other quality checks which can be run
+individually or as a suite.
 
-To see available tasks, run ``nox --list``. To run all available tasks -- which requires
-functioning installs of all supported Python versions -- run ``nox``. To run a single
-task, use ``nox -s`` with the name of that task.
+To see available tasks, run ``python -m nox --list``. To run all available tasks --
+which requires functioning installs of all supported Python versions -- run ``python -m
+nox``. To run a single task, use ``python -m nox --session`` with the name of that task.
 
 """
 import os
@@ -33,6 +33,9 @@ ARTIFACT_PATHS = (
     NOXFILE_PATH / "src" / PACKAGE_NAME / "__pycache__",
     NOXFILE_PATH / "tests" / "__pycache__",
 )
+
+TEST_KEY = "INVALID_TEST_KEY"
+TEST_URL = "http://example.com"
 
 
 def clean(paths: typing.Iterable[os.PathLike] = ARTIFACT_PATHS) -> None:
@@ -69,10 +72,7 @@ def tests_with_coverage(session: nox.Session) -> None:
         "-m",
         "unittest",
         "discover",
-        env={
-            "PYTHON_AKISMET_API_KEY": os.getenv("TEST_AKISMET_API_KEY", ""),
-            "PYTHON_AKISMET_BLOG_URL": os.getenv("TEST_AKISMET_BLOG_URL", ""),
-        },
+        env={"PYTHON_AKISMET_API_KEY": TEST_KEY, "PYTHON_AKISMET_BLOG_URL": TEST_URL},
     )
     session.run(
         f"python{session.python}",
@@ -85,7 +85,7 @@ def tests_with_coverage(session: nox.Session) -> None:
 
 
 @nox.session(python=["3.8", "3.9", "3.10", "3.11", "3.12"], tags=["tests", "release"])
-def test_end_to_end(session: nox.Session) -> None:
+def tests_end_to_end(session: nox.Session) -> None:
     """
     Run the end-to-end (live Akismet API) tests.
 
@@ -100,8 +100,8 @@ def test_end_to_end(session: nox.Session) -> None:
         "--pattern",
         "end_to_end*",
         env={
-            "PYTHON_AKISMET_API_KEY": os.getenv("TEST_AKISMET_API_KEY", ""),
-            "PYTHON_AKISMET_BLOG_URL": os.getenv("TEST_AKISMET_BLOG_URL", ""),
+            "PYTHON_AKISMET_API_KEY": os.getenv("PYTHON_AKISMET_API_KEY", ""),
+            "PYTHON_AKISMET_BLOG_URL": os.getenv("PYTHON_AKISMET_BLOG_URL", ""),
         },
     )
     clean()

@@ -20,7 +20,7 @@ Dev environment recommendations
 
 * Please have `nox <https://nox.thea.codes/en/stable/>`_ installed on
   your computer, and run at least the unit-test suite (``python -m nox
-  -t tests``) before you push your commits to GitHub. If you can
+  --tag tests``) before you push your commits to GitHub. If you can
   manage it, installing the full set of supported Python versions and
   running the entire suite (``python -m nox``) is even better. Tools
   like `pyenv <https://github.com/pyenv/pyenv>`_ or ``asdf
