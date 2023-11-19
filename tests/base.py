@@ -23,8 +23,8 @@ class AkismetTests(unittest.TestCase):
 
     """
 
-    api_key = os.getenv("TEST_AKISMET_API_KEY")
-    site_url = os.getenv("TEST_AKISMET_BLOG_URL")
+    api_key = os.getenv("PYTHON_AKISMET_API_KEY")
+    site_url = os.getenv("PYTHON_AKISMET_BLOG_URL")
     verify_key_url = f"{_common._API_URL}/{_common._API_V11}/{_common._VERIFY_KEY}"
 
     config = akismet.Config(key="fake-test-key", url="http://example.com")
