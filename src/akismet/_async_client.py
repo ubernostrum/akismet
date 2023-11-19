@@ -70,7 +70,7 @@ class AsyncClient:
     ``PYTHON_AKISMET_TIMEOUT`` to a value that can be parsed into a :class:`float` or
     :class:`int`.
 
-    :param config: An Askimet :class:`~akismet.Config`, consisting of an API key and
+    :param config: An Akismet :class:`~akismet.Config`, consisting of an API key and
        site URL.
 
     :param http_client: An optional ``httpx`` async HTTP client instance to
