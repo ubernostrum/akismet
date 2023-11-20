@@ -122,6 +122,36 @@ class SyncAkismetAPITests(AsyncAkismetTests):
 
     """
 
+    async def test_unsupported_request_method(self):
+        """
+        Attempting to make a request with an unsupported method raises
+        ``AkismetError``.
+
+        """
+        client = akismet.AsyncClient(
+            config=self.config,
+            http_client=self.custom_response_sync_client(),
+        )
+        # The tested set of methods here are all the methods that are in Python 3.11's
+        # http.HTTPMethod enum but not supported for Akismet requests.
+        for bad_method in (
+            "CONNECT",
+            "DELETE",
+            "HEAD",
+            "OPTIONS",
+            "PATCH",
+            "PUT",
+            "TRACE",
+        ):
+            with self.subTest(method=bad_method):
+                with self.assertRaises(akismet.AkismetError):
+                    await client._request(
+                        bad_method,
+                        _common._API_V11,
+                        _common._COMMENT_CHECK,
+                        {"api_key", client._config.key},
+                    )
+
     async def test_verify_key_valid(self):
         """
         ``verify_key()`` returns True when the config is valid.

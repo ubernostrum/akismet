@@ -160,7 +160,7 @@ class AsyncClient:
 
     async def _request(
         self,
-        method: str,
+        method: _common._REQUEST_METHODS,
         version: str,
         endpoint: str,
         data: dict,
@@ -180,6 +180,11 @@ class AsyncClient:
            when Akiset returns a non-success status code.
 
         """
+        method = method.upper()
+        if method not in ("GET", "POST"):
+            raise _exceptions.AkismetError(
+                f"Unrecognized request method attempted: {method}."
+            )
         handler = getattr(self._http_client, method.lower())
         request_kwarg = "data" if method == "POST" else "params"
         try:

@@ -23,6 +23,7 @@ _API_V11 = "1.1"
 _API_V12 = "1.2"
 _COMMENT_CHECK = "comment-check"
 _KEY_SITES = "key-sites"
+_REQUEST_METHODS = typing.Literal["GET", "POST"]  # pylint: disable=invalid-name
 _SUBMISSION_RESPONSE = "Thanks for making the web a better place."
 _SUBMIT_HAM = "submit-ham"
 _SUBMIT_SPAM = "submit-spam"
