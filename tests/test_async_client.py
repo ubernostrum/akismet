@@ -362,7 +362,7 @@ class AsyncAkismetErrorTests(AsyncAkismetTests):
                 config=self.config,
                 http_client=self.custom_response_async_client(status_code=code),
             )
-        with self.subTest():
+        with self.subTest(method="verify_key"):
             with self.assertRaises(akismet.RequestError):
                 await client.verify_key(self.config.key, self.config.url)
         for method in ("comment_check", "submit_ham", "submit_spam"):
@@ -386,7 +386,7 @@ class AsyncAkismetErrorTests(AsyncAkismetTests):
                 httpx.TimeoutException, "Timed out."
             ),
         )
-        with self.subTest():
+        with self.subTest(method="verify_key"):
             with self.assertRaises(akismet.RequestError):
                 await client.verify_key(self.config.key, self.config.url)
         for method in ("comment_check", "submit_ham", "submit_spam"):
@@ -407,7 +407,7 @@ class AsyncAkismetErrorTests(AsyncAkismetTests):
             config=self.config,
             http_client=self.exception_async_client(httpx.RequestError),
         )
-        with self.subTest():
+        with self.subTest(method="verify_key"):
             with self.assertRaises(akismet.RequestError):
                 await client.verify_key(self.config.key, self.config.url)
         for method in ("comment_check", "submit_ham", "submit_spam"):
@@ -429,7 +429,7 @@ class AsyncAkismetErrorTests(AsyncAkismetTests):
             config=self.config,
             http_client=self.exception_async_client(TypeError),
         )
-        with self.subTest():
+        with self.subTest(method="verify_key"):
             with self.assertRaises(akismet.RequestError):
                 await client.verify_key(self.config.key, self.config.url)
         for method in ("comment_check", "submit_ham", "submit_spam"):
