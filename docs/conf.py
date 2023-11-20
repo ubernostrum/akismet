@@ -5,6 +5,7 @@ https://www.sphinx-doc.org/
 
 """
 import sys
+from importlib.metadata import version as get_version
 
 extensions = [
     "notfound.extension",
@@ -20,8 +21,8 @@ source_suffix = ".rst"
 master_doc = "index"
 project = "akismet"
 copyright = "2005-2023, Michael Foord and James Bennett"
-version = "1.3a1"
-release = "1.3a1"
+version = get_version("akismet")
+release = version
 exclude_trees = ["_build"]
 pygments_style = "sphinx"
 htmlhelp_basename = "akismetdoc"
