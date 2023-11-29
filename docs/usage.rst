@@ -197,7 +197,7 @@ values; when fed directly to an ``if``/``else``, they work as boolean values
 
 
 Using a custom HTTP client
---------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 For some use cases, you may need custom HTTP client behavior. For example, you
 might be running on a server which has to use an HTTP proxy to access any
@@ -252,7 +252,7 @@ client, or you can simply set the environment variable
 
 
 Alternative configuration
--------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If you don't want to configure your Akismet client via the standard environment
 variables, or aren't able to set the environment variables, you can avoid the
