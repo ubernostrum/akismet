@@ -9,22 +9,18 @@ Documentation contents
 
 
 .. toctree::
-   :caption: Installation and configuration
+   :caption: Installation and usage
    :maxdepth: 2
 
    install
+   usage
 
 .. toctree::
-   :caption: The Akismet API clients
+   :caption: API reference
    :maxdepth: 1
 
    sync_client
    async_client
-
-.. toctree::
-   :caption: Supporting code
-   :maxdepth: 1
-
    exceptions
    misc
 

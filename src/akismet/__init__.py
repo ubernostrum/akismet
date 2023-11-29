@@ -36,31 +36,6 @@ submitted forum post for spam:
    ):
        # This piece of content was classified as spam; handle it appropriately.
 
-Or using the asynchronous client:
-
-.. code-block:: python
-
-   import akismet
-
-   akismet_client = await akismet.AsyncClient.validated_client()
-
-   if await akismet_client.comment_check(
-       user_ip=submitter_ip,
-       comment_content=submitted_content,
-       comment_type="forum-post",
-       comment_author=submitter_name
-   ):
-       # This piece of content was classified as spam; handle it appropriately.
-
-Note that in both cases the client instance is created via the alternate constructor
-``validated_client()``. This is recommended instead of using the default constructor
-(i.e., directly calling ``akismet.SyncClient()`` or ``akismet.AsyncClient()``); the
-``validated_client()`` constructor will perform automatic discovery of the
-environment-variable configuration and validate the configuration with the Akismet web
-service before returning the client, while directly constructing an instance will not
-(so if you do directly construct an instance, you must manually provide and validate its
-configuration).
-
 """
 # SPDX-License-Identifier: BSD-3-Clause
 

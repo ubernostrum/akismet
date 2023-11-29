@@ -1,10 +1,13 @@
 Akismet
 CSV
+Litestar
 async
+boolean
 blog
 bugfixes
 classmethods
 config
+dataclass
 docstrings
 instantiation
 linters
