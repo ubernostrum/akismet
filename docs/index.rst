@@ -10,7 +10,7 @@ Documentation contents
 
 .. toctree::
    :caption: Installation and usage
-   :maxdepth: 2
+   :maxdepth: 1
 
    install
    usage
