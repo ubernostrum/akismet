@@ -415,7 +415,7 @@ class SyncClient:
         :param str comment_author_email: (optional, recommended) The email address of
            the content's submitter.
 
-        :param int is_test: (optional Set to ``1`` if you are making requests for
+        :param int is_test: (optional) Set to ``1`` if you are making requests for
           testing purposes; this tells Akismet not to incorporate the request into its
           training corpus or allow it to affect future responses.
 
