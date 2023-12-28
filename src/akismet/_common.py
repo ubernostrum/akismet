@@ -4,7 +4,6 @@ Common definitions used by both the sync and async Akismet implementations.
 """
 # SPDX-License-Identifier: BSD-3-Clause
 
-import dataclasses
 import enum
 import os
 import sys
@@ -83,10 +82,10 @@ class CheckResponse(enum.IntEnum):
     DISCARD = 2
 
 
-@dataclasses.dataclass
-class Config:
+class Config(typing.NamedTuple):
     """
-    An Akismet configuration, consisting of a key and a URL.
+    A :func:`~collections.namedtuple` representing Akismet configuration, consisting
+    of a key and a URL.
 
     You only need to use this if you're manually configuring an Akismet API client
     (which should be rare) rather than letting the ``validated_client()`` constructor

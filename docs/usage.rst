@@ -257,7 +257,7 @@ Alternative configuration
 If you don't want to configure your Akismet client via the standard environment
 variables, or aren't able to set the environment variables, you can avoid the
 ``validated_client()`` method and instantiate your Akismet client
-directly. This is done via the :class:`akismet.Config` utility dataclass. You
+directly. This is done via the :class:`akismet.Config` utility tuple. You
 should also the make sure to validate the configuration before trying to use
 the client.
 
