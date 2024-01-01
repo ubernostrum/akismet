@@ -48,13 +48,13 @@ including comments, contact-form submissions, user signups and more. See
 
 .. _alt-constructor:
 
-Why is there an alternate constructor?
---------------------------------------
+Why shouldn't I create the client directly?
+-------------------------------------------
 
 Both of the API clients provide a ``classmethod`` which serves as an alternate
 constructor: :meth:`akismet.SyncClient.validated_client` and
-:meth:`akismet.AsyncClient.validated_client`, and you're encouraged to use the
-alternate constructor when you need an instance of one of the clients.
+:meth:`akismet.AsyncClient.validated_client`, and you're encouraged to use
+these alternate constructors when you need an instance of one of the clients.
 
 The short explanation for this is that the ``validated_client()`` constructor
 will automatically read your Akismet API key and site URL from environment
@@ -68,7 +68,7 @@ constructor, and you'll want to ensure you call the verify-key operation to
 validate that configuration.
 
 The longer explanation is that the ``validated_client()`` constructor allows
-both the sync and async clients to provide the same overall
+both the sync and async clients to provide the same
 interface. :class:`~akismet.SyncClient` could easily just read the
 configuration and do the validation in its own ``__init__()`` method. But
 :class:`~akismet.AsyncClient` cannot do this, because its
@@ -99,26 +99,27 @@ If you're not able to do this, you can also manually instantiate a client and
 then call its ``verify_key()`` method, passing the key and URL you want to
 check as the arguments. For example:
 
-.. code-block:: python
+.. tab:: Sync
 
-   import akismet
+   .. code-block:: python
 
-   config = akismet.Config(key=key_to_test, url=url_to_test)
-   client = akismet.SyncClient(config=config)
-   if not client.verify_key(key_to_test, url_to_test):
-       # The key/URL were invalid.
+      import akismet
 
-The same :meth:`~akismet.AsyncClient.verify_key` method also exists on the
-async client:
+      config = akismet.Config(key=key_to_test, url=url_to_test)
+      client = akismet.SyncClient(config=config)
+      if not client.verify_key(key_to_test, url_to_test):
+          # The key/URL were invalid.
 
-.. code-block:: python
+.. tab:: Async
 
-   import akismet
+   .. code-block:: python
 
-   config = akismet.Config(key=key_to_test, url=url_to_test)
-   client = akismet.AyncClient(config=config)
-   if not await client.verify_key(key_to_test, url_to_test):
-       # The key/URL were invalid.
+      import akismet
+
+      config = akismet.Config(key=key_to_test, url=url_to_test)
+      client = akismet.AyncClient(config=config)
+      if not await client.verify_key(key_to_test, url_to_test):
+          # The key/URL were invalid.
 
 
 How can I test that it's working?
