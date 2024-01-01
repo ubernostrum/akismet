@@ -55,7 +55,7 @@ tests = [
 skips = ["B101"]
 
 [tool.black]
-target-version = ["py38"]
+target-version = ["py38", "py39", "py310", "py311", "py312"]
 
 [tool.coverage.report]
 fail_under = 100
