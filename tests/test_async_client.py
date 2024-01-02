@@ -116,7 +116,7 @@ class AsyncAkismetConstructorTests(AsyncAkismetTests):
         assert http_client.headers["user-agent"] == _common.USER_AGENT
 
 
-class SyncAkismetAPITests(AsyncAkismetTests):
+class AsyncAkismetAPITests(AsyncAkismetTests):
     """
     Test the API behavior of the asynchronous Akismet API client.
 
