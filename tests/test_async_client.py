@@ -346,7 +346,7 @@ class AsyncAkismetAPITests(AsyncAkismetTests):
 
 class AsyncAkismetErrorTests(AsyncAkismetTests):
     """
-    Test the error behavior of the synchronous Akismet API client.
+    Test the error behavior of the asynchronous Akismet API client.
 
     """
 
