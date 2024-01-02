@@ -61,7 +61,7 @@ _OPTIONAL_KEYS = [
 # -------------------------------------------------------------------------------
 
 USER_AGENT = (
-    f"akismet/{_version.LIBRARY_VERSION} | Python/"
+    f"akismet.py/{_version.LIBRARY_VERSION} | Python/"
     f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
 )
 
