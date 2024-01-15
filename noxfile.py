@@ -120,13 +120,13 @@ def docs_build(session: nox.Session) -> None:
     session.install(".[docs]")
     session.chdir("docs")
     session.run(
-        f"{session.bin}/python{session.python}",
+        f"python{session.python}",
         "-Im",
         "sphinx",
         "-b",
         "html",
         "-d",
-        f"{session.bin}/../tmp/doctrees",
+        f"{session.bin}/../tmp/doctrees",  # FIX ME
         ".",
         f"{session.bin}/../tmp/html",
     )
@@ -171,7 +171,7 @@ def docs_spellcheck(session: nox.Session) -> None:
     build_dir = session.create_tmp()
     session.chdir("docs")
     session.run(
-        f"{session.bin}/python{session.python}",
+        f"python{session.python}",
         "-Im",
         "sphinx",
         "-W",  # Promote warnings to errors, so that misspelled words fail the build.
