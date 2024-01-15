@@ -28,7 +28,7 @@ dependencies = [
   "httpx",
 ]
 dynamic = ["version"]
-keywords = ["spam"]
+keywords = ["akismet", "spam", "spam-filtering"]
 license = {text = "BSD-3-Clause"}
 readme = "README.rst"
 requires-python = ">=3.8"
