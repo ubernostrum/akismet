@@ -2,6 +2,7 @@
 Tests for the deprectaed legacy Akismet API client.
 
 """
+
 # SPDX-License-Identifier: BSD-3-Clause
 
 import os

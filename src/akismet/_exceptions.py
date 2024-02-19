@@ -2,6 +2,7 @@
 Exceptions used by the Akismet clients.
 
 """
+
 # SPDX-License-Identifier: BSD-3-Clause
 
 
@@ -38,7 +39,6 @@ class ProtocolError(AkismetError):
 
 
 class ConfigurationError(AkismetError):
-
     """
     Raised when an Akismet configuration error is detected (config missing or
     invalid).

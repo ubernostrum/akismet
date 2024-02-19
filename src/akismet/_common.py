@@ -2,6 +2,7 @@
 Common definitions used by both the sync and async Akismet implementations.
 
 """
+
 # SPDX-License-Identifier: BSD-3-Clause
 
 import enum
@@ -32,9 +33,7 @@ _VERIFY_KEY = "verify-key"
 _KEY_ENV_VAR = "PYTHON_AKISMET_API_KEY"
 _URL_ENV_VAR = "PYTHON_AKISMET_BLOG_URL"
 
-_TIMEOUT = float(
-    os.getenv("PYTHON_AKISMET_TIMEOUT", 1.0)  # pylint: disable=invalid-envvar-default
-)
+_TIMEOUT = float(os.getenv("PYTHON_AKISMET_TIMEOUT", "1.0"))
 
 _OPTIONAL_KEYS = [
     "blog_charset",

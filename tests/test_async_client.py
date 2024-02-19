@@ -2,6 +2,7 @@
 Tests for the asynchronous Akismet API client.
 
 """
+
 # SPDX-License-Identifier: BSD-3-Clause
 
 import os

@@ -4,6 +4,7 @@ Configuration file for the Sphinx documentation builder:
 https://www.sphinx-doc.org/
 
 """
+
 import sys
 from importlib.metadata import version as get_version
 

@@ -2,6 +2,7 @@
 Synchronous Akismet API client implementation.
 
 """
+
 # SPDX-License-Identifier: BSD-3-Clause
 
 import textwrap
@@ -57,6 +58,15 @@ class SyncClient:
        import akismet
        config = akismet.Config(key=your_api_key, url=your_site_url)
        akismet_client = akismet.SyncClient(config=config)
+
+    .. warning:: **Consequences of invalid configurationn**
+
+       If you construct an Akismet API client manually and provide an invalid key or
+       URL, all operations of the Akismet web service, other than key verification, will
+       reply with an invalid-key message. This will cause all client methods other than
+       :meth:`verify_key` to raise :exc:`akismet.APIKeyError`. To avoid this situation,
+       it is strongly recommended that you call :meth:`verify_key` to validate your
+       configuration prior to calling any other methods.
 
     If you want to modify the HTTP request behavior -- for example, to support a
     required HTTP proxy -- you can construct a custom ``httpx.Client`` and pass it as

@@ -3,6 +3,7 @@ End-to-end tests of the Akismet API clients, which will make real requests to th
 Akismet web service.
 
 """
+
 # SPDX-License-Identifier: BSD-3-Clause
 
 import os

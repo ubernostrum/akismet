@@ -10,6 +10,7 @@ which requires functioning installs of all supported Python versions -- run ``py
 nox``. To run a single task, use ``python -m nox --session`` with the name of that task.
 
 """
+
 import os
 import pathlib
 import shutil
@@ -126,7 +127,7 @@ def docs_build(session: nox.Session) -> None:
         "-b",
         "html",
         "-d",
-        f"{session.bin}/../tmp/doctrees",  # FIX ME
+        f"{session.bin}/../tmp/doctrees",
         ".",
         f"{session.bin}/../tmp/html",
     )
@@ -202,7 +203,7 @@ def format_black(session: nox.Session) -> None:
     Check code formatting with Black.
 
     """
-    session.install("black")
+    session.install("black>=24.0,<25.0")
     session.run(f"python{session.python}", "-Im", "black", "--version")
     session.run(
         f"python{session.python}",

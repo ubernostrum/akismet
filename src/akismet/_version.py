@@ -2,6 +2,7 @@
 Library version number.
 
 """
+
 # SPDX-License-Identifier: BSD-3-Clause
 
 # This is set here instead of in common.py or __init__.py because it's read dynamically

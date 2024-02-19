@@ -1,7 +1,7 @@
 """
 A Python interface to `the Akismet spam-filtering service <https://akismet.com>`_.
 
-Two API clients are available from this library:
+Two Akismet API clients are available from this library:
 
 * :class:`akismet.SyncClient` is an Akismet API client which performs synchronous
   (blocking) HTTP requests to the Akismet web service.
@@ -22,21 +22,49 @@ they will be automatically detected and used.
 You can then construct a client instance and call its methods. For example, to check a
 submitted forum post for spam:
 
-.. code-block:: python
+.. tab:: Sync
 
-   import akismet
+   .. code-block:: python
 
-   akismet_client = akismet.SyncClient.validated_client()
+      import akismet
 
-   if akismet_client.comment_check(
-       user_ip=submitter_ip,
-       comment_content=submitted_content,
-       comment_type="forum-post",
-       comment_author=submitter_name
-   ):
-       # This piece of content was classified as spam; handle it appropriately.
+      akismet_client = akismet.SyncClient.validated_client()
+
+      if akismet_client.comment_check(
+          user_ip=submitter_ip,
+          comment_content=submitted_content,
+          comment_type="forum-post",
+          comment_author=submitter_name
+      ):
+          # This piece of content was classified as spam; handle it appropriately.
+
+.. tab:: Async
+
+   .. code-block:: python
+
+      import akismet
+
+      akismet_client = await akismet.AsyncClient.validated_client()
+
+      if await akismet_client.comment_check(
+          user_ip=submitter_ip,
+          comment_content=submitted_content,
+          comment_type="forum-post",
+          comment_author=submitter_name
+      ):
+          # This piece of content was classified as spam; handle it appropriately.
+
+Note that in both cases the client instance is created via the alternate constructor
+``validated_client()``. This is recommended instead of using the default constructor
+(i.e., directly calling ``akismet.SyncClient()`` or ``akismet.AsyncClient()``); the
+``validated_client()`` constructor will perform automatic discovery of the
+environment-variable configuration and validate the configuration with the Akismet web
+service before returning the client, while directly constructing an instance will not
+(so if you do directly construct an instance, you must manually provide and validate its
+configuration).
 
 """
+
 # SPDX-License-Identifier: BSD-3-Clause
 
 from ._async_client import AsyncClient

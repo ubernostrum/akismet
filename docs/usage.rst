@@ -93,6 +93,7 @@ client created above):
           """
           if akismet_client.comment_check(
               user_ip=request.META["REMOTE_ADDR"],
+              comment_type="forum_post",
               comment_content=request.POST["post_body"],
               comment_author=request.user.username,
           ):
@@ -111,6 +112,7 @@ client created above):
           """
           if await akismet_client.comment_check(
               user_ip=request.META["REMOTE_ADDR"],
+              comment_type="forum_post",
               comment_content=request.POST["post_body"],
               comment_author=request.user.username,
           ):
@@ -156,6 +158,7 @@ adapt the example of ``comment_check()`` above to do this:
           """
           classification = akismet_client.comment_check(
               user_ip=request.META["REMOTE_ADDR"],
+              comment_type="forum_post",
               comment_content=request.POST["post_body"],
               comment_author=request.user.username,
           )
@@ -180,6 +183,7 @@ adapt the example of ``comment_check()`` above to do this:
           """
           classification = await akismet_client.comment_check(
               user_ip=request.META["REMOTE_ADDR"],
+              comment_type="forum_post",
               comment_content=request.POST["post_body"],
               comment_author=request.user.username,
           )
@@ -193,7 +197,7 @@ adapt the example of ``comment_check()`` above to do this:
 
 This works because the :class:`~akismet.CheckResponse` enum uses integer
 values; when fed directly to an ``if``/``else``, they work as boolean values
-("HAM" is 0, "SPAM" is 1, and "DISCARD" is 2).
+(``HAM`` is ``0``, ``SPAM`` is ``1``, and ``DISCARD`` is ``2``).
 
 
 Using a custom HTTP client
