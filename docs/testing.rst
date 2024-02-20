@@ -16,14 +16,14 @@ be done from the root of your git checkout of ``akismet``:
 
    .. code-block:: shell
 
-      python -m pip install nox
+      python -m pip install --upgrade nox
       python -m nox
 
 .. tab:: Windows
 
    .. code-block:: shell
 
-      py -m pip install nox
+      py -m pip install --upgrade nox
       py -m nox
 
 Note that to run the full test matrix you will need to have each supported

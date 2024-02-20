@@ -21,20 +21,20 @@ on the following versions of Python:
 Installing ``akismet``
 ----------------------
 
-To install ``akismet``, run the following command from a command
-prompt/terminal:
+To install the latest stable released version of ``akismet``, run the following
+command from a command prompt/terminal:
 
 .. tab:: macOS/Linux/other Unix
 
    .. code-block:: shell
 
-      python -m pip install akismet
+      python -m pip install --upgrade akismet
 
 .. tab:: Windows
 
    .. code-block:: shell
 
-      py -m pip install akismet
+      py -m pip install --upgrade akismet
 
 This will use ``pip``, the standard Python package-installation tool. If you
 are using a supported version of Python, your installation of Python should

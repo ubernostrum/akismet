@@ -228,7 +228,7 @@ use, it's available as :data:`akismet.USER_AGENT`.
 
       akismet_client = akismet.SyncClient.validated_client(
           http_client=httpx.Client(
-              proxies=settings.PROXY_URL,
+              proxy=settings.PROXY_URL,
               headers={"User-Agent": akismet.USER_AGENT}
           )
       )
@@ -244,7 +244,7 @@ use, it's available as :data:`akismet.USER_AGENT`.
 
       akismet_client = await akismet.AsyncClient.validated_client(
           http_client=httpx.AsyncClient(
-              proxies=settings.PROXY_URL,
+              proxy=settings.PROXY_URL,
               headers={"User-Agent": akismet.USER_AGENT}
           )
       )
@@ -262,8 +262,8 @@ If you don't want to configure your Akismet client via the standard environment
 variables, or aren't able to set the environment variables, you can avoid the
 ``validated_client()`` method and instantiate your Akismet client
 directly. This is done via the :class:`akismet.Config` utility tuple. You
-should also the make sure to validate the configuration before trying to use
-the client.
+should also make sure to validate the configuration before trying to use the
+client.
 
 .. tab:: Sync
 

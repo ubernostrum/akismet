@@ -6,13 +6,13 @@ Synchronous Akismet API client implementation.
 # SPDX-License-Identifier: BSD-3-Clause
 
 import textwrap
-import typing
+from typing import TYPE_CHECKING, Optional, Union
 
 import httpx
 
 from . import _common, _exceptions
 
-if typing.TYPE_CHECKING:  # pragma: no cover
+if TYPE_CHECKING:  # pragma: no cover
     import akismet
 
 
@@ -75,6 +75,20 @@ class SyncClient:
     string used by the Akismet API clients, and <https://www.python-httpx.org> for the
     full documentation of the HTTPX module.
 
+    .. code-block:: python
+
+       import akismet
+       import httpx
+
+       from your_app.config import settings
+
+       akismet_client = akismet.SyncClient.validated_client(
+           http_client=httpx.Client(
+               proxy=settings.PROXY_URL,
+               headers={"User-Agent": akismet.USER_AGENT}
+           )
+       )
+
     Note that if you only want to set a custom request timeout threshold (the default is
     1 second), you can specify it by setting the environment variable
     ``PYTHON_AKISMET_TIMEOUT`` to a value that can be parsed into a :class:`float` or
@@ -100,7 +114,7 @@ class SyncClient:
     # ----------------------------------------------------------------------------
 
     def __init__(
-        self, config: _common.Config, http_client: typing.Optional[httpx.Client] = None
+        self, config: _common.Config, http_client: Optional[httpx.Client] = None
     ) -> None:
         """
         Default constructor.
@@ -113,7 +127,7 @@ class SyncClient:
 
     @classmethod
     def validated_client(
-        cls, http_client: typing.Optional[httpx.Client] = None
+        cls, http_client: Optional[httpx.Client] = None
     ) -> "SyncClient":
         """
         Constructor of :class:`SyncClient`.
@@ -304,8 +318,7 @@ class SyncClient:
 
         The IP address of the user posting the content is required. All `other
         comment-check arguments documented by Akismet
-        <https://akismet.com/developers/comment-check/>`_ are also optionally accepted,
-        except for the PHP server information array.
+        <https://akismet.com/developers/comment-check/>`_ are also optionally accepted.
 
         It is recommended that you supply at least the following optional arguments:
         ``comment_content``; ``comment_type``; and ``comment_author`` and/or
@@ -359,8 +372,7 @@ class SyncClient:
 
         The IP address of the user posting the content is required. All `other
         submit-ham arguments documented by Akismet
-        <https://akismet.com/developers/submit-ham/>`_ are also optionally accepted,
-        except for the PHP server information array.
+        <https://akismet.com/developers/submit-ham/>`_ are also optionally accepted.
 
         It is recommended that you supply at least the following optional arguments:
         ``comment_content``; ``comment_type``; and ``comment_author`` and/or
@@ -400,8 +412,7 @@ class SyncClient:
 
         The IP address of the user posting the content is required. All `other
         submit-spam arguments documented by Akismet
-        <https://akismet.com/developers/submit-spam/>`_ are also optionally accepted,
-        except for the PHP server information array.
+        <https://akismet.com/developers/submit-spam/>`_ are also optionally accepted.
 
         It is recommended that you supply at least the following optional arguments:
         ``comment_content``; ``comment_type``; and ``comment_author`` and/or
@@ -437,13 +448,13 @@ class SyncClient:
 
     def key_sites(  # pylint: disable=too-many-arguments
         self,
-        month: typing.Optional[str] = None,
-        url_filter: typing.Optional[str] = None,
-        result_format: typing.Optional[str] = None,
-        order: typing.Optional[str] = None,
-        limit: typing.Optional[int] = None,
-        offset: typing.Optional[int] = None,
-    ) -> typing.Union[dict, str]:
+        month: Optional[str] = None,
+        url_filter: Optional[str] = None,
+        result_format: Optional[str] = None,
+        order: Optional[str] = None,
+        limit: Optional[int] = None,
+        offset: Optional[int] = None,
+    ) -> Union[dict, str]:
         """
         Return Akismet API usage statistics keyed by site.
 

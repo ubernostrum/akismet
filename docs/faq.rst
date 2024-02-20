@@ -143,7 +143,7 @@ The Akismet web service documentation recommends sending a string identifying
 the application or platform with version, and Akismet plugin/implementation
 name with version. In accordance with this, ``akismet`` sends an HTTP
 ``User-Agent`` based on the versions of Python and ``akismet`` in use. For
-example, ``akismet`` 1.3 on Python 3.10.4 will send ``akismet/1.3 | Python
+example, ``akismet`` 1.3 on Python 3.10.4 will send ``akismet.py/1.3 | Python
 3.10.4``.
 
 

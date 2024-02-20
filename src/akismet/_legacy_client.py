@@ -80,9 +80,9 @@ class Akismet:
         warnings.warn(
             textwrap.dedent(
                 """
-            The akismet.Akismet API client is deprecated and will be removed in version
-            2.0. Please migrate to either akismet.SyncClient or akismet.AsyncClient.
-                """,
+                The akismet.Akismet API client is deprecated and will be removed in
+            version 2.0. Please migrate to either akismet.SyncClient or
+            akismet.AsyncClient.  """,
             ),
             DeprecationWarning,
             stacklevel=2,
@@ -116,10 +116,9 @@ class Akismet:
         """
         Make a request to the Akismet API.
 
-        This method is used for all API calls except key verification,
-        since all endpoints other than key verification must
-        interpolate the API key into the URL and supply certain basic
-        data.
+        This method is used for all API calls except key verification, since all
+        endpoints other than key verification must interpolate the API key into the URL
+        and supply certain basic data.
 
         """
         unknown_args = [k for k in kwargs if k not in self.OPTIONAL_KEYS]
@@ -210,15 +209,14 @@ class Akismet:
         """
         Check a comment to determine whether it is spam.
 
-        The IP address and user-agent string of the remote user are
-        required. All other arguments documented by Akismet (other
-        than the PHP server information) are also optionally accepted.
-        See the Akismet API documentation for a full list:
+        The IP address and user-agent string of the remote user are required. All other
+        arguments documented by Akismet (other than the PHP server information) are also
+        optionally accepted.  See the Akismet API documentation for a full list:
 
         https://akismet.com/developers/comment-check/
 
-        Like the Akismet web API, returns True for a comment that is
-        spam, and False for a comment that is not spam.
+        Like the Akismet web API, returns True for a comment that is spam, and False for
+        a comment that is not spam.
 
         """
         response = self._api_request(
@@ -234,10 +232,9 @@ class Akismet:
         """
         Inform Akismet that a comment is spam.
 
-        The IP address and user-agent string of the remote user are
-        required. All other arguments documented by Akismet (other
-        than the PHP server information) are also optionally accepted.
-        See the Akismet API documentation for a full list:
+        The IP address and user-agent string of the remote user are required. All other
+        arguments documented by Akismet (other than the PHP server information) are also
+        optionally accepted.  See the Akismet API documentation for a full list:
 
         https://akismet.com/developers/submit-spam-missed-spam/
 
@@ -250,10 +247,9 @@ class Akismet:
         """
         Inform Akismet that a comment is not spam.
 
-        The IP address and user-agent string of the remote user are
-        required. All other arguments documented by Akismet (other
-        than the PHP server information) are also optionally accepted.
-        See the Akismet API documentation for a full list:
+        The IP address and user-agent string of the remote user are required. All other
+        arguments documented by Akismet (other than the PHP server information) are also
+        optionally accepted.  See the Akismet API documentation for a full list:
 
         https://akismet.com/developers/submit-ham-false-positives/
 
