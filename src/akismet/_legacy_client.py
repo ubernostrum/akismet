@@ -19,7 +19,10 @@ class Akismet:
     """
     Legacy class-based Akismet client.
 
-    This class is deprecated.
+    This class is deprecated and will be removed in a future release. It receives no new
+    features and only minimal security-oriented bugfixes. Please migrate as quickly as
+    possible to one of the two supported client classes: akismet.SyncClient or
+    akismet.AsyncClient.
 
     Two configuration parameters -- your Akismet API key and registered URL -- are
     required; they can be passed when instantiating, or set in the environment variables
