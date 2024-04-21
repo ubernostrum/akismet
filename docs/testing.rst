@@ -3,6 +3,152 @@
 Testing guide
 =============
 
+
+Testing your use of ``akismet``
+-------------------------------
+
+The recommended way to test your use of ``akismet`` is with one of the included
+:ref:`test clients <test-clients>`. They implement the full API of the
+corresponding real clients, but do not make live HTTP requests to the Akismet
+web service. They also are configurable to allow testing important behaviors
+which your own code using ``akismet`` will need to handle:
+
+* Marking content as spam or as not spam
+* Rejecting an API key/URL as invalid
+
+The test clients are configured by subclassing and setting attributes on the
+subclass:
+
+* Setting the attribute ``comment_check_response`` to a
+  :class:`~akismet.CheckResponse` enum value will cause the comment-check
+  operation to always return that value, allowing you to test spam, non-spam
+  and "blatant spam" responses.
+
+* Setting the attribute ``verify_key_response`` to a :class:`bool` will cause
+  the verify-key operation to always return that value, allowing you to test
+  for the case of both valid and invalid keys. Setting to :data:`False` will
+  also cause the ``validated_client()`` alternate constructor to raise
+  :exc:`~akismet.APIKeyError`, allowing you to test your handling of
+  that situation.
+
+For example:
+
+.. tab:: Sync
+
+   .. code-block:: python
+
+      import akismet
+
+
+      class AlwaysSpam(akismet.TestSyncClient):
+         """
+         This client's comment_check() always returns SPAM.
+
+         """
+         comment_check_response = akismet.CheckResponse.SPAM
+
+
+      class AlwaysBlatantSpam(akismet.TestSyncClient):
+         """
+         This client's comment_check() always returns DISCARD.
+
+         """
+         comment_check_response = akismet.CheckResponse.DISCARD
+
+
+      class NeverSpam(akismet.TestSyncClient):
+         """
+         This client's comment_check() always returns HAM.
+
+         """
+         comment_check_response = akismet.CheckResponse.HAM
+
+
+      class AlwaysValid(akismet.TestSyncClient):
+         """
+         This client's verify_key() always returns True.
+
+         """
+         verify_key_response = True
+
+
+      class NeverValid(akismet.TestSyncClient):
+         """
+         This client's verify_key() always returns False.
+
+         """
+         verify_key_response = False
+
+
+.. tab:: Async
+
+   .. code-block:: python
+
+      import akismet
+
+
+      class AlwaysSpam(akismet.TestAsyncClient):
+         """
+         This client's comment_check() always returns SPAM.
+
+         """
+         comment_check_response = akismet.CheckResponse.SPAM
+
+
+      class AlwaysBlatantSpam(akismet.TestAsyncClient):
+         """
+         This client's comment_check() always returns DISCARD.
+
+         """
+         comment_check_response = akismet.CheckResponse.DISCARD
+
+
+      class NeverSpam(akismet.TestAsyncClient):
+         """
+         This client's comment_check() always returns HAM.
+
+         """
+         comment_check_response = akismet.CheckResponse.HAM
+
+
+      class AlwaysValid(akismet.TestAsyncClient):
+         """
+         This client's verify_key() always returns True.
+
+         """
+         verify_key_response = True
+
+
+      class NeverValid(akismet.TestAsyncClient):
+         """
+         This client's verify_key() always returns False.
+
+         """
+         verify_key_response = False
+
+
+If you also want to perform live end-to-end testing of your use of Akismet, you
+can do so with a real Akismet API client, by passing the optional keyword
+argument ``is_test=1`` to the comment-check, submit-ham, and submit-spam
+operations; this tells Akismet that you are only issuing requests for testing
+purposes, and will not result in any submissions being incorporated into
+Akismet's training corpus. Additionally, the Akismet web service supports
+certain special values for use in triggering specific responses:
+
+* Passing ``comment_author="akismet-guaranteed-spam"`` to the comment-check
+  operation will always cause Akismet to mark the content as spam.
+
+* Passing ``user_role="administrator"`` to the comment-check operation will
+  always cause Akismet to mark the content as not spam.
+
+However, it is generally discouraged to make live requests to an external
+service as part of a normal test suite -- for most cases you should be making
+use of the included test clients.
+
+
+Running this library's tests
+----------------------------
+
 A standard install of ``akismet`` does not install the test suite; you will
 need to perform :ref:`a source checkout as described in the installation guide
 <source-install>`, though performing the "editable" install step is not
@@ -115,7 +261,7 @@ issuing a new release, hence the keyword name):
 
 If you also want to manually perform your own tests, you can instantiate an
 Akismet client class and call its methods to communicate with the live Akismet
-web service. When doing so, it is recommended that you pass the optional
+web service. As mentioned above, it is recommended that you pass the optional
 keyword argument ``is_test=1`` to the comment-check, submit-ham, and
 submit-spam operations; this tells the Akismet web service that you are only
 issuing requests for testing purposes, and will not result in any submissions

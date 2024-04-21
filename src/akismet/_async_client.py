@@ -6,7 +6,7 @@ Asynchronous Akismet API client implementation.
 # SPDX-License-Identifier: BSD-3-Clause
 
 import textwrap
-from typing import TYPE_CHECKING, Optional, Union
+from typing import TYPE_CHECKING, Literal, Optional, Union
 
 import httpx
 
@@ -108,14 +108,14 @@ class AsyncClient:
     """
 
     _http_client: httpx.AsyncClient
-    _config: _common.Config
+    _config: "akismet.Config"
 
     # Constructors.
     # ----------------------------------------------------------------------------
 
     def __init__(
         self,
-        config: _common.Config,
+        config: "akismet.Config",
         http_client: Optional[httpx.AsyncClient] = None,
     ) -> None:
         """
@@ -281,7 +281,7 @@ class AsyncClient:
         unknown_args = [k for k in kwargs if k not in _common._OPTIONAL_KEYS]
         if unknown_args:
             raise _exceptions.UnknownArgumentError(
-                f"Received unknown argument(s) for Akismet operation {endpoint}"
+                f"Received unknown argument(s) for Akismet operation {endpoint}: "
                 f"{', '.join(unknown_args)}"
             )
         data = {
@@ -455,7 +455,7 @@ class AsyncClient:
         self,
         month: Optional[str] = None,
         url_filter: Optional[str] = None,
-        result_format: Optional[str] = None,
+        result_format: Literal["csv", "json"] = "json",
         order: Optional[str] = None,
         limit: Optional[int] = None,
         offset: Optional[int] = None,

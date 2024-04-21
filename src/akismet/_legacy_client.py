@@ -84,8 +84,8 @@ class Akismet:
             textwrap.dedent(
                 """
             The akismet.Akismet API client is deprecated and will be removed in
-            version 2.0. Please migrate to either akismet.SyncClient or
-            akismet.AsyncClient.  """,
+            2025. Please migrate to either akismet.SyncClient or akismet.AsyncClient.
+            """,
             ),
             DeprecationWarning,
             stacklevel=2,

@@ -5,19 +5,97 @@ Tests for the asynchronous Akismet API client.
 
 # SPDX-License-Identifier: BSD-3-Clause
 
+import csv
 import os
-import textwrap
+import typing
 from http import HTTPStatus
+from unittest import mock
 
 import httpx
 
 import akismet
-from akismet import _common
+from akismet import _common, _test_clients
 
-from .base import AsyncAkismetTests
+from . import base
 
 
-class AsyncAkismetConstructorTests(AsyncAkismetTests):
+def make_fixed_response_async_client(
+    response_text: str = "true",
+    status_code: HTTPStatus = HTTPStatus.OK,
+    response_json: typing.Optional[dict] = None,
+) -> httpx.AsyncClient:
+    """
+    Return an asynchronous HTTP client that produces a fixed repsonse, for use in
+    testing.
+
+    """
+    return httpx.AsyncClient(
+        transport=base.make_fixed_response_transport(
+            response_text, status_code, response_json
+        )
+    )
+
+
+def make_exception_async_client(
+    exception_class: Exception, message: str = "Error!"
+) -> httpx.AsyncClient:
+    """
+    Return an asynchronous HTTP client that raises the given exception/message.
+
+    """
+    return mock.AsyncMock(
+        spec_set=httpx.AsyncClient,
+        get=mock.AsyncMock(side_effect=exception_class(message)),
+        post=mock.AsyncMock(side_effect=exception_class(message)),
+    )
+
+
+class ValidConfig(akismet.TestAsyncClient):
+    """
+    Test client with valid config.
+
+    """
+
+    verify_key_response = True
+
+
+class InvalidConfig(akismet.TestAsyncClient):
+    """
+    Test client with invalid config.
+
+    """
+
+    verify_key_response = False
+
+
+class AlwaysBlatantSpam(akismet.TestAsyncClient):
+    """
+    Test client which marks all content as "blatant" spam.
+
+    """
+
+    comment_check_response = akismet.CheckResponse.DISCARD
+
+
+class AlwaysSpam(akismet.TestAsyncClient):
+    """
+    Test client which marks all content as spam.
+
+    """
+
+    comment_check_response = akismet.CheckResponse.SPAM
+
+
+class NeverSpam(akismet.TestAsyncClient):
+    """
+    Test client which marks all content as not spam.
+
+    """
+
+    comment_check_response = akismet.CheckResponse.HAM
+
+
+class AsyncAkismetConstructorTests(base.AsyncAkismetTests):
     """
     Test the ``client()`` constructor of the asynchronous Akismet API client.
 
@@ -28,9 +106,7 @@ class AsyncAkismetConstructorTests(AsyncAkismetTests):
         With a valid configuration, constructing a client succeeds.
 
         """
-        await akismet.AsyncClient.validated_client(
-            http_client=self.custom_response_async_client()
-        )
+        await ValidConfig.validated_client()
 
     async def test_construct_config_invalid_key(self):
         """
@@ -38,9 +114,7 @@ class AsyncAkismetConstructorTests(AsyncAkismetTests):
 
         """
         with self.assertRaises(akismet.APIKeyError):
-            await akismet.AsyncClient.validated_client(
-                http_client=self.custom_response_async_client(config_valid=False)
-            )
+            await InvalidConfig.validated_client()
 
     async def test_construct_config_bad_url(self):
         """
@@ -64,9 +138,7 @@ class AsyncAkismetConstructorTests(AsyncAkismetTests):
             if _common._KEY_ENV_VAR in os.environ:
                 del os.environ[_common._KEY_ENV_VAR]
             with self.assertRaises(akismet.ConfigurationError):
-                await akismet.AsyncClient.validated_client(
-                    http_client=self.custom_response_async_client()
-                )
+                await ValidConfig.validated_client()
         finally:
             os.environ[_common._KEY_ENV_VAR] = self.api_key
 
@@ -80,9 +152,7 @@ class AsyncAkismetConstructorTests(AsyncAkismetTests):
             if _common._URL_ENV_VAR in os.environ:
                 del os.environ[_common._URL_ENV_VAR]
             with self.assertRaises(akismet.ConfigurationError):
-                await akismet.AsyncClient.validated_client(
-                    http_client=self.custom_response_async_client()
-                )
+                await ValidConfig.validated_client()
         finally:
             os.environ[_common._URL_ENV_VAR] = self.site_url
 
@@ -98,9 +168,7 @@ class AsyncAkismetConstructorTests(AsyncAkismetTests):
             if _common._URL_ENV_VAR in os.environ:
                 del os.environ[_common._URL_ENV_VAR]
             with self.assertRaises(akismet.ConfigurationError):
-                await akismet.AsyncClient.validated_client(
-                    http_client=self.custom_response_async_client()
-                )
+                await ValidConfig.validated_client()
         finally:
             os.environ[_common._KEY_ENV_VAR] = self.api_key
             os.environ[_common._URL_ENV_VAR] = self.site_url
@@ -117,7 +185,7 @@ class AsyncAkismetConstructorTests(AsyncAkismetTests):
         assert http_client.headers["user-agent"] == _common.USER_AGENT
 
 
-class AsyncAkismetAPITests(AsyncAkismetTests):
+class AsyncAkismetAPITests(base.AsyncAkismetTests):
     """
     Test the API behavior of the asynchronous Akismet API client.
 
@@ -129,10 +197,7 @@ class AsyncAkismetAPITests(AsyncAkismetTests):
         ``AkismetError``.
 
         """
-        client = akismet.AsyncClient(
-            config=self.config,
-            http_client=self.custom_response_sync_client(),
-        )
+        client = ValidConfig(config=self.config)
         # The tested set of methods here are all the methods that are in Python 3.11's
         # http.HTTPMethod enum but not supported for Akismet requests.
         for bad_method in (
@@ -158,10 +223,7 @@ class AsyncAkismetAPITests(AsyncAkismetTests):
         ``verify_key()`` returns True when the config is valid.
 
         """
-        client = akismet.AsyncClient(
-            config=self.config,
-            http_client=self.custom_response_async_client(),
-        )
+        client = ValidConfig(config=self.config)
         assert await client.verify_key(key=self.api_key, url=self.site_url)
 
     async def test_verify_key_invalid(self):
@@ -169,10 +231,7 @@ class AsyncAkismetAPITests(AsyncAkismetTests):
         ``verify_key()`` returns False when the config is invalid.
 
         """
-        client = akismet.AsyncClient(
-            config=self.config,
-            http_client=self.custom_response_async_client(config_valid=False),
-        )
+        client = InvalidConfig(config=self.config)
         assert not await client.verify_key(key=self.api_key, url=self.site_url)
 
     async def test_request_with_invalid_key(self):
@@ -183,7 +242,7 @@ class AsyncAkismetAPITests(AsyncAkismetTests):
         """
         client = akismet.AsyncClient(
             config=self.config,
-            http_client=self.custom_response_async_client(response_text="invalid"),
+            http_client=make_fixed_response_async_client(response_text="invalid"),
         )
         for method in ("comment_check", "submit_ham", "submit_spam"):
             with self.subTest(method=method):
@@ -200,10 +259,7 @@ class AsyncAkismetAPITests(AsyncAkismetTests):
         to be spam.
 
         """
-        client = akismet.AsyncClient(
-            config=self.config,
-            http_client=self.custom_response_async_client(response_text="true"),
-        )
+        client = AlwaysSpam(config=self.config)
         assert (
             await client.comment_check(comment_content="test", **self.common_kwargs)
             == akismet.CheckResponse.SPAM
@@ -215,12 +271,7 @@ class AsyncAkismetAPITests(AsyncAkismetTests):
         to be spam and sends the "discard"" header value.
 
         """
-        client = akismet.AsyncClient(
-            config=self.config,
-            http_client=self.custom_response_async_client(
-                response_text="true", headers={"X-akismet-pro-tip": "discard"}
-            ),
-        )
+        client = AlwaysBlatantSpam(config=self.config)
         assert (
             await client.comment_check(comment_content="test", **self.common_kwargs)
             == akismet.CheckResponse.DISCARD
@@ -232,10 +283,7 @@ class AsyncAkismetAPITests(AsyncAkismetTests):
         to be ham.
 
         """
-        client = akismet.AsyncClient(
-            config=self.config,
-            http_client=self.custom_response_async_client(response_text="false"),
-        )
+        client = NeverSpam(config=self.config)
         assert (
             await client.comment_check(comment_content="test", **self.common_kwargs)
             == akismet.CheckResponse.HAM
@@ -246,12 +294,7 @@ class AsyncAkismetAPITests(AsyncAkismetTests):
         ``submit_ham()`` returns True when Akismet accepts the submission.
 
         """
-        client = akismet.AsyncClient(
-            config=self.config,
-            http_client=self.custom_response_async_client(
-                response_text=_common._SUBMISSION_RESPONSE
-            ),
-        )
+        client = ValidConfig(config=self.config)
         assert await client.submit_ham(**self.common_kwargs)
 
     async def test_submit_spam(self):
@@ -259,93 +302,67 @@ class AsyncAkismetAPITests(AsyncAkismetTests):
         ``submit_spam()`` returns True when Akismet accepts the submission.
 
         """
-        client = akismet.AsyncClient(
-            config=self.config,
-            http_client=self.custom_response_async_client(
-                response_text=_common._SUBMISSION_RESPONSE
-            ),
-        )
+        client = ValidConfig(config=self.config)
         assert await client.submit_spam(**self.common_kwargs)
 
     async def test_key_sites_json(self):
         """
-        ``key_sites()`` returns key usage information in JSON format by async default.
+        ``key_sites()`` returns key usage information in JSON format by default.
 
         """
-        # Sample response data taken from Akismet's dev docs.
-        response_json = {
-            "2022-09": [
-                {
-                    "site": "site6735.example.com",
-                    "api_calls": "2072",
-                    "spam": "2069",
-                    "ham": "3",
-                    "missed_spam": "0",
-                    "false_positives": "4",
-                    "is_revoked": False,
-                },
-                {
-                    "site": "site4748.example.com",
-                    "api_calls": "1633",
-                    "spam": "3",
-                    "ham": "1630",
-                    "missed_spam": "0",
-                    "false_positives": "0",
-                    "is_revoked": True,
-                },
-            ],
-            "limit": 10,
-            "offset": 0,
-            "total": 2,
-        }
-        client = akismet.AsyncClient(
-            config=self.config,
-            http_client=self.custom_response_async_client(response_json=response_json),
-        )
-        assert await client.key_sites() == response_json
+        client = ValidConfig(config=self.config)
+        response_json = await client.key_sites()
+        for key in ["2022-09", "limit", "offset", "total"]:
+            assert key in response_json
+        sites = response_json["2022-09"]
+        for site in sites:
+            for key in [
+                "site",
+                "api_calls",
+                "spam",
+                "ham",
+                "missed_spam",
+                "false_positives",
+                "is_revoked",
+            ]:
+                assert key in site
 
     async def test_key_sites_csv(self):
         """
         ``key_sites()`` returns key usage information in CSV format when requested.
 
         """
-        # Sample response data taken from Akismet's dev docs.
-        response_csv = textwrap.dedent(
-            """
-        Active sites for 123YourAPIKey during 2022-09 (limit:10, offset: 0, total: 4)
-        Site,Total API Calls,Spam,Ham,Missed Spam,False Positives,Is Revoked
-        site6735.example.com,14446,33,13,0,9,false
-        site3026.example.com,8677,101,6,0,0,false
-        site3737.example.com,4230,65,5,2,0,true
-        site5653.example.com,2921,30,1,2,6,false
-        """
-        )
-        client = akismet.AsyncClient(
-            config=self.config,
-            http_client=self.custom_response_async_client(response_text=response_csv),
-        )
-        assert await client.key_sites(result_format="csv") == response_csv
+        client = ValidConfig(config=self.config)
+        first, *rest = (await client.key_sites(result_format="csv")).splitlines()
+        assert first.startswith("Active sites for")
+        reader = csv.DictReader(rest)
+        row = next(reader)
+        assert set(row.keys()) == {
+            "Site",
+            "Total API Calls",
+            "Spam",
+            "Ham",
+            "Missed Spam",
+            "False Positives",
+            "Is Revoked",
+        }
 
     async def test_usage_limit(self):
         """
         ``usage_limit()`` returns the API usage statistics in JSON format.
 
         """
-        # Sample response data taken from Akismet's dev docs.
-        response_json = {
-            "limit": 350000,
-            "usage": 7463,
-            "percentage": "2.13",
-            "throttled": False,
+        client = ValidConfig(config=self.config)
+        response_json = await client.usage_limit()
+        assert set(response_json.keys()) == {
+            "limit",
+            "usage",
+            "percentage",
+            "throttled",
         }
-        client = akismet.AsyncClient(
-            config=self.config,
-            http_client=self.custom_response_async_client(response_json=response_json),
-        )
-        assert await client.usage_limit() == response_json
 
 
-class AsyncAkismetErrorTests(AsyncAkismetTests):
+class AsyncAkismetErrorTests(base.AsyncAkismetTests):
     """
     Test the error behavior of the asynchronous Akismet API client.
 
@@ -361,7 +378,7 @@ class AsyncAkismetErrorTests(AsyncAkismetTests):
         for code in codes:
             client = akismet.AsyncClient(
                 config=self.config,
-                http_client=self.custom_response_async_client(status_code=code),
+                http_client=make_fixed_response_async_client(status_code=code),
             )
         with self.subTest(method="verify_key"):
             with self.assertRaises(akismet.RequestError):
@@ -383,7 +400,7 @@ class AsyncAkismetErrorTests(AsyncAkismetTests):
 
         client = akismet.AsyncClient(
             config=self.config,
-            http_client=self.exception_async_client(
+            http_client=make_exception_async_client(
                 httpx.TimeoutException, "Timed out."
             ),
         )
@@ -406,7 +423,7 @@ class AsyncAkismetErrorTests(AsyncAkismetTests):
         """
         client = akismet.AsyncClient(
             config=self.config,
-            http_client=self.exception_async_client(httpx.RequestError),
+            http_client=make_exception_async_client(httpx.RequestError),
         )
         with self.subTest(method="verify_key"):
             with self.assertRaises(akismet.RequestError):
@@ -428,7 +445,7 @@ class AsyncAkismetErrorTests(AsyncAkismetTests):
         """
         client = akismet.AsyncClient(
             config=self.config,
-            http_client=self.exception_async_client(TypeError),
+            http_client=make_exception_async_client(TypeError),
         )
         with self.subTest(method="verify_key"):
             with self.assertRaises(akismet.RequestError):
@@ -449,7 +466,7 @@ class AsyncAkismetErrorTests(AsyncAkismetTests):
 
         """
         client = akismet.AsyncClient(
-            config=self.config, http_client=self.custom_response_async_client()
+            config=self.config, http_client=_test_clients._make_test_async_http_client()
         )
         for method in ("comment_check", "submit_ham", "submit_spam"):
             with self.subTest(method=method):
@@ -464,7 +481,7 @@ class AsyncAkismetErrorTests(AsyncAkismetTests):
         """
         client = akismet.AsyncClient(
             config=self.config,
-            http_client=self.custom_response_async_client(response_text="bad"),
+            http_client=make_fixed_response_async_client(response_text="bad"),
         )
         with self.assertRaises(akismet.ProtocolError):
             await client.comment_check(**self.common_kwargs)
@@ -477,7 +494,7 @@ class AsyncAkismetErrorTests(AsyncAkismetTests):
         """
         client = akismet.AsyncClient(
             config=self.config,
-            http_client=self.custom_response_async_client(response_text="bad"),
+            http_client=make_fixed_response_async_client(response_text="bad"),
         )
         for method in ("submit_ham", "submit_spam"):
             with self.subTest(method=method):
@@ -490,18 +507,9 @@ class AsyncAkismetErrorTests(AsyncAkismetTests):
 
         """
 
-        def _handler(  # pylint: disable=unused-argument
-            request: httpx.Request,
-        ) -> httpx.Response:
-            """
-            Mock transport handler which returns a controlled response.
-
-            """
-            return httpx.Response(status_code=HTTPStatus.OK, content="bad")
-
         client = akismet.AsyncClient(
             config=self.config,
-            http_client=httpx.AsyncClient(transport=httpx.MockTransport(_handler)),
+            http_client=make_fixed_response_async_client(response_text="bad"),
         )
         with self.assertRaises(akismet.ProtocolError):
             await client.verify_key(self.config.key, self.config.url)

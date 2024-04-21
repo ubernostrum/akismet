@@ -222,7 +222,7 @@ def format_black(session: nox.Session) -> None:
 @nox.session(python=["3.12"], tags=["formatters"])
 def format_isort(session: nox.Session) -> None:
     """
-    Check code formating with Black.
+    Check import order with isort.
 
     """
     session.install("isort")

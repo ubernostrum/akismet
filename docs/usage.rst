@@ -4,7 +4,7 @@
 Usage guide
 ===========
 
-To use this library, you will need to obtain an Akismet API key and register a
+To use ``akismet``, you will need to obtain an Akismet API key and register a
 site for use with the Akismet web service; you can do this at
 <https://akismet.com>. Once you have a key and corresponding registered site
 URL to use with it, place them in the environment variables
@@ -17,8 +17,8 @@ to use for making requests to the Akismet web service; if not set, this will
 default to ``1.0`` (one second).
 
 
-Basic usage
------------
+Basic use
+---------
 
 Once you have a key and registered site, and have set the environment
 variables, you can create an Akismet API client. Two are available, one being
@@ -38,8 +38,9 @@ synchronous (blocking I/O), and the other asynchronous (non-blocking I/O).
 
 To create an Akismet API client, call the ``validated_client()`` constructor
 method; this will automatically read your Akismet API key and site URL from the
-environment variables, and validate them with Akismet. If they're not valid,
-you'll get an :exc:`akismet.ConfigurationError` exception.
+environment variables, and validate them with Akismet. If they're not valid, or
+if they're not found in the environment variables mentioned above, you'll get
+an :exc:`akismet.ConfigurationError` exception.
 
 .. tab:: Sync
 
@@ -119,6 +120,170 @@ client created above):
               # The post was spam, reject it.
           else:
               # The post wasn't spam, allow it.
+
+
+Recommended patterns
+--------------------
+
+Creating an Akismet API client and verifying its API key/URL is a moderately
+expensive process, and you generally don't need to constantly re-create the
+client or re-verify its configuration. So you should try to do this only once
+per Python process, and then keep the client in memory for the duration of the
+process. One way to do this is to write a function which creates the client the
+first time it's needed, and then stores it in a module-level variable for
+reuse:
+
+.. tab:: Sync
+
+   .. code-block:: python
+
+      import akismet
+
+      _akismet_client = None
+
+      def get_akismet_client():
+          """
+          Create (if necessary) and return an Akismet API client.
+
+          """
+          global _akismet_client
+          if _akismet_client is None:
+              _akismet_client = akismet.SyncClient.validated_client()
+          return _akismet_client
+
+      # Other files in your codebase can import this one and call get_akismet_client()
+
+.. tab:: Async
+
+   .. code-block:: python
+
+      import akismet
+
+      _akismet_client = None
+
+      async def get_akismet_client():
+          """
+          Create (if necessary) and return an Akismet API client.
+
+          """
+          global _akismet_client
+          if _akismet_client is None:
+              _akismet_client = await akismet.AsyncClient.validated_client()
+          return _akismet_client
+
+      # Other files in your codebase can import this one and call get_akismet_client()
+
+A more flexible approach is to adopt something like a `service locator pattern
+<https://en.wikipedia.org/wiki/Service_locator_pattern>`_ and use that to
+obtain and manage an Akismet API client. For example, `svcs
+<https://pypi.org/project/svcs/>`_ is a service-locator implementation for
+Python which could be used to register and re-use an Akismet API client (or a
+factory function for building a custom one). Whenever possible, this approach
+is recommended because it simplifies not just the use of the Akismet API client
+but likely many other aspects of your application as well.
+
+
+Testing your use of ``akismet``
+-------------------------------
+
+While you *can* perform limited end-to-end testing of Akismet's spam-checking
+if you want to (see :ref:`the testing guide <testing>` for details), in general
+it's discouraged to make live requests to external services as part of a normal
+application test suite.
+
+It's also generally discouraged to build extensive :mod:`unittest.mock`
+representations of code that isn't under your control; this often leads to
+over-complicated test setups and a high maintenance burden as you attempt to
+keep your mocks in sync with what a third-party library is doing.
+
+So ``akismet`` provides two test clients intended to be used in your
+application's tests: :class:`~akismet.TestAsyncClient` as a test version of
+:class:`~akismet.AsyncClient`, and :class:`~akismet.TestSyncClient` as a test
+version of :class:`~akismet.SyncClient`.
+
+Both of these test classes implement the full API of their real counterparts,
+but they do *not* make actual requests to the Akismet web service. You can
+configure them by subclassing and setting attributes to simulate content being
+marked as spam/not-spam and also to simulate an invalid API key. For example,
+you might write a simple spam-flagging function which toggles an attribute on a
+submitted comment:
+
+.. code-block:: python
+
+   def flag_spam_comment(akismet_client, request, comment):
+       """
+       If the submitted content is marked as spam by Akismet, set it to
+       have filtered=True.
+
+       """
+       if akismet_client.comment_check(
+           user_ip=request.META["REMOTE_ADDR"],
+           comment_type="comment",
+           comment_content=comment.body,
+           comment_author=request.user.username,
+       ):
+           comment.filtered = True
+       return comment
+
+And then test it like so:
+
+.. code-block:: python
+
+   import unittest
+
+   import akismet
+
+   from your_app.moderation import flag_spam_comment
+   from your_app.test_factories import make_test_request, make_test_comment
+
+   class AlwaysSpam(akismet.TestSyncClient):
+       """
+       An Akismet client whose comment_check() always returns SPAM.
+
+       """
+       comment_check_response = akismet.CheckResponse.SPAM
+
+   class NeverSpam(akismet.TestSyncClient):
+       """
+       An Akismet client whose comment_check() always returns HAM.
+
+       """
+       comment_check_response = akismet.CheckResponse.HAM
+
+   test_config = akismet.Config(key="fake-test-key", url="http://example.com")
+
+   class SpamFlagTests(unittest.TestCase):
+       """
+       Test the spam-flagging function.
+
+       """
+       def test_flag_set_on_spam(self):
+           """
+           When the comment is identified as spam, the "filtered" attribute
+           is set to True.
+
+           """
+           akismet_client = AlwaysSpam(config=test_config)
+           comment = flag_spam_comment(
+               akismet_client,
+               make_test_request(),
+               make_test_comment()
+           )
+           assert comment.filtered
+
+       def test_flag_not_set_on_non_spam(self):
+           """
+           When the comment is identified as non-spam, the "filtered" attribute
+           is set to False.
+
+           """
+           akismet_client = NeverSpam(config=test_config)
+           comment = flag_spam_comment(
+               akismet_client,
+               make_test_request(),
+               make_test_comment()
+           )
+           assert not comment.filtered
 
 
 Advanced usage

@@ -21,6 +21,7 @@ Documentation contents
 
    sync_client
    async_client
+   test_clients
    exceptions
    misc
 
@@ -29,7 +30,7 @@ Documentation contents
    :maxdepth: 1
 
    testing
-   upgrade
+   changelog
    faq
 
 .. seealso::
