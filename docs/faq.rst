@@ -57,24 +57,19 @@ constructor: :meth:`akismet.SyncClient.validated_client` and
 these alternate constructors when you need an instance of one of the clients.
 
 The short explanation for this is that the ``validated_client()`` constructor
-will automatically read your Akismet API key and site URL from environment
-variables (``PYTHON_AKISMET_API_KEY`` and ``PYTHON_AKISMET_BLOG_URL``) and
-validate them via the ``verify_key`` operation before returning the API client
-instance to you, and this is highly useful behavior.
-
-If you don't use the ``validated_client()`` constructor, you'll need to
-construct your own :class:`~akismet.Config` to pass in to the default
-constructor, and you'll want to ensure you call the verify-key operation to
-validate that configuration.
+will automatically validate your Akismet configuration ``verify_key`` operation
+before returning the API client instance to you, and this is highly useful
+behavior. If you don't use the ``validated_client()`` constructor, you'll need
+to manually call the verify-key operation to validate that configuration.
 
 The longer explanation is that the ``validated_client()`` constructor allows
 both the sync and async clients to provide the same
-interface. :class:`~akismet.SyncClient` could easily just read the
-configuration and do the validation in its own ``__init__()`` method. But
-:class:`~akismet.AsyncClient` cannot do this, because its
-:meth:`~akismet.AsyncClient.verify_key` method is asynchronous; calling it in
-``__init__()`` would require making the ``__init__()`` method asynchronous too,
-and an async ``__init__()`` is not currently supported by Python.
+interface. :class:`~akismet.SyncClient` could easily just perform the
+validation in its own ``__init__()`` method. But :class:`~akismet.AsyncClient`
+cannot do this, because its :meth:`~akismet.AsyncClient.verify_key` method is
+asynchronous; calling it in ``__init__()`` would require making the
+``__init__()`` method asynchronous too, and an async ``__init__()`` is not
+currently supported by Python.
 
 This limitation does not apply to classmethods used as alternate constructors,
 so to provide a useful constructor that does automatic discovery and validation

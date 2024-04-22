@@ -38,9 +38,11 @@ synchronous (blocking I/O), and the other asynchronous (non-blocking I/O).
 
 To create an Akismet API client, call the ``validated_client()`` constructor
 method; this will automatically read your Akismet API key and site URL from the
-environment variables, and validate them with Akismet. If they're not valid, or
-if they're not found in the environment variables mentioned above, you'll get
-an :exc:`akismet.ConfigurationError` exception.
+environment variables, and validate them with Akismet (see :ref:`the FAQ
+<alt-constructor>` for an explanation of why this is done through an alternate
+constructor). If they're not valid, or if they're not found in the environment
+variables mentioned above, you'll get an :exc:`akismet.ConfigurationError`
+exception.
 
 .. tab:: Sync
 
@@ -57,6 +59,29 @@ an :exc:`akismet.ConfigurationError` exception.
       import akismet
 
       akismet_client = await akismet.AsyncClient.validated_client()
+
+
+If you're not able to, or don't want to, set the environment variables, you can
+create a :class:`~akismet.Config` instance and use that to manually configure
+your Akismet API client:
+
+.. tab:: Sync
+
+   .. code-block:: python
+
+      import akismet
+
+      config = akismet.Config(key=your_api_key, url=your_site_url)
+      akismet_client = akismet.SyncClient.validated_client(config=config)
+
+.. tab:: Async
+
+   .. code-block:: python
+
+      import akismet
+
+      config = akismet.Config(key=your_api_key, url=your_site_url)
+      akismet_client = await akismet.AsyncClient.validated_client(config=config)
 
 The most important operation of the Akismet client is checking a piece of
 content to see if it's spam. This is done with the ``comment_check()``
@@ -424,11 +449,8 @@ Alternative configuration
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If you don't want to configure your Akismet client via the standard environment
-variables, or aren't able to set the environment variables, you can avoid the
-``validated_client()`` method and instantiate your Akismet client
-directly. This is done via the :class:`akismet.Config` utility tuple. You
-should also make sure to validate the configuration before trying to use the
-client.
+variables, or aren't able to set the environment variables, you can pass in the
+configuration explicitly via the :class:`akismet.Config` utility tuple.
 
 .. tab:: Sync
 
@@ -438,10 +460,7 @@ client.
 
       config = akismet.Config(key=your_api_key, url=your_site_url)
 
-      akismet_client = akismet.SyncClient(config=config)
-
-      if not akismet_client.verify_key(config.key, config.url):
-          # The configuration was invalid!
+      akismet_client = akismet.SyncClient.validated_client(config=config)
 
 .. tab:: Async
 
@@ -451,12 +470,4 @@ client.
 
       config = akismet.Config(key=your_api_key, url=your_site_url)
 
-      # When constructing a client this way, you do *not* need to "await" it!
-      akismet_client = akismet.AsyncClient(config=config)
-
-      # But you *do* need to "await" the verify_key() method.
-      if not await akismet_client.verify_key(config.key, config.url):
-          # The configuration was invalid!
-
-If you also need a custom HTTP client when configuring this way, you can also
-pass it in, again as the keyword argument ``http_client``.
+      akismet_client = await akismet.AsyncClient.validated_client(config=config)

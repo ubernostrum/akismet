@@ -18,15 +18,15 @@ from ._sync_client import SyncClient
 if TYPE_CHECKING:  # pragma: no cover
     import akismet
 
-_TEST_KEY = "invalid-key-for-testing"
+_TEST_KEY = "invalid-test-key"
 _TEST_URL = "http://example.com/"
 
-_COMMENT_CHECK_URL = f"{_common._API_URL}/{_common._API_V11}/{_common._COMMENT_CHECK}"
-_KEY_SITES_URL = f"{_common._API_URL}/{_common._API_V12}/{_common._KEY_SITES}"
-_SUBMIT_HAM_URL = f"{_common._API_URL}/{_common._API_V11}/{_common._SUBMIT_HAM}"
-_SUBMIT_SPAM_URL = f"{_common._API_URL}/{_common._API_V11}/{_common._SUBMIT_SPAM}"
-_USAGE_LIMIT_URL = f"{_common._API_URL}/{_common._API_V12}/{_common._USAGE_LIMIT}"
-_VERIFY_KEY_URL = f"{_common._API_URL}/{_common._API_V11}/{_common._VERIFY_KEY}"
+_COMMENT_CHECK_URL = f"/{_common._API_V11}/{_common._COMMENT_CHECK}"
+_KEY_SITES_URL = f"/{_common._API_V12}/{_common._KEY_SITES}"
+_SUBMIT_HAM_URL = f"/{_common._API_V11}/{_common._SUBMIT_HAM}"
+_SUBMIT_SPAM_URL = f"/{_common._API_V11}/{_common._SUBMIT_SPAM}"
+_USAGE_LIMIT_URL = f"/{_common._API_V12}/{_common._USAGE_LIMIT}"
+_VERIFY_KEY_URL = f"/{_common._API_V11}/{_common._VERIFY_KEY}"
 
 _COMMENT_CHECK_DISCARD_RESPONSE = {
     "content": "true",
@@ -37,48 +37,49 @@ _COMMENT_CHECK_SPAM_RESPONSE = {"content": "true"}
 _VERIFY_KEY_VALID_RESPONSE = {"content": "valid"}
 _VERIFY_KEY_INVALID_RESPONSE = {"content": "invalid"}
 
-# Sample CSV data taken from Akismet's dev docs.
-_CSV_TEXT = """Active sites for 123YourAPIKey during 2022-09 (limit:10, offset: 0, total: 4)
+_KEY_SITES_CSV = {
+    # Sample CSV data taken from Akismet's dev docs.
+    "content": """Active sites for 123YourAPIKey during 2022-09 (limit:10, offset: 0, total: 4)
 Site,Total API Calls,Spam,Ham,Missed Spam,False Positives,Is Revoked
 site6735.example.com,14446,33,13,0,9,false
 site3026.example.com,8677,101,6,0,0,false
 site3737.example.com,4230,65,5,2,0,true
 site5653.example.com,2921,30,1,2,6,false"""
+}
+_KEY_SITES_JSON = {
+    # Sample JSON from Akismet's dev docs.
+    "json": {
+        "2022-09": [
+            {
+                "site": "site6735.example.com",
+                "api_calls": "2072",
+                "spam": "2069",
+                "ham": "3",
+                "missed_spam": "0",
+                "false_positives": "4",
+                "is_revoked": False,
+            },
+            {
+                "site": "site4748.example.com",
+                "api_calls": "1633",
+                "spam": "3",
+                "ham": "1630",
+                "missed_spam": "0",
+                "false_positives": "0",
+                "is_revoked": True,
+            },
+        ],
+        "limit": 10,
+        "offset": 0,
+        "total": 2,
+    }
+}
 
 _BASE_RESPONSE_MAP = {
     _COMMENT_CHECK_URL: _COMMENT_CHECK_SPAM_RESPONSE,
-    f"{_KEY_SITES_URL}?format=json": {
-        # Sample JSON from Akismet's dev docs.
-        "json": {
-            "2022-09": [
-                {
-                    "site": "site6735.example.com",
-                    "api_calls": "2072",
-                    "spam": "2069",
-                    "ham": "3",
-                    "missed_spam": "0",
-                    "false_positives": "4",
-                    "is_revoked": False,
-                },
-                {
-                    "site": "site4748.example.com",
-                    "api_calls": "1633",
-                    "spam": "3",
-                    "ham": "1630",
-                    "missed_spam": "0",
-                    "false_positives": "0",
-                    "is_revoked": True,
-                },
-            ],
-            "limit": 10,
-            "offset": 0,
-            "total": 2,
-        }
-    },
-    f"{_KEY_SITES_URL}?format=csv": {"content": _CSV_TEXT},
     _SUBMIT_HAM_URL: {"content": _common._SUBMISSION_RESPONSE},
     _SUBMIT_SPAM_URL: {"content": _common._SUBMISSION_RESPONSE},
-    f"{_USAGE_LIMIT_URL}?api_key={_TEST_KEY}": {
+    _USAGE_LIMIT_URL: {
         # Sample JSON from Akismet's dev docs.
         "json": {
             "limit": 350000,
@@ -122,7 +123,18 @@ def _make_test_transport(
         Mock transport handler which returns controlled responses.
 
         """
-        return httpx.Response(status_code=HTTPStatus.OK, **response_map[request.url])
+        if request.url.path != _KEY_SITES_URL:
+            response_args = response_map[request.url.path]
+        else:
+            # key-sites is the only operation where anything other than the path
+            # matters; it has a single query param which controls the response format,
+            # so we have to adjust the response to match what was requested.
+            response_args = (
+                _KEY_SITES_CSV
+                if request.url.query == b"format=csv"
+                else _KEY_SITES_JSON
+            )
+        return httpx.Response(status_code=HTTPStatus.OK, **response_args)
 
     return httpx.MockTransport(_handler)
 
@@ -202,7 +214,7 @@ class TestAsyncClient(AsyncClient):
 
     def __init__(
         self,
-        config: "akismet.Config",
+        config: Optional["akismet.Config"] = None,
         http_client: Optional[httpx.AsyncClient] = None,
     ) -> None:
         """
@@ -255,7 +267,7 @@ class TestSyncClient(SyncClient):
 
     def __init__(
         self,
-        config: "akismet.Config",
+        config: Optional["akismet.Config"] = None,
         http_client: Optional[httpx.Client] = None,
     ) -> None:
         """

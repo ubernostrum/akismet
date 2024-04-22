@@ -64,7 +64,7 @@ class SyncAkismetEndToEndTests(AkismetTests):
         ``verify_key()`` returns True when the config is valid.
 
         """
-        assert self.client.verify_key(self.api_key, self.site_url)
+        assert self.client.verify_key()
 
     def test_verify_key_invalid(self):
         """
@@ -178,7 +178,7 @@ class AsyncAkismetEndToEndTests(AsyncAkismetTests):
         ``verify_key()`` returns True when the config is valid.
 
         """
-        assert await self.client.verify_key(self.api_key, self.site_url)
+        assert await self.client.verify_key()
 
     async def test_verify_key_invalid(self):
         """

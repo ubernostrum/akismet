@@ -54,7 +54,7 @@ class SyncTestClientTests(AkismetTests):
 
         """
         client = TestSyncClient(config=self.config)
-        assert client.verify_key(self.config.key, self.config.url)
+        assert client.verify_key()
 
     def test_verify_key_explicit_success(self):
         """
@@ -73,7 +73,7 @@ class SyncTestClientTests(AkismetTests):
 
         # Explicit configuration succeeds.
         client = _Client(config=self.config)
-        assert client.verify_key(self.config.key, self.config.url)
+        assert client.verify_key()
 
         # Implicit configuration succeeds.
         _Client.validated_client()
@@ -95,7 +95,7 @@ class SyncTestClientTests(AkismetTests):
 
         # Explicit configuration fails.
         client = _Client(config=self.config)
-        assert not client.verify_key(self.config.key, self.config.url)
+        assert not client.verify_key()
 
         # Implicit configuration fails.
         with self.assertRaises(APIKeyError):
@@ -150,7 +150,7 @@ class AsyncTestClientTests(AsyncAkismetTests):
 
         """
         client = TestAsyncClient(config=self.config)
-        assert await client.verify_key(self.config.key, self.config.url)
+        assert await client.verify_key()
 
     async def test_verify_key_explicit_success(self):
         """
@@ -169,7 +169,7 @@ class AsyncTestClientTests(AsyncAkismetTests):
 
         # Explicit configuration succeeds.
         client = _Client(config=self.config)
-        assert await client.verify_key(self.config.key, self.config.url)
+        assert await client.verify_key()
 
         # Implicit configuration succeeds.
         await _Client.validated_client()
@@ -191,7 +191,7 @@ class AsyncTestClientTests(AsyncAkismetTests):
 
         # Explicit configuration fails.
         client = _Client(config=self.config)
-        assert not await client.verify_key(self.config.key, self.config.url)
+        assert not await client.verify_key()
 
         # Implicit configuration fails.
         with self.assertRaises(APIKeyError):

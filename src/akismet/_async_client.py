@@ -49,24 +49,16 @@ class AsyncClient:
     <alt-constructor>` for the technical reasons why the default constructor does not
     have this behavior.
 
-    **Advanced/unusual use cases:** Instantiate the client directly. You must construct
-    a :class:`~akismet.Config` instance with your API key and site URL, and they will
-    *not* be automatically validated for you.
+    If you don't want to or can't use the environment variables to configure Akismet,
+    you can also explicitly configure by creating a :class:`~akismet.Config` instance
+    with your API key and site URL, and passing it as the constructor argument
+    ``config``:
 
     .. code-block:: python
 
        import akismet
        config = akismet.Config(key=your_api_key, url=your_site_url)
-       akismet_client = akismet.AsyncClient(config=config)
-
-    .. warning:: **Consequences of invalid configurationn**
-
-       If you construct an Akismet API client manually and provide an invalid key or
-       URL, all operations of the Akismet web service, other than key verification, will
-       reply with an invalid-key message. This will cause all client methods other than
-       :meth:`verify_key` to raise :exc:`akismet.APIKeyError`. To avoid this situation,
-       it is strongly recommended that you call :meth:`verify_key` to validate your
-       configuration prior to calling any other methods.
+       akismet_client = await akismet.AsyncClient.validated_client(config=config)
 
     If you want to modify the HTTP request behavior -- for example, to support a
     required HTTP proxy -- you can construct a custom ``httpx.AsyncClient`` and pass it
@@ -75,35 +67,39 @@ class AsyncClient:
     string used by the Akismet API clients, and <https://www.python-httpx.org> for the
     full documentation of the HTTPX module.
 
-    .. code-block:: python
-
-       import akismet
-       import httpx
-
-       from your_app.config import settings
-
-       akismet_client = await akismet.AsyncClient.validated_client(
-           http_client=httpx.AsyncClient(
-               proxy=settings.PROXY_URL,
-               headers={"User-Agent": akismet.USER_AGENT}
-           )
-       )
-
     Note that if you only want to set a custom request timeout threshold (the default is
     1 second), you can specify it by setting the environment variable
     ``PYTHON_AKISMET_TIMEOUT`` to a value that can be parsed into a :class:`float` or
-    :class:`int`.
+    :class:`int` and represents the desired timeout in seconds.
 
-    :param config: An Akismet :class:`~akismet.Config`, consisting of an API key and
-       site URL.
+    **Unusual/advanced use cases:** Invoke the default constructor. It accepts the same
+    set of arguments as the :meth:`validated_client` constructor, and its behavior is
+    identical *except* for the fact that it will not automatically validate your
+    configuration, so you must remember to do so manually. You should only invoke the
+    default constructor if you are absolutely certain that you need to avoid the
+    automatic validation performed by :meth:`validated_client`.
+
+    .. warning:: **Consequences of invalid configurationn**
+
+       If you construct an Akismet API client through the default constructor and
+       provide an invalid key or URL, all operations of the Akismet web service, other
+       than key verification, will reply with an invalid-key message. This will cause
+       all client methods other than :meth:`verify_key` to raise
+       :exc:`~akismet.APIKeyError`. To avoid this situation, it is strongly recommended
+       that you call :meth:`verify_key` to validate your configuration prior to calling
+       any other methods, at which point you likely should be using
+       :meth:`validated_client` anyway.
+
+    :param config: An optional Akismet :class:`~akismet.Config`, consisting of an API
+       key and site URL.
 
     :param http_client: An optional ``httpx`` async HTTP client instance to
        use. Generally you should only pass this in if you need significantly customized
        HTTP-client behavior, and if you do pass this argument you are responsible for
        setting an appropriate ``User-Agent`` (see :data:`~akismet.USER_AGENT`), timeout,
        and other configuration values. If all you want is to change the default timeout
-       (1 second), store the desired timeout as a floating-point or integer value in the
-       environment variable ``PYTHON_AKISMET_TIMEOUT``.
+       (1 second), store the desired timeout, in seconds, as a floating-point or integer
+       value in the environment variable ``PYTHON_AKISMET_TIMEOUT``.
 
     """
 
@@ -115,7 +111,7 @@ class AsyncClient:
 
     def __init__(
         self,
-        config: "akismet.Config",
+        config: Optional["akismet.Config"] = None,
         http_client: Optional[httpx.AsyncClient] = None,
     ) -> None:
         """
@@ -124,21 +120,26 @@ class AsyncClient:
         You will almost always want to use :meth:`validated_client` instead.
 
         """
+        self._config = config if config is not None else _common._try_discover_config()
         self._http_client = http_client or _common._get_async_http_client()
-        self._config = config
 
     @classmethod
     async def validated_client(
-        cls, http_client: Optional[httpx.AsyncClient] = None
+        cls,
+        config: Optional["akismet.Config"] = None,
+        http_client: Optional[httpx.AsyncClient] = None,
     ) -> "AsyncClient":
         """
         Constructor of :class:`AsyncClient`.
 
         This is usually preferred over the default ``AsyncClient()`` constructor,
-        because this constructor will discover and validate the Akismet configuration
-        (API key and URL) prior to returning the client instance. The Akismet API key
-        will be read from the environment variable ``PYTHON_AKISMET_API_KEY``, and the
-        registered site URL from the environment variable ``PYTHON_AKISMET_BLOG_URL``.
+        because this constructor will validate the Akismet configuration (API key and
+        URL) prior to returning the client instance.
+
+        :param config: An optional explicit Akismet :class:`~akismet.Config`, consisting
+           of an API key and site URL; if not passed, the configuration will be read
+           from the environment variables ``PYTHON_AKISMET_API_KEY`` and
+           ``PYTHON_AKISMET_BLOG_URL``.
 
         :param http_client: An optional ``httpx`` async HTTP client instance to
            use. Generally you should only pass this in if you need significantly
@@ -146,8 +147,8 @@ class AsyncClient:
            responsible for setting an appropriate ``User-Agent`` (see
            :data:`~akismet.USER_AGENT`), timeout, and other configuration values. If all
            you want is to change the default timeout (1 second), store the desired
-           timeout as a floating-point or integer value in the environment variable
-           ``PYTHON_AKISMET_TIMEOUT``.
+           timeout, in seconds, as a floating-point or integer value in the environment
+           variable ``PYTHON_AKISMET_TIMEOUT``.
 
         :raises akismet.APIKeyError: When the discovered Akismet configuration is
            invalid according to :meth:`verify_key`.
@@ -164,16 +165,15 @@ class AsyncClient:
         # Python does not currently allow __init__() to be usefully async. But a
         # classmethod *can* be async, so we define and encourage the use of an
         # alternative constructor in order to achieve API consistency.
-        config = _common._try_discover_config()
         instance = cls(config=config, http_client=http_client)
-        if not await instance.verify_key(config.key, config.url):
+        if not await instance.verify_key():
             raise _exceptions.APIKeyError(
                 textwrap.dedent(
                     f"""
                     Akismet API key and/or blog URL were invalid.
 
-                    Found API key: {config.key}
-                    Found blog URL: {config.url}
+                    Found API key: {instance._config.key}
+                    Found blog URL: {instance._config.url}
                     """
                 )
             )
@@ -519,7 +519,9 @@ class AsyncClient:
         )
         return response.json()
 
-    async def verify_key(self, key: str, url: str) -> bool:
+    async def verify_key(
+        self, key: Optional[str] = None, url: Optional[str] = None
+    ) -> bool:
         """
         Verify an Akismet API key and URL.
 
@@ -527,7 +529,9 @@ class AsyncClient:
 
         In general, you should not need to explicitly call this method. The
         :meth:`validated_client` constructor will ensure this method is called during
-        client construction, after which the now-verified key/URL can be trusted.
+        client construction, after which the now-verified key/URL can be trusted. If
+        neither ``key`` nor ``url`` are provided, the key and URL currently in use by
+        this client will be checked.
 
         :param key: The API key to check.
 
@@ -537,6 +541,8 @@ class AsyncClient:
            received from the Akismet API.
 
         """
+        if not all([key, url]):
+            key, url = self._config
         response = await self._request(
             "POST", _common._API_V11, _common._VERIFY_KEY, {"key": key, "blog": url}
         )

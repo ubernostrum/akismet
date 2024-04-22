@@ -64,6 +64,20 @@ Version 24.4.0
 * Introduced the test client classes: :class:`~akismet.TestSyncClient` and
   :class:`~akismet.TestAsyncClient`.
 
+* The ``validated_client()`` constructor of both client classes now optionally
+  accepts an explicit ``Config`` instance.
+
+* The default constructor's ``config`` argument is now optional on both client
+  classes; as with ``validated_client()``, it will attempt to find the config
+  in environment variables if it is not explicitly passed in. This means the
+  only difference now between the default constructor and the
+  ``validated_client()`` constructor is the validation of the key/URL in
+  ``validated_client()``.
+
+* The ``key`` and ``url`` arguments to the ``verify_key()`` method of both
+  client classes are now optional; if not supplied, ``verify_key()`` uses the
+  key and URL from the client's current config.
+
 
 Releases not under CalVer
 -------------------------
