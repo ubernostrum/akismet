@@ -18,6 +18,7 @@ linters
 online
 pre
 plugin
+pytest
 signup
 signups
 spam
