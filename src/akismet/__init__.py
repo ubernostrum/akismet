@@ -55,11 +55,39 @@ Or using the asynchronous client:
 Note that in both cases the client instance is created via the alternate constructor
 ``validated_client()``. This is recommended instead of using the default constructor
 (i.e., directly calling ``akismet.SyncClient()`` or ``akismet.AsyncClient()``); the
-``validated_client()`` constructor will perform automatic discovery of the
-environment-variable configuration and validate the configuration with the Akismet web
-service before returning the client, while directly constructing an instance will not
-(so if you do directly construct an instance, you must manually provide and validate its
-configuration).
+``validated_client()`` constructor will validate the configuration with the Akismet web
+service before returning the client.
+
+You can also use either client class as a context manager. This also will validate the
+configuration for you prior to returning the client:
+
+.. code-block:: python
+
+   import akismet
+
+   with akismet.SyncClient() as akismet_client:
+       if akismet_client.comment_check(
+           user_ip=submitter_ip,
+           comment_content=submitted_content,
+           comment_type="forum-post",
+           comment_author=submitter_name
+       ):
+           # This piece of content was classified as spam; handle it appropriately.
+
+Or using the asynchronous client:
+
+.. code-block:: python
+
+   import akismet
+
+   async with akismet.AsyncClient() as akismet_client:
+       if await akismet_client.comment_check(
+           user_ip=submitter_ip,
+           comment_content=submitted_content,
+           comment_type="forum-post",
+           comment_author=submitter_name
+       ):
+           # This piece of content was classified as spam; handle it appropriately.
 
 """
 

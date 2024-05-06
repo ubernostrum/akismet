@@ -20,7 +20,7 @@ subsequent release in the same month would be 25.1.1; a release the following
 month (February) would be 25.2.0.
 
 The CalVer system was adopted for this library in 2024, and the first release
-to use a CalVer version number was 24.4.0.
+to use a CalVer version number was 24.5.0.
 
 
 API stability and deprecations
@@ -50,13 +50,13 @@ The API stability/deprecation policy for this library is as follows:
   case.
 
 * This policy is in effect as of the adoption of CalVer versioning, with
-  version 24.4.0 of this library.
+  version 24.5.0 of this library.
 
 
 Releases under CalVer
 ---------------------
 
-Version 24.4.0
+Version 24.5.0
 ~~~~~~~~~~~~~~
 
 * Adopted `CalVer versioning <https://calver.org>`_.
@@ -77,6 +77,12 @@ Version 24.4.0
 * The ``key`` and ``url`` arguments to the ``verify_key()`` method of both
   client classes are now optional; if not supplied, ``verify_key()`` uses the
   key and URL from the client's current config.
+
+* :class:`~akismet.SyncClient` can now be used as a context manager, and
+  :class:`~akismet.AsyncClient` can now be used as an async (``async with``)
+  context manager. In both cases, it is not necessary to use the
+  ``validated_client()`` constructor; the config validation is performed when
+  entering the context manager.
 
 
 Releases not under CalVer

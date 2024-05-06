@@ -9,4 +9,4 @@ Library version number.
 # by setuptools during the package build, and both common.py and __init__.py (which
 # imports common.py) need to import the third-party httpx library, which is not
 # available during package build (it only becomes available after package install).
-LIBRARY_VERSION = "24.4.0a1"
+LIBRARY_VERSION = "24.5.0a1"

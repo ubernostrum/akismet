@@ -100,6 +100,23 @@ class Config(typing.NamedTuple):
 # -------------------------------------------------------------------------------
 
 
+def _configuration_error(config: Config) -> typing.NoReturn:
+    """
+    Raise an appropriate exception for invalid configuration.
+
+    """
+    raise _exceptions.APIKeyError(
+        textwrap.dedent(
+            f"""
+            Akismet API key and/or blog URL were invalid.
+
+            Found API key: {config.key}
+            Found URL: {config.url}
+            """
+        )
+    )
+
+
 def _get_async_http_client() -> httpx.AsyncClient:
     """
     Return an asynchronous HTTP client for interacting with the Akismet API.

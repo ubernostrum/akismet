@@ -5,8 +5,8 @@ Synchronous Akismet API client implementation.
 
 # SPDX-License-Identifier: BSD-3-Clause
 
-import textwrap
-from typing import TYPE_CHECKING, Literal, Optional, Union
+from types import TracebackType
+from typing import TYPE_CHECKING, Literal, Optional, Type, Union
 
 import httpx
 
@@ -60,6 +60,13 @@ class SyncClient:
        config = akismet.Config(key=your_api_key, url=your_site_url)
        akismet_client = akismet.SyncClient.validated_client(config=config)
 
+    If you rely on environment variable configuration and the complete configuration
+    cannot be found in the environment variables, :meth:`validated_client` will raise
+    :exc:`~akismet.ConfigurationError`. If the API key and URL you supply are invalid
+    according to :meth:`verify_key` -- regardless of whether you provided them via
+    environment variables or an explicit :class:`~akismet.Config` --
+    :meth:`validated_client` will raise :exc:`~akismet.APIKeyError`.
+
     If you want to modify the HTTP request behavior -- for example, to support a
     required HTTP proxy -- you can construct a custom ``httpx.Client`` and pass it as
     the keyword argument ``http_client`` to either :meth:`validated_client` or the
@@ -71,6 +78,18 @@ class SyncClient:
     1 second), you can specify it by setting the environment variable
     ``PYTHON_AKISMET_TIMEOUT`` to a value that can be parsed into a :class:`float` or
     :class:`int` and represents the desired timeout in seconds.
+
+    You can also use this class as a context manager; when doing so, you do *not* need
+    to use the :meth:`validated_client` constructor, as the context manager can perform
+    the validation for you when entering the ``with`` block.
+
+    .. code-block:: python
+
+       import akismet
+
+       with akismet.SyncClient() as akismet_client:
+           # Use the client here. It will be automatically cleaned up when the "with"
+           # block exits.
 
     **Unusual/advanced use cases:** Invoke the default constructor. It accepts the same
     set of arguments as the :meth:`validated_client` constructor, and its behavior is
@@ -168,17 +187,29 @@ class SyncClient:
         # constructor in order to achieve API consistency.
         instance = cls(config=config, http_client=http_client)
         if not instance.verify_key():
-            raise _exceptions.APIKeyError(
-                textwrap.dedent(
-                    f"""
-                    Akismet API key and/or blog URL were invalid.
-
-                    Found API key: {instance._config.key}
-                    Found blog URL: {instance._config.url}
-                    """
-                )
-            )
+            _common._configuration_error(instance._config)
         return instance
+
+    # Context-manager protocol.
+    # ----------------------------------------------------------------------------
+
+    def __enter__(self) -> "SyncClient":
+        """
+        Entry method of the context manager.
+
+        """
+        if not self.verify_key():
+            _common._configuration_error(self._config)
+        return self
+
+    def __exit__(
+        self, exc_type: Type[BaseException], exc: BaseException, tb: TracebackType
+    ):
+        """
+        Exit method of the context manager.
+
+        """
+        self._http_client.close()
 
     # Internal/helper methods.
     # ----------------------------------------------------------------------------
