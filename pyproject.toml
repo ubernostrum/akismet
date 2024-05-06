@@ -34,8 +34,8 @@ readme = "README.rst"
 requires-python = ">=3.8"
 
 [project.urls]
-documentation = "https://akismet.readthedocs.io"
-homepage = "https://github.com/ubernostrum/akismet"
+Documentation = "https://akismet.readthedocs.io"
+GitHub = "https://github.com/ubernostrum/akismet"
 
 [project.optional-dependencies]
 docs = [
