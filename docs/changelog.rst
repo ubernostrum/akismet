@@ -59,6 +59,8 @@ Releases under CalVer
 Version 24.5.0
 ~~~~~~~~~~~~~~
 
+*Unreleased -- release date pending*
+
 * Adopted `CalVer versioning <https://calver.org>`_.
 
 * Introduced the test client classes: :class:`~akismet.TestSyncClient` and
