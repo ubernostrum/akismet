@@ -125,5 +125,4 @@ __all__ = [
     "TestSyncClient",
     "UnknownArgumentError",
     "USER_AGENT",
-    "__version__",
 ]
