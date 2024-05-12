@@ -87,8 +87,8 @@ class Config(typing.NamedTuple):
     of a key and a URL.
 
     You only need to use this if you're manually configuring an Akismet API client
-    (which should be rare) rather than letting the ``validated_client()`` constructor
-    automatically read the configuration from environment variables.
+    rather than letting the configuration be read automatically from environment
+    variables.
 
     """
 

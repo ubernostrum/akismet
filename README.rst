@@ -18,8 +18,7 @@ Two API clients are available from this library:
 
 Aside from one being sync and the other async, the two clients expose
 identical APIs, and implement all methods of `the Akismet web API
-<https://akismet.com/developers/>`_, including the v1.2 key and API
-usage metrics.
+<https://akismet.com/developers/>`_.
 
 To use this library, you will need to obtain an Akismet API key and
 register a site for use with the Akismet web service; you can do this
@@ -29,6 +28,9 @@ variables ``PYTHON_AKISMET_API_KEY`` and ``PYTHON_AKISMET_BLOG_URL``,
 and they will be automatically detected and used.
 
 You can then construct a client instance and call its methods. For
+creating a long-lived API client instance, it's recommended that you
+use the ``validated_client()`` constructor method, which will
+automatically validate your API key with the Akismet web service. For
 example, to check a submitted forum post for spam:
 
 .. code-block:: python
@@ -61,19 +63,9 @@ Or using the asynchronous client:
    ):
        # This piece of content was classified as spam; handle it appropriately.
 
-Note that in both cases the client instance is created via the
-alternate constructor ``validated_client()``. This is recommended
-instead of using the default constructor (i.e., directly calling
-``akismet.SyncClient()`` or ``akismet.AsyncClient()``); the
-``validated_client()`` constructor will perform automatic discovery of
-the environment-variable configuration and validate the configuration
-with the Akismet web service before returning the client, while
-directly constructing an instance will not (so if you do directly
-construct an instance, you must manually provide and validate its
-configuration).
-
-You can also use either client class as a context manager. This also
-will validate the configuration for you prior to returning the client:
+You can also use either client class as a context manager. This does
+*not* require the ``validated_client()`` constructor, because your API
+key is validated on entering the ``with`` block.
 
 .. code-block:: python
 

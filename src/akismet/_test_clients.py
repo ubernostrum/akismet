@@ -207,6 +207,17 @@ class TestAsyncClient(AsyncClient):
     and instead always uses its own custom HTTP client to produce the desired fixed
     responses.
 
+    For operations other than comment-check and verify-key, the response values will be:
+
+    * submit-ham and submit-spam: :data:`True`
+
+    * key-sites: the sample responses (depending on requested format) given in `the
+      Akismet web service documentation for key-sites
+      <https://akismet.com/developers/detailed-docs/key-sites-activity/>`_.
+
+    * usage-limit: the sample response given in `the Akismet web service documentation
+      for usage-limit <https://akismet.com/developers/detailed-docs/usage-limit/>`_.
+
     """
 
     comment_check_response: "akismet.CheckResponse" = _common.CheckResponse.HAM
@@ -259,6 +270,17 @@ class TestSyncClient(SyncClient):
     as with the base :class:`~akismet.SyncClient`, this class will ignore that argument
     and instead always uses its own custom HTTP client to produce the desired fixed
     responses.
+
+    For operations other than comment-check and verify-key, the response values will be:
+
+    * submit-ham and submit-spam: :data:`True`
+
+    * key-sites: the sample responses (depending on requested format) given in `the
+      Akismet web service documentation for key-sites
+      <https://akismet.com/developers/detailed-docs/key-sites-activity/>`_.
+
+    * usage-limit: the sample response given in `the Akismet web service documentation
+      for usage-limit <https://akismet.com/developers/detailed-docs/usage-limit/>`_.
 
     """
 

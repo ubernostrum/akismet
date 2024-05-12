@@ -41,12 +41,12 @@ API client creation and basic use
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 To create an Akismet API client, call the ``validated_client()`` constructor
-method; this will automatically read your Akismet API key and site URL from the
-environment variables, and validate them with Akismet (see :ref:`the FAQ
-<alt-constructor>` for an explanation of why this is done through an alternate
-constructor). If they're not valid, or if they're not found in the environment
-variables mentioned above, you'll get an :exc:`akismet.ConfigurationError`
-exception.
+method of the appropriate client class; this will automatically read your
+Akismet API key and site URL from the environment variables, and validate them
+with Akismet (see :ref:`the FAQ <alt-constructor>` for an explanation of why
+this is done through an alternate constructor). If they're not valid, or if
+they're not found in the environment variables mentioned above, you'll get an
+:exc:`akismet.ConfigurationError` exception.
 
 .. tab:: Sync
 
@@ -65,9 +65,9 @@ exception.
       akismet_client = await akismet.AsyncClient.validated_client()
 
 
-If you're not able to, or don't want to, set the environment variables, you can
-create a :class:`~akismet.Config` instance and use that to manually configure
-your Akismet API client:
+If don't want to or can't set the environment variables you can use a
+:class:`~akismet.Config` instance and use that to manually configure your
+Akismet API client:
 
 .. tab:: Sync
 
@@ -103,8 +103,8 @@ following arguments:
   you can also pass other values depending on the type of user-submitted
   content you're dealing with.
 
-* ``comment_author`` and/or ``comment_email`` -- The identifier (such as a
-  username) and/or the email address of the user who submitted the content.
+* ``comment_author`` and/or ``comment_author_email`` -- The identifier (such as
+  a username) and/or the email address of the user who submitted the content.
 
 For example, suppose you're using `the Django web framework
 <https://www.djangoproject.com>`_ to build an online forum. You might write a
@@ -301,9 +301,9 @@ use, it's available as :data:`akismet.USER_AGENT`.
       )
 
 Finally, note that if all you want is to set a custom timeout value for
-connections to the Akismet web service, you *can* do this with a custom HTTP
-client, or you can simply set the environment variable
-``PYTHON_AKISMET_TIMEOUT`` as described above.
+connections to the Akismet web service, you do not need a custom HTTP client;
+you can set the environment variable ``PYTHON_AKISMET_TIMEOUT`` as described
+above.
 
 
 .. _usage-testing:
