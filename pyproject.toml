@@ -4,8 +4,11 @@ build-backend = "setuptools.build_meta"
 
 [project]
 authors = [
-  {name = "James Bennett", email = "james@b-list.org"},
   {name = "Michael Foord"},
+  {name = "James Bennett"}
+]
+maintainers = [
+  {name = "James Bennett"}
 ]
 classifiers = [
   "Development Status :: 5 - Production/Stable",
@@ -34,8 +37,8 @@ readme = "README.rst"
 requires-python = ">=3.8"
 
 [project.urls]
-Documentation = "https://akismet.readthedocs.io"
-GitHub = "https://github.com/ubernostrum/akismet"
+"Documentation" = "https://akismet.readthedocs.io"
+"Source Code" = "https://github.com/ubernostrum/akismet"
 
 [project.optional-dependencies]
 docs = [
