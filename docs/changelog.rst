@@ -75,7 +75,7 @@ Released May 2024
   :class:`~akismet.TestAsyncClient`.
 
 * The ``validated_client()`` constructor of both client classes now optionally
-  accepts an explicit ``Config`` instance.
+  accepts an explicit :class:`~akismet.Config` instance.
 
 * The default constructor's ``config`` argument is now optional on both client
   classes; as with ``validated_client()``, it will attempt to find the config
