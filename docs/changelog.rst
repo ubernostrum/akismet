@@ -56,10 +56,18 @@ The API stability/deprecation policy for this library is as follows:
 Releases under CalVer
 ---------------------
 
+Version 24.5.1
+~~~~~~~~~~~~~~
+
+Released May 2024
+
+* Corrected a missing release date in the changelog.
+
+
 Version 24.5.0
 ~~~~~~~~~~~~~~
 
-*Unreleased -- release date pending*
+Released May 2024
 
 * Adopted `CalVer versioning <https://calver.org>`_.
 
