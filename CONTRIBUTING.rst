@@ -10,7 +10,7 @@ Dev environment recommendations
 -------------------------------
 
 * Please use a code editor/IDE that supports `EditorConfig
-  <https://editorconfig.org>`_ Most editors do nowadays, so you
+  <https://editorconfig.org>`_. Most editors do nowadays, so you
   probably don't have to worry about it, but it will help to
   automatically apply some formatting and style rules.
 
