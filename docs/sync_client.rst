@@ -1,7 +1,6 @@
 .. _sync_client:
 
-.. module:: akismet
-  :noindex:
+.. currentmodule:: akismet
 
 
 The synchronous Akismet client

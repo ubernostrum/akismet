@@ -1,7 +1,6 @@
 .. _misc:
 
-.. module:: akismet
-  :noindex:
+.. currentmodule:: akismet
 
 
 Other code and data

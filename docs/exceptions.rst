@@ -1,7 +1,6 @@
 .. _exceptions:
 
-.. module:: akismet
-  :noindex:
+.. currentmodule:: akismet
 
 
 Exception classes

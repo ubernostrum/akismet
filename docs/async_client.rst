@@ -1,7 +1,6 @@
 .. _async_client:
 
-.. module:: akismet
-  :noindex:
+.. currentmodule:: akismet
 
 
 The asynchronous Akismet client

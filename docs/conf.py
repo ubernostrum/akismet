@@ -18,7 +18,7 @@ extensions = [
     "sphinx_inline_tabs",
 ]
 templates_path = ["_templates"]
-source_suffix = ".rst"
+source_suffix = {".rst": "restructuredtext"}
 master_doc = "index"
 project = "akismet"
 copyright = "Michael Foord, James Bennett, and contributors"

@@ -55,7 +55,13 @@ tests = [
 ]
 
 [tool.bandit]
-skips = ["B101"]
+# For reasons I do not understand, Bandit has decided to begin
+# alerting on use of httpx without an explicit timeout, when httpx
+# applies an automatic default timeout in that case. See
+# https://github.com/PyCQA/bandit/issues/1175 for details; if and when
+# they revert their alerts on httpx, the B113 check can be turned on
+# again.
+skips = ["B101", "B113"]
 
 [tool.black]
 target-version = ["py38", "py39", "py310", "py311", "py312"]

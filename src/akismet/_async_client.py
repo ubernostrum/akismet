@@ -482,7 +482,7 @@ class AsyncClient:
         """
         return await self._submit(_common._SUBMIT_SPAM, user_ip, **kwargs)
 
-    async def key_sites(  # pylint: disable=too-many-arguments
+    async def key_sites(  # pylint: disable=too-many-positional-arguments,too-many-arguments
         self,
         month: Optional[str] = None,
         url_filter: Optional[str] = None,

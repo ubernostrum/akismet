@@ -1,7 +1,6 @@
 .. _test-clients:
 
-.. module:: akismet
-   :noindex:
+.. currentmodule:: akismet
 
 
 The test clients
