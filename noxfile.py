@@ -24,6 +24,8 @@ nox.options.reuse_existing_virtualenvs = True
 
 PACKAGE_NAME = "akismet"
 
+IS_CI = bool(os.getenv("CI", False))
+
 NOXFILE_PATH = pathlib.Path(__file__).parents[0]
 ARTIFACT_PATHS = (
     NOXFILE_PATH / "src" / f"{PACKAGE_NAME}.egg-info",
@@ -44,6 +46,10 @@ def clean(paths: typing.Iterable[os.PathLike] = ARTIFACT_PATHS) -> None:
     Clean up after a test run.
 
     """
+    # This cleanup is only useful for the working directory of a local checkout; in CI
+    # we don't need it because CI environments are ephemeral anyway.
+    if IS_CI:
+        return
     [
         shutil.rmtree(path) if path.is_dir() else path.unlink()
         for path in paths
@@ -58,7 +64,7 @@ def clean(paths: typing.Iterable[os.PathLike] = ARTIFACT_PATHS) -> None:
 @nox.session(python=["3.8", "3.9", "3.10", "3.11", "3.12"], tags=["tests"])
 def tests_with_coverage(session: nox.Session) -> None:
     """
-    Run the package's unit tests, with coverage report.
+    Run the package's unit tests, with coverage instrumentation.
 
     """
     session.install(".[tests]")
@@ -75,22 +81,17 @@ def tests_with_coverage(session: nox.Session) -> None:
         "discover",
         env={"PYTHON_AKISMET_API_KEY": TEST_KEY, "PYTHON_AKISMET_BLOG_URL": TEST_URL},
     )
-    session.run(
-        f"python{session.python}",
-        "-Im",
-        "coverage",
-        "report",
-        "--show-missing",
-    )
     clean()
 
 
-@nox.session(python=["3.8", "3.9", "3.10", "3.11", "3.12"], tags=["tests", "release"])
+@nox.session(python=["3.8", "3.9", "3.10", "3.11", "3.12"], tags=["release"])
 def tests_end_to_end(session: nox.Session) -> None:
     """
     Run the end-to-end (live Akismet API) tests.
 
     """
+    if IS_CI:
+        session.skip("Release tests do not run in CI")
     session.install(".[tests]")
     session.run(
         f"python{session.python}",
@@ -106,6 +107,26 @@ def tests_end_to_end(session: nox.Session) -> None:
         },
     )
     clean()
+
+
+@nox.session(python=["3.12"], tags=["tests"])
+def coverage_report(session: nox.Session) -> None:
+    """
+    Combine coverage from the various test runs and output the report.
+
+    """
+    # In CI this job does not run because we substitute one that integrates with the CI
+    # system.
+    if IS_CI:
+        session.skip(
+            "Running in CI -- skipping nox coverage job in favor of CI coverage job"
+        )
+    session.install("coverage[toml]")
+    session.run(f"python{session.python}", "-Im", "coverage", "combine")
+    session.run(
+        f"python{session.python}", "-Im", "coverage", "report", "--show-missing"
+    )
+    session.run(f"python{session.python}", "-Im", "coverage", "erase")
 
 
 # Tasks which test the package's documentation.
@@ -296,7 +317,7 @@ def lint_pylint(session: nox.Session) -> None:
     # does not have any direct dependencies, nor does the normal test suite, but the
     # full conformance suite does require a few extra libraries, so they're installed
     # here.
-    session.install("httpx", "pylint")
+    session.install("pylint", "bs4", "html5lib", "requests")
     session.run(f"python{session.python}", "-Im", "pylint", "--version")
     session.run(f"python{session.python}", "-Im", "pylint", "src/", "tests/")
     clean()
@@ -348,6 +369,8 @@ def package_manifest(session: nox.Session) -> None:
     Check that the set of files in the package matches the set under version control.
 
     """
+    if IS_CI:
+        session.skip("check-manifest already run by earlier CI steps.")
     session.install("check-manifest")
     session.run(f"python{session.python}", "-Im", "check_manifest", "--version")
     session.run(f"python{session.python}", "-Im", "check_manifest", "--verbose")

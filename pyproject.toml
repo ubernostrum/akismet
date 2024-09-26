@@ -60,8 +60,16 @@ skips = ["B101"]
 [tool.black]
 target-version = ["py38", "py39", "py310", "py311", "py312"]
 
+[tool.coverage.paths]
+source = ["src", ".nox/tests_with_coverage*/**/site-packages"]
+
 [tool.coverage.report]
 fail_under = 100
+
+[tool.coverage.run]
+branch = true
+parallel = true
+source = ["akismet"]
 
 [tool.interrogate]
 fail-under = 100
