@@ -13,7 +13,8 @@ import typing
 
 import httpx
 
-from . import _exceptions, _version
+from . import _version
+from ._exceptions import ConfigurationError, APIKeyError, ProtocolError
 
 # Private constants.
 # -------------------------------------------------------------------------------
@@ -54,7 +55,6 @@ _OPTIONAL_KEYS = [
     "user_agent",
     "user_role",
 ]
-
 
 # Public constants.
 # -------------------------------------------------------------------------------
@@ -105,7 +105,7 @@ def _configuration_error(config: Config) -> typing.NoReturn:
     Raise an appropriate exception for invalid configuration.
 
     """
-    raise _exceptions.APIKeyError(
+    raise APIKeyError(
         textwrap.dedent(
             f"""
             Akismet API key and/or blog URL were invalid.
@@ -138,7 +138,7 @@ def _protocol_error(operation: str, response: httpx.Response) -> typing.NoReturn
     Raise an appropriate exception for unexpected API responses.
 
     """
-    raise _exceptions.ProtocolError(
+    raise ProtocolError(
         textwrap.dedent(
             f"""
         Received unexpected or non-standard response from Akismet API.
@@ -163,7 +163,7 @@ def _try_discover_config() -> Config:
     key = os.getenv(_KEY_ENV_VAR, None)
     url = os.getenv(_URL_ENV_VAR, None)
     if not all([key, url]):
-        raise _exceptions.ConfigurationError(
+        raise ConfigurationError(
             textwrap.dedent(
                 f"""
         Could not find full Akismet configuration.
@@ -174,7 +174,7 @@ def _try_discover_config() -> Config:
             )
         )
     if not url.startswith(("http://", "https://")):
-        raise _exceptions.ConfigurationError(
+        raise ConfigurationError(
             textwrap.dedent(
                 f"""
             Invalid Akismet site URL specified: {url}

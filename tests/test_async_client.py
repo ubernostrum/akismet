@@ -7,22 +7,21 @@ Tests for the asynchronous Akismet API client.
 
 import csv
 import os
-import typing
 from http import HTTPStatus
+from typing import Optional, Type
 from unittest import mock
 
 import httpx
 
 import akismet
 from akismet import _common, _test_clients
-
 from . import base
 
 
 def make_fixed_response_async_client(
     response_text: str = "true",
     status_code: HTTPStatus = HTTPStatus.OK,
-    response_json: typing.Optional[dict] = None,
+    response_json: Optional[dict] = None,
 ) -> httpx.AsyncClient:
     """
     Return an asynchronous HTTP client that produces a fixed repsonse, for use in
@@ -37,7 +36,7 @@ def make_fixed_response_async_client(
 
 
 def make_exception_async_client(
-    exception_class: Exception, message: str = "Error!"
+    exception_class: Type[BaseException], message: str = "Error!"
 ) -> httpx.AsyncClient:
     """
     Return an asynchronous HTTP client that raises the given exception/message.
@@ -283,10 +282,10 @@ class AsyncAkismetAPITests(base.AsyncAkismetTests):
             with self.subTest(method=bad_method):
                 with self.assertRaises(akismet.AkismetError):
                     await client._request(
-                        bad_method,
+                        bad_method,  # type: ignore
                         _common._API_V11,
                         _common._COMMENT_CHECK,
-                        {"api_key", client._config.key},
+                        {"api_key": client._config.key},
                     )
 
     async def test_verify_key_valid(self):
