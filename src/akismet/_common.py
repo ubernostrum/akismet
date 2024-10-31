@@ -14,7 +14,7 @@ import typing
 import httpx
 
 from . import _version
-from ._exceptions import ConfigurationError, APIKeyError, ProtocolError
+from ._exceptions import APIKeyError, ConfigurationError, ProtocolError
 
 # Private constants.
 # -------------------------------------------------------------------------------
