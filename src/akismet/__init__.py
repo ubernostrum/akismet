@@ -102,9 +102,6 @@ from ._exceptions import (
 from ._legacy_client import Akismet
 from ._sync_client import SyncClient
 from ._test_clients import TestAsyncClient, TestSyncClient
-from ._version import LIBRARY_VERSION
-
-__version__ = LIBRARY_VERSION
 
 __all__ = [
     "APIKeyError",

@@ -7,8 +7,6 @@ Installation guide
 The |release| version of ``akismet`` is officially tested and supported
 on the following versions of Python:
 
-* Python 3.8
-
 * Python 3.9
 
 * Python 3.10
@@ -16,6 +14,8 @@ on the following versions of Python:
 * Python 3.11
 
 * Python 3.12
+
+* Python 3.13
 
 
 Installing ``akismet``
@@ -74,10 +74,11 @@ default to ``1.0`` (one second).
 
 .. _source-install:
 
-Installing from a source checkout
----------------------------------
+Installing for local development
+--------------------------------
 
-If you want to work on ``akismet``, you can obtain a source checkout.
+If you want to work on ``akismet``, you can obtain a source
+checkout.
 
 The development repository for ``akismet`` is at
 <https://github.com/ubernostrum/akismet>. If you have `git
@@ -86,18 +87,5 @@ typing::
 
     git clone https://github.com/ubernostrum/akismet.git
 
-From there, you can use git commands to check out the specific revision you
-want, and perform an "editable" install (allowing you to change code as you
-work on it) by typing:
-
-.. tab:: macOS/Linux/other Unix
-
-   .. code-block:: shell
-
-      python -m pip install -e .
-
-.. tab:: Windows
-
-   .. code-block:: shell
-
-      py -m pip install -e .
+Then follow the instructions in the file ``CONTRIBUTING.rst`` in the root
+directory of the source checkout.

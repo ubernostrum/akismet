@@ -10,10 +10,10 @@ import os
 import sys
 import textwrap
 import typing
+from importlib.metadata import version
 
 import httpx
 
-from . import _version
 from ._exceptions import APIKeyError, ConfigurationError, ProtocolError
 
 # Private constants.
@@ -60,7 +60,7 @@ _OPTIONAL_KEYS = [
 # -------------------------------------------------------------------------------
 
 USER_AGENT = (
-    f"akismet.py/{_version.LIBRARY_VERSION} | Python/"
+    f"akismet.py/{version('akismet')} | Python/"
     f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
 )
 

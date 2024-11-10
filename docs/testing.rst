@@ -151,8 +151,7 @@ Running this library's tests
 
 A standard install of ``akismet`` does not install the test suite; you will
 need to perform :ref:`a source checkout as described in the installation guide
-<source-install>`, though performing the "editable" install step is not
-necessary for running the tests.
+<source-install>`.
 
 ``akismet``'s testing tasks are run using `nox <https://nox.thea.codes/>`_, so
 you will also need to install it, after which you can run ``nox``, which should
@@ -190,11 +189,8 @@ example, to run tasks for Python 3.10 only, you could run:
       py -m nox --python "3.10"
 
 By default, ``nox`` will only run the tasks whose associated Python versions
-are available on your system. For example, if you have only Python 3.8 and 3.9
-installed, test runs for Python 3.10, 3.11, and 3.12 would be skipped. To
-install and manage multiple versions of Python, tools like `pyenv
-<https://github.com/pyenv/pyenv>`_ or `asdf <https://asdf-vm.com>`_ are
-recommended.
+are available on your system. For example, if you have only Python 3.9 and 3.13
+installed, test runs for Python 3.10, 3.11, and 3.12 would be skipped.
 
 To see a list of all available test tasks, run:
 

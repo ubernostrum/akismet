@@ -1,11 +1,11 @@
 [build-system]
-requires = ["setuptools>=61.0"]
-build-backend = "setuptools.build_meta"
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"
 
 [project]
 authors = [
-  {name = "Michael Foord"},
-  {name = "James Bennett"}
+    {name = "Michael Foord"},
+    {name = "James Bennett"},
 ]
 maintainers = [
   {name = "James Bennett"}
@@ -18,53 +18,38 @@ classifiers = [
   "Operating System :: OS Independent",
   "Programming Language :: Python",
   "Programming Language :: Python :: 3",
-  "Programming Language :: Python :: 3.8",
   "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.3",
   "Topic :: Utilities",
 ]
 name = "akismet"
 description = "A Python interface to the Akismet spam-filtering service."
 dependencies = [
-  "httpx",
+    "httpx",
 ]
-dynamic = ["version"]
 keywords = ["akismet", "spam", "spam-filtering"]
 license = {text = "BSD-3-Clause"}
 readme = "README.rst"
-requires-python = ">=3.8"
+requires-python = ">=3.9"
+version = "24.11.0a1"
 
 [project.urls]
 "Documentation" = "https://akismet.readthedocs.io"
 "Source Code" = "https://github.com/ubernostrum/akismet"
 
-[project.optional-dependencies]
-docs = [
-  "furo",
-  "matplotlib",
-  "sphinx",
-  "sphinx-copybutton",
-  "sphinx-inline-tabs",
-  "sphinx-notfound-page",
-  "sphinxext-opengraph",
-]
-tests = [
-  "coverage[toml]",
-]
+[dependency-groups]
+tests = ["nox"]
 
 [tool.bandit]
-# For reasons I do not understand, Bandit has decided to begin
-# alerting on use of httpx without an explicit timeout, when httpx
-# applies an automatic default timeout in that case. See
-# https://github.com/PyCQA/bandit/issues/1175 for details; if and when
-# they revert their alerts on httpx, the B113 check can be turned on
-# again.
+# B113 is only skipped right now because of a bug in Bandit. Bandit 1.8 should fix it:
+# https://github.com/PyCQA/bandit/issues/1175
 skips = ["B101", "B113"]
 
 [tool.black]
-target-version = ["py38", "py39", "py310", "py311", "py312"]
+target-version = ["py39", "py39", "py310", "py311", "py313"]
 
 [tool.coverage.paths]
 source = ["src", ".nox/tests_with_coverage*/**/site-packages"]
@@ -85,11 +70,26 @@ ignore-init-module = true
 [tool.isort]
 profile = "black"
 
+[tool.pdm]
+distribution = true
+
+[tool.pdm.build]
+source-includes = [
+    ".editorconfig",
+    ".flake8",
+    ".pre-commit-config.yaml",
+    ".readthedocs.yaml",
+    "AUTHORS",
+    "CONTRIBUTING.rst",
+    "docs/",
+    "noxfile.py",
+    "pdm.lock",
+    "runtests.py",
+    "tests/",
+]
+
 [tool.pylint]
 disable = [
   "duplicate-code",
   "protected-access",
 ]
-
-[tool.setuptools.dynamic]
-version = {attr = "akismet._version.LIBRARY_VERSION"}
