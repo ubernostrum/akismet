@@ -59,7 +59,7 @@ Releases under CalVer
 Version 24.11.0
 ~~~~~~~~~~~~~~~
 
-*Under development*
+Released November 2024
 
 * Supported Python versions are now Python 3.9, 3.10, 3.11, 3.12, and 3.13.
 
