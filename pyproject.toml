@@ -4,26 +4,26 @@ build-backend = "pdm.backend"
 
 [project]
 authors = [
-    {name = "Michael Foord"},
-    {name = "James Bennett"},
+    { name = "Michael Foord" },
+    { name = "James Bennett" },
 ]
 maintainers = [
-  {name = "James Bennett"}
+    { name = "James Bennett" }
 ]
 classifiers = [
-  "Development Status :: 5 - Production/Stable",
-  "Environment :: Web Environment",
-  "Intended Audience :: Developers",
-  "License :: OSI Approved :: BSD License",
-  "Operating System :: OS Independent",
-  "Programming Language :: Python",
-  "Programming Language :: Python :: 3",
-  "Programming Language :: Python :: 3.9",
-  "Programming Language :: Python :: 3.10",
-  "Programming Language :: Python :: 3.11",
-  "Programming Language :: Python :: 3.12",
-  "Programming Language :: Python :: 3.13",
-  "Topic :: Utilities",
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Web Environment",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: BSD License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Utilities",
 ]
 name = "akismet"
 description = "A Python interface to the Akismet spam-filtering service."
@@ -31,10 +31,10 @@ dependencies = [
     "httpx",
 ]
 keywords = ["akismet", "spam", "spam-filtering"]
-license = {text = "BSD-3-Clause"}
+license = { text = "BSD-3-Clause" }
 readme = "README.rst"
 requires-python = ">=3.9"
-version = "24.11.0"
+version = "24.11.1a0"
 
 [project.urls]
 "Documentation" = "https://akismet.readthedocs.io"
@@ -90,6 +90,6 @@ source-includes = [
 
 [tool.pylint]
 disable = [
-  "duplicate-code",
-  "protected-access",
+    "duplicate-code",
+    "protected-access",
 ]

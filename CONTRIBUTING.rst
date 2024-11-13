@@ -25,6 +25,10 @@ repository:
 
 * `nox <https://nox.thea.codes/en/stable/>`_
 
+It is strongly *recommended* that you also have ``make`` installed, as
+there is a ``Makefile`` provided which can perform some common dev tasks
+for you.
+
 You will also need at least one supported Python version. It is also
 recommended that you test against *all* the supported Python verisions
 before opening a pull request; you can use `PDM's Python installer
@@ -38,16 +42,20 @@ Local setup
 Once you have the tools above installed, run the following in the root
 of your git checkout::
 
-   pdm install
+   make install
 
 This will create a local virtual environment and install
 ``akismet`` and its dependencies.
+
+If you do not have ``make`` available, you can also run ``pdm install`` and
+``pre-commit install`` to achieve the same result.
 
 
 Testing
 -------
 
-To run the tests, use ``nox``::
+To run the tests, run ``make test`` if you have ``make``, or invoke
+``nox`` directly::
 
    nox --tags tests
 
@@ -57,13 +65,15 @@ can run::
 
    nox --tags tests --python "3.11"
 
-You can also run the full CI suite locally by just invoking
+You can also run the full CI suite locally by running ``make ci`` or
 ``nox``. This will run the tests, check the documentation, lint the
 code and check formatting, and build a package and perform checks on
 it.
 
-For more information about available tasks, run ``nox --list`` or read
-the file ``noxfile.py`` in the root of your source checkout, or the
+For more information about available ``make`` tasks, run ``make help``.
+
+For more information about available ``nox`` tasks, run ``nox --list``
+or read the file ``noxfile.py`` in the root of your source checkout, or the
 testing documentation in the file ``docs/testing.rst``.
 
 
