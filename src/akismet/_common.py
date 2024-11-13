@@ -9,8 +9,8 @@ import enum
 import os
 import sys
 import textwrap
-import typing
 from importlib.metadata import version
+from typing import Literal, NamedTuple, NoReturn, TypedDict
 
 import httpx
 
@@ -24,7 +24,7 @@ _API_V11 = "1.1"
 _API_V12 = "1.2"
 _COMMENT_CHECK = "comment-check"
 _KEY_SITES = "key-sites"
-_REQUEST_METHODS = typing.Literal["GET", "POST"]  # pylint: disable=invalid-name
+_REQUEST_METHODS = Literal["GET", "POST"]  # pylint: disable=invalid-name
 _SUBMISSION_RESPONSE = "Thanks for making the web a better place."
 _SUBMIT_HAM = "submit-ham"
 _SUBMIT_SPAM = "submit-spam"
@@ -81,7 +81,7 @@ class CheckResponse(enum.IntEnum):
     DISCARD = 2
 
 
-class Config(typing.NamedTuple):
+class Config(NamedTuple):
     """
     A :func:`~collections.namedtuple` representing Akismet configuration, consisting
     of a key and a URL.
@@ -96,11 +96,37 @@ class Config(typing.NamedTuple):
     url: str
 
 
+class AkismetArguments(TypedDict, total=False):
+    """
+    A :class:`~typing.TypedDict` representing the optional keyword arguments accepted by
+    most Akismet API operations.
+
+    """
+
+    blog_charset: str
+    blog_lang: str
+    comment_author: str
+    comment_author_email: str
+    comment_author_url: str
+    comment_content: str
+    comment_context: str
+    comment_date_gmt: str
+    comment_post_modified_gmt: str
+    comment_type: str
+    honeypot_field_name: str
+    is_test: bool
+    permalink: str
+    recheck_reason: str
+    referrer: str
+    user_agent: str
+    user_role: str
+
+
 # Private helper functions.
 # -------------------------------------------------------------------------------
 
 
-def _configuration_error(config: Config) -> typing.NoReturn:
+def _configuration_error(config: Config) -> NoReturn:
     """
     Raise an appropriate exception for invalid configuration.
 
@@ -133,7 +159,7 @@ def _get_sync_http_client() -> httpx.Client:
     return httpx.Client(headers={"User-Agent": USER_AGENT}, timeout=_TIMEOUT)
 
 
-def _protocol_error(operation: str, response: httpx.Response) -> typing.NoReturn:
+def _protocol_error(operation: str, response: httpx.Response) -> NoReturn:
     """
     Raise an appropriate exception for unexpected API responses.
 

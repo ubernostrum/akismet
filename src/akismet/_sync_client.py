@@ -9,8 +9,29 @@ from types import TracebackType
 from typing import TYPE_CHECKING, Literal, Optional, Type, Union
 
 import httpx
+from typing_extensions import Self, Unpack
 
-from . import _common, _exceptions
+from . import _exceptions
+from ._common import (
+    _API_URL,
+    _API_V11,
+    _API_V12,
+    _COMMENT_CHECK,
+    _KEY_SITES,
+    _OPTIONAL_KEYS,
+    _REQUEST_METHODS,
+    _SUBMISSION_RESPONSE,
+    _SUBMIT_HAM,
+    _SUBMIT_SPAM,
+    _USAGE_LIMIT,
+    _VERIFY_KEY,
+    AkismetArguments,
+    CheckResponse,
+    _configuration_error,
+    _get_sync_http_client,
+    _protocol_error,
+    _try_discover_config,
+)
 
 if TYPE_CHECKING:  # pragma: no cover
     import akismet
@@ -139,15 +160,15 @@ class SyncClient:
         You will almost always want to use :meth:`validated_client` instead.
 
         """
-        self._config = config if config is not None else _common._try_discover_config()
-        self._http_client = http_client or _common._get_sync_http_client()
+        self._config = config if config is not None else _try_discover_config()
+        self._http_client = http_client or _get_sync_http_client()
 
     @classmethod
     def validated_client(
         cls,
         config: Optional["akismet.Config"] = None,
         http_client: Optional[httpx.Client] = None,
-    ) -> "SyncClient":
+    ) -> Self:
         """
         Constructor of :class:`SyncClient`.
 
@@ -187,7 +208,7 @@ class SyncClient:
         # constructor in order to achieve API consistency.
         instance = cls(config=config, http_client=http_client)
         if not instance.verify_key():
-            _common._configuration_error(instance._config)
+            _configuration_error(instance._config)
         return instance
 
     # Context-manager protocol.
@@ -199,7 +220,7 @@ class SyncClient:
 
         """
         if not self.verify_key():
-            _common._configuration_error(self._config)
+            _configuration_error(self._config)
         return self
 
     def __exit__(
@@ -216,7 +237,7 @@ class SyncClient:
 
     def _request(
         self,
-        method: _common._REQUEST_METHODS,
+        method: _REQUEST_METHODS,
         version: str,
         endpoint: str,
         data: dict,
@@ -245,7 +266,7 @@ class SyncClient:
         request_kwarg = "data" if method == "POST" else "params"
         try:
             response = handler(
-                f"{_common._API_URL}/{version}/{endpoint}", **{request_kwarg: data}
+                f"{_API_URL}/{version}/{endpoint}", **{request_kwarg: data}
             )
             response.raise_for_status()
         except httpx.HTTPStatusError as exc:
@@ -261,7 +282,7 @@ class SyncClient:
         # Since it's possible to construct a client without performing up-front API key
         # validation, we have to watch out here for the possibility that we're making
         # requests with an invalid key, and raise the appropriate exception.
-        if endpoint != _common._VERIFY_KEY and response.text == "invalid":
+        if endpoint != _VERIFY_KEY and response.text == "invalid":
             raise _exceptions.APIKeyError(
                 "Akismet API key and/or site URL are invalid."
             )
@@ -308,7 +329,7 @@ class SyncClient:
            optional argument names.
 
         """
-        unknown_args = [k for k in kwargs if k not in _common._OPTIONAL_KEYS]
+        unknown_args = [k for k in kwargs if k not in _OPTIONAL_KEYS]
         if unknown_args:
             raise _exceptions.UnknownArgumentError(
                 f"Received unknown argument(s) for Akismet operation {endpoint}: "
@@ -335,17 +356,17 @@ class SyncClient:
            received from the Akismet API.
 
         """
-        response = self._post_request(
-            _common._API_V11, endpoint, user_ip=user_ip, **kwargs
-        )
-        if response.text == _common._SUBMISSION_RESPONSE:
+        response = self._post_request(_API_V11, endpoint, user_ip=user_ip, **kwargs)
+        if response.text == _SUBMISSION_RESPONSE:
             return True
-        _common._protocol_error(endpoint, response)
+        _protocol_error(endpoint, response)
 
     # Public methods corresponding to the methods of the Akismet API.
     # ----------------------------------------------------------------------------
 
-    def comment_check(self, user_ip: str, **kwargs: str) -> "akismet.CheckResponse":
+    def comment_check(
+        self, user_ip: str, **kwargs: Unpack[AkismetArguments]
+    ) -> "akismet.CheckResponse":
         """
         Check a piece of user-submitted content to determine whether it is spam.
 
@@ -389,17 +410,17 @@ class SyncClient:
 
         """
         response = self._post_request(
-            _common._API_V11, _common._COMMENT_CHECK, user_ip=user_ip, **kwargs
+            _API_V11, _COMMENT_CHECK, user_ip=user_ip, **kwargs
         )
         if response.text == "true":
             if response.headers.get("X-akismet-pro-tip", "") == "discard":
-                return _common.CheckResponse.DISCARD
-            return _common.CheckResponse.SPAM
+                return CheckResponse.DISCARD
+            return CheckResponse.SPAM
         if response.text == "false":
-            return _common.CheckResponse.HAM
-        _common._protocol_error(_common._COMMENT_CHECK, response)
+            return CheckResponse.HAM
+        _protocol_error(_COMMENT_CHECK, response)
 
-    def submit_ham(self, user_ip: str, **kwargs: str) -> bool:
+    def submit_ham(self, user_ip: str, **kwargs: Unpack[AkismetArguments]) -> bool:
         """
         Inform Akismet that a piece of user-submitted comment is not spam.
 
@@ -437,9 +458,9 @@ class SyncClient:
            received from the Akismet API.
 
         """
-        return self._submit(_common._SUBMIT_HAM, user_ip, **kwargs)
+        return self._submit(_SUBMIT_HAM, user_ip, **kwargs)
 
-    def submit_spam(self, user_ip: str, **kwargs: str) -> bool:
+    def submit_spam(self, user_ip: str, **kwargs: Unpack[AkismetArguments]) -> bool:
         """
         Inform Akismet that a piece of user-submitted comment is spam.
 
@@ -477,7 +498,7 @@ class SyncClient:
            received from the Akismet API.
 
         """
-        return self._submit(_common._SUBMIT_SPAM, user_ip, **kwargs)
+        return self._submit(_SUBMIT_SPAM, user_ip, **kwargs)
 
     def key_sites(  # pylint: disable=too-many-positional-arguments,too-many-arguments
         self,
@@ -528,7 +549,7 @@ class SyncClient:
         ):
             if value is not None:
                 params[argument] = value
-        response = self._get_request(_common._API_V12, _common._KEY_SITES, params)
+        response = self._get_request(_API_V12, _KEY_SITES, params)
         if result_format == "csv":
             return response.text
         return response.json()
@@ -543,7 +564,7 @@ class SyncClient:
 
         """
         response = self._get_request(
-            _common._API_V12, _common._USAGE_LIMIT, params={"api_key": self._config.key}
+            _API_V12, _USAGE_LIMIT, params={"api_key": self._config.key}
         )
         return response.json()
 
@@ -570,10 +591,10 @@ class SyncClient:
         if not all([key, url]):
             key, url = self._config
         response = self._request(
-            "POST", _common._API_V11, _common._VERIFY_KEY, {"key": key, "blog": url}
+            "POST", _API_V11, _VERIFY_KEY, {"key": key, "blog": url}
         )
         if response.text == "valid":
             return True
         if response.text == "invalid":
             return False
-        _common._protocol_error(_common._VERIFY_KEY, response)
+        _protocol_error(_VERIFY_KEY, response)

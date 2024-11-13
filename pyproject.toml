@@ -29,6 +29,7 @@ name = "akismet"
 description = "A Python interface to the Akismet spam-filtering service."
 dependencies = [
     "httpx",
+    "typing-extensions",
 ]
 keywords = ["akismet", "spam", "spam-filtering"]
 license = { text = "BSD-3-Clause" }
@@ -81,6 +82,7 @@ source-includes = [
     ".readthedocs.yaml",
     "AUTHORS",
     "CONTRIBUTING.rst",
+    "Makefile",
     "docs/",
     "noxfile.py",
     "pdm.lock",

@@ -90,7 +90,7 @@ Or using the asynchronous client:
 # SPDX-License-Identifier: BSD-3-Clause
 
 from ._async_client import AsyncClient
-from ._common import USER_AGENT, CheckResponse, Config
+from ._common import USER_AGENT, AkismetArguments, CheckResponse, Config
 from ._exceptions import (
     AkismetError,
     APIKeyError,
@@ -106,6 +106,7 @@ from ._test_clients import TestAsyncClient, TestSyncClient
 __all__ = [
     "APIKeyError",
     "Akismet",
+    "AkismetArguments",
     "AkismetError",
     "AsyncClient",
     "CheckResponse",

@@ -323,7 +323,7 @@ def lint_pylint(session: nox.Session) -> None:
 
     """
     # Pylint requires that all dependencies be importable during the run.
-    session.install("httpx", "pylint")
+    session.install("httpx", "typing-extensions", "pylint")
     session.run(f"python{session.python}", "-Im", "pylint", "--version")
     session.run(f"python{session.python}", "-Im", "pylint", "src/", "tests/")
     clean()
