@@ -50,7 +50,7 @@ tests = ["nox"]
 skips = ["B101", "B113"]
 
 [tool.black]
-target-version = ["py39", "py39", "py310", "py311", "py313"]
+target-version = ["py39", "py310", "py311", "py312", "py313"]
 
 [tool.coverage.paths]
 source = ["src", ".nox/tests_with_coverage*/**/site-packages"]
