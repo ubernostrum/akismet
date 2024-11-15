@@ -213,7 +213,7 @@ class AsyncClient:
     # Async context-manager protocol.
     # ----------------------------------------------------------------------------
 
-    async def __aenter__(self) -> "AsyncClient":
+    async def __aenter__(self) -> Self:
         """
         Entry method of the async context manager.
 

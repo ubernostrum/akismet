@@ -214,7 +214,7 @@ class SyncClient:
     # Context-manager protocol.
     # ----------------------------------------------------------------------------
 
-    def __enter__(self) -> "SyncClient":
+    def __enter__(self) -> Self:
         """
         Entry method of the context manager.
 
