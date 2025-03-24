@@ -213,3 +213,17 @@ def _try_discover_config() -> Config:
             )
         )
     return Config(key=key, url=url)
+
+
+def _handle_check_response(response: httpx.Response) -> CheckResponse:
+    """
+    Return the correct result for a response from the comment-check endpoint.
+
+    """
+    if response.text == "true":
+        if response.headers.get("X-akismet-pro-tip", "") == "discard":
+            return CheckResponse.DISCARD
+        return CheckResponse.SPAM
+    if response.text == "false":
+        return CheckResponse.HAM
+    _protocol_error(_COMMENT_CHECK, response)

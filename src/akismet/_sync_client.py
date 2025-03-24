@@ -396,16 +396,11 @@ class SyncClient:
            received from the Akismet API.
 
         """
-        response = self._post_request(
-            _common._API_V11, _common._COMMENT_CHECK, user_ip=user_ip, **kwargs
+        return _common._handle_check_response(
+            self._post_request(
+                _common._API_V11, _common._COMMENT_CHECK, user_ip=user_ip, **kwargs
+            )
         )
-        if response.text == "true":
-            if response.headers.get("X-akismet-pro-tip", "") == "discard":
-                return _common.CheckResponse.DISCARD
-            return _common.CheckResponse.SPAM
-        if response.text == "false":
-            return _common.CheckResponse.HAM
-        _common._protocol_error(_common._COMMENT_CHECK, response)
 
     def submit_ham(
         self, user_ip: str, **kwargs: Unpack[_common.AkismetArguments]
