@@ -44,7 +44,7 @@ def make_fixed_response_transport(
         if response_json is not None:
             del response_kwargs["content"]
             response_kwargs["json"] = response_json
-        return httpx.Response(**response_kwargs)
+        return httpx.Response(**response_kwargs)  # type: ignore
 
     return httpx.MockTransport(_handler)
 

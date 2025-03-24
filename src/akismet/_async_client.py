@@ -11,27 +11,7 @@ from typing import TYPE_CHECKING, Literal, Optional, Type, Union
 import httpx
 from typing_extensions import Self, Unpack
 
-from . import _exceptions
-from ._common import (
-    _API_URL,
-    _API_V11,
-    _API_V12,
-    _COMMENT_CHECK,
-    _KEY_SITES,
-    _OPTIONAL_KEYS,
-    _REQUEST_METHODS,
-    _SUBMISSION_RESPONSE,
-    _SUBMIT_HAM,
-    _SUBMIT_SPAM,
-    _USAGE_LIMIT,
-    _VERIFY_KEY,
-    AkismetArguments,
-    CheckResponse,
-    _configuration_error,
-    _get_async_http_client,
-    _protocol_error,
-    _try_discover_config,
-)
+from . import _common, _exceptions
 
 if TYPE_CHECKING:  # pragma: no cover
     import akismet
@@ -160,8 +140,8 @@ class AsyncClient:
         You will almost always want to use :meth:`validated_client` instead.
 
         """
-        self._config = config if config is not None else _try_discover_config()
-        self._http_client = http_client or _get_async_http_client()
+        self._config = config if config is not None else _common._try_discover_config()
+        self._http_client = http_client or _common._get_async_http_client()
 
     @classmethod
     async def validated_client(
@@ -207,7 +187,7 @@ class AsyncClient:
         # alternative constructor in order to achieve API consistency.
         instance = cls(config=config, http_client=http_client)
         if not await instance.verify_key():
-            _configuration_error(instance._config)
+            _common._configuration_error(instance._config)
         return instance
 
     # Async context-manager protocol.
@@ -219,7 +199,7 @@ class AsyncClient:
 
         """
         if not await self.verify_key():
-            _configuration_error(self._config)
+            _common._configuration_error(self._config)
         return self
 
     async def __aexit__(
@@ -236,7 +216,7 @@ class AsyncClient:
 
     async def _request(
         self,
-        method: _REQUEST_METHODS,
+        method: _common._REQUEST_METHODS,
         version: str,
         endpoint: str,
         data: dict,
@@ -256,7 +236,6 @@ class AsyncClient:
            when Akiset returns a non-success status code.
 
         """
-        method = method.upper()
         if method not in ("GET", "POST"):
             raise _exceptions.AkismetError(
                 f"Unrecognized request method attempted: {method}."
@@ -265,7 +244,7 @@ class AsyncClient:
         request_kwarg = "data" if method == "POST" else "params"
         try:
             response = await handler(
-                f"{_API_URL}/{version}/{endpoint}", **{request_kwarg: data}
+                f"{_common._API_URL}/{version}/{endpoint}", **{request_kwarg: data}
             )
             response.raise_for_status()
         except httpx.HTTPStatusError as exc:
@@ -281,7 +260,7 @@ class AsyncClient:
         # Since it's possible to construct a client without performing up-front API key
         # validation, we have to watch out here for the possibility that we're making
         # requests with an invalid key, and raise the appropriate exception.
-        if endpoint != _VERIFY_KEY and response.text == "invalid":
+        if endpoint != _common._VERIFY_KEY and response.text == "invalid":
             raise _exceptions.APIKeyError(
                 "Akismet API key and/or site URL are invalid."
             )
@@ -308,7 +287,11 @@ class AsyncClient:
         return await self._request("GET", version, endpoint, params)
 
     async def _post_request(
-        self, version: str, endpoint: str, user_ip: str, **kwargs: str
+        self,
+        version: str,
+        endpoint: str,
+        user_ip: str,
+        **kwargs: Unpack[_common.AkismetArguments],
     ) -> httpx.Response:
         """
         Make a POST request to the Akismet API and return the response.
@@ -330,7 +313,7 @@ class AsyncClient:
            optional argument names.
 
         """
-        unknown_args = [k for k in kwargs if k not in _OPTIONAL_KEYS]
+        unknown_args = [k for k in kwargs if k not in _common._OPTIONAL_KEYS]
         if unknown_args:
             raise _exceptions.UnknownArgumentError(
                 f"Received unknown argument(s) for Akismet operation {endpoint}: "
@@ -344,7 +327,9 @@ class AsyncClient:
         }
         return await self._request("POST", version, endpoint, data)
 
-    async def _submit(self, endpoint: str, user_ip: str, **kwargs: str) -> bool:
+    async def _submit(
+        self, endpoint: str, user_ip: str, **kwargs: Unpack[_common.AkismetArguments]
+    ) -> bool:
         """
         Submit ham or spam to the Akismet API.
 
@@ -358,17 +343,17 @@ class AsyncClient:
 
         """
         response = await self._post_request(
-            _API_V11, endpoint, user_ip=user_ip, **kwargs
+            _common._API_V11, endpoint, user_ip=user_ip, **kwargs
         )
-        if response.text == _SUBMISSION_RESPONSE:
+        if response.text == _common._SUBMISSION_RESPONSE:
             return True
-        _protocol_error(endpoint, response)
+        _common._protocol_error(endpoint, response)
 
     # Public methods corresponding to the methods of the Akismet API.
     # ----------------------------------------------------------------------------
 
     async def comment_check(
-        self, user_ip: str, **kwargs: Unpack[AkismetArguments]
+        self, user_ip: str, **kwargs: Unpack[_common.AkismetArguments]
     ) -> "akismet.CheckResponse":
         """
         Check a piece of user-submitted content to determine whether it is spam.
@@ -413,18 +398,18 @@ class AsyncClient:
 
         """
         response = await self._post_request(
-            _API_V11, _COMMENT_CHECK, user_ip=user_ip, **kwargs
+            _common._API_V11, _common._COMMENT_CHECK, user_ip=user_ip, **kwargs
         )
         if response.text == "true":
             if response.headers.get("X-akismet-pro-tip", "") == "discard":
-                return CheckResponse.DISCARD
-            return CheckResponse.SPAM
+                return _common.CheckResponse.DISCARD
+            return _common.CheckResponse.SPAM
         if response.text == "false":
-            return CheckResponse.HAM
-        _protocol_error(_COMMENT_CHECK, response)
+            return _common.CheckResponse.HAM
+        _common._protocol_error(_common._COMMENT_CHECK, response)
 
     async def submit_ham(
-        self, user_ip: str, **kwargs: Unpack[AkismetArguments]
+        self, user_ip: str, **kwargs: Unpack[_common.AkismetArguments]
     ) -> bool:
         """
         Inform Akismet that a piece of user-submitted comment is not spam.
@@ -463,10 +448,10 @@ class AsyncClient:
            received from the Akismet API.
 
         """
-        return await self._submit(_SUBMIT_HAM, user_ip, **kwargs)
+        return await self._submit(_common._SUBMIT_HAM, user_ip, **kwargs)
 
     async def submit_spam(
-        self, user_ip: str, **kwargs: Unpack[AkismetArguments]
+        self, user_ip: str, **kwargs: Unpack[_common.AkismetArguments]
     ) -> bool:
         """
         Inform Akismet that a piece of user-submitted comment is spam.
@@ -505,7 +490,7 @@ class AsyncClient:
            received from the Akismet API.
 
         """
-        return await self._submit(_SUBMIT_SPAM, user_ip, **kwargs)
+        return await self._submit(_common._SUBMIT_SPAM, user_ip, **kwargs)
 
     async def key_sites(
         # pylint: disable=too-many-positional-arguments,too-many-arguments
@@ -557,7 +542,7 @@ class AsyncClient:
         ):
             if value is not None:
                 params[argument] = value
-        response = await self._get_request(_API_V12, _KEY_SITES, params)
+        response = await self._get_request(_common._API_V12, _common._KEY_SITES, params)
         if result_format == "csv":
             return response.text
         return response.json()
@@ -572,7 +557,7 @@ class AsyncClient:
 
         """
         response = await self._get_request(
-            _API_V12, _USAGE_LIMIT, params={"api_key": self._config.key}
+            _common._API_V12, _common._USAGE_LIMIT, params={"api_key": self._config.key}
         )
         return response.json()
 
@@ -601,10 +586,10 @@ class AsyncClient:
         if not all([key, url]):
             key, url = self._config
         response = await self._request(
-            "POST", _API_V11, _VERIFY_KEY, {"key": key, "blog": url}
+            "POST", _common._API_V11, _common._VERIFY_KEY, {"key": key, "blog": url}
         )
         if response.text == "valid":
             return True
         if response.text == "invalid":
             return False
-        _protocol_error(_VERIFY_KEY, response)
+        _common._protocol_error(_common._VERIFY_KEY, response)

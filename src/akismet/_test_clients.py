@@ -134,7 +134,9 @@ def _make_test_transport(
                 if request.url.query == b"format=csv"
                 else _KEY_SITES_JSON
             )
-        return httpx.Response(status_code=HTTPStatus.OK, **response_args)
+        return httpx.Response(
+            status_code=HTTPStatus.OK, **response_args
+        )  # type: ignore
 
     return httpx.MockTransport(_handler)
 

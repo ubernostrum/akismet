@@ -28,7 +28,7 @@ class SyncAkismetEndToEndTests(AkismetTests):
 
     """
 
-    common_kwargs = {"user_ip": "127.0.0.1", "is_test": 1}
+    common_kwargs = {"user_ip": "127.0.0.1", "is_test": 1}  # type: ignore
 
     def setUp(self):
         """
@@ -142,7 +142,7 @@ class AsyncAkismetEndToEndTests(AsyncAkismetTests):
 
     """
 
-    common_kwargs = {"user_ip": "127.0.0.1", "is_test": 1}
+    common_kwargs = {"user_ip": "127.0.0.1", "is_test": 1}  # type: ignore
 
     async def asyncSetUp(self):
         """
@@ -257,7 +257,11 @@ class LegacyAkismetEndToEndTests(AkismetTests):
 
     """
 
-    common_kwargs = {"user_ip": "127.0.0.1", "user_agent": "Mozilla", "is_test": 1}
+    common_kwargs = {
+        "user_ip": "127.0.0.1",
+        "user_agent": "Mozilla",
+        "is_test": 1,  # type: ignore
+    }
 
     def setUp(self):
         """

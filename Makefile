@@ -1,9 +1,12 @@
-# This Makefile is not used to compile particular files or sets of files, as in a C/C++ project, but instead is used
-# as a task runner and centralized point for defining local development tasks.
+# This Makefile is not used to compile particular files or sets of
+# files, as in a C/C++ project, but instead is used as a task runner
+# and centralized point for defining local development tasks.
 #
-# This Makefile also is an experimental feature for this repository, and may be removed without warning.
+# This Makefile also is an experimental feature for this repository,
+# and may be removed without warning.
 #
-# You can view a list of available tasks by running "make help" or just "make".
+# You can view a list of available tasks by running "make help" or
+# just "make".
 #
 .POSIX:
 

@@ -8,7 +8,7 @@ Legacy/deprecated Akismet client.
 import os
 import textwrap
 import warnings
-from typing import Optional
+from typing import NoReturn, Optional
 
 import httpx
 
@@ -156,7 +156,7 @@ class Akismet:
         self._protocol_error(operation, response)
 
     @classmethod
-    def _protocol_error(cls, operation: str, response: httpx.Response) -> None:
+    def _protocol_error(cls, operation: str, response: httpx.Response) -> NoReturn:
         """
         Raise an appropriate exception for unexpected API responses.
 

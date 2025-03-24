@@ -188,7 +188,8 @@ def _try_discover_config() -> Config:
     """
     key = os.getenv(_KEY_ENV_VAR, None)
     url = os.getenv(_URL_ENV_VAR, None)
-    if not all([key, url]):
+
+    if key is None or url is None:
         raise ConfigurationError(
             textwrap.dedent(
                 f"""
@@ -199,6 +200,7 @@ def _try_discover_config() -> Config:
         """
             )
         )
+
     if not url.startswith(("http://", "https://")):
         raise ConfigurationError(
             textwrap.dedent(
