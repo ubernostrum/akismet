@@ -137,11 +137,7 @@ def coverage_report(session: nox.Session) -> None:
 # -----------------------------------------------------------------------------------
 
 
-# The documentation jobs ordinarily would want to use the latest Python version, but
-# currently that's 3.13 and Read The Docs doesn't yet support it. So to ensure the
-# documentation jobs are as closely matched to what would happen on RTD, these jobs stay
-# on 3.12 for now.
-@nox.session(python=["3.12"], tags=["docs"])
+@nox.session(python=["3.13"], tags=["docs"])
 def docs_build(session: nox.Session) -> None:
     """
     Build the package's documentation as HTML.
@@ -166,7 +162,7 @@ def docs_build(session: nox.Session) -> None:
     clean()
 
 
-@nox.session(python=["3.12"], tags=["docs"])
+@nox.session(python=["3.13"], tags=["docs"])
 def docs_docstrings(session: nox.Session) -> None:
     """
     Enforce the presence of docstrings on all modules, classes, functions, and
@@ -190,7 +186,7 @@ def docs_docstrings(session: nox.Session) -> None:
     clean()
 
 
-@nox.session(python=["3.12"], tags=["docs"])
+@nox.session(python=["3.13"], tags=["docs"])
 def docs_spellcheck(session: nox.Session) -> None:
     """
     Spell-check the package's documentation.
