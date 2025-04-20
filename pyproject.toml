@@ -45,8 +45,6 @@ version = "24.11.1a0"
 tests = ["nox"]
 
 [tool.bandit]
-# B113 is only skipped right now because of a bug in Bandit. Bandit 1.8 should fix it:
-# https://github.com/PyCQA/bandit/issues/1175
 skips = ["B101", "B113"]
 
 [tool.black]
