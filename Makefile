@@ -51,19 +51,19 @@ update: ### Update dependencies and tooling.
 
 .PHONY: check-docs
 check-docs: ### Check the package's documentation.
-	@nox -t docs
+	@nox -k docs
 
 .PHONY: check-format
 check-format: ### Check code formatting.
-	@nox -t formatters
+	@nox -k formatters
 
 .PHONY: check-package
 check-package: ### Check the package build and contents.
-	@nox -t packaging
+	@nox -k packaging
 
 .PHONY: ci
 ci: ### Run entire CI test/check suite locally: tests with coverage, docs, linters, format checks, package checks.
-	@nox
+	@nox -k "not release"
 
 .PHONY: format
 format: ### Apply autoformatters to the entire codebase.
@@ -72,7 +72,7 @@ format: ### Apply autoformatters to the entire codebase.
 
 .PHONY: lint
 lint: ### Run linter suite over the codebase.
-	@nox -t linters
+	@nox -k linters
 
 .PHONY: pre-commit
 pre-commit: ### Run all pre-commit hooks.
@@ -80,7 +80,7 @@ pre-commit: ### Run all pre-commit hooks.
 
 .PHONY: test
 test: ### Run unit tests with coverage report.
-	@nox -t tests
+	@nox -k "tests and not release"
 
 
 # Targets for packaging.

@@ -19,7 +19,6 @@ import typing
 import nox
 
 nox.options.default_venv_backend = "venv"
-nox.options.keywords = ["not release"]
 nox.options.reuse_existing_virtualenvs = True
 
 PACKAGE_NAME = "akismet"
