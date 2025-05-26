@@ -36,8 +36,8 @@ ARTIFACT_PATHS = (
     NOXFILE_PATH / "tests" / "__pycache__",
 )
 
-TEST_KEY = "INVALID_TEST_KEY"
-TEST_URL = "http://example.com"
+TEST_KEY = "invalid-test-key"
+TEST_URL = "http://example.com/"
 
 
 def clean(paths: typing.Iterable[pathlib.Path] = ARTIFACT_PATHS) -> None:
@@ -67,24 +67,26 @@ def tests_with_coverage(session: nox.Session) -> None:
 
     """
     session.install(
-        ".[tests]",
-        "coverage",
-        'tomli; python_full_version < "3.11.0a7"',
+        ".",
+        "anyio",
+        "pytest",
+        "coverage[toml]",
     )
+    clean()
     session.run(
         f"python{session.python}",
-        "-Wonce::DeprecationWarning",
         "-Im",
         "coverage",
         "run",
         "--source",
         PACKAGE_NAME,
         "-m",
-        "unittest",
-        "discover",
+        "pytest",
+        "-m",
+        "not end_to_end",
+        "-vv",
         env={"PYTHON_AKISMET_API_KEY": TEST_KEY, "PYTHON_AKISMET_BLOG_URL": TEST_URL},
     )
-    clean()
 
 
 @nox.session(python=["3.9", "3.10", "3.11", "3.12", "3.13"], tags=["release"])
@@ -95,15 +97,14 @@ def tests_end_to_end(session: nox.Session) -> None:
     """
     if IS_CI:
         session.skip("Release tests do not run in CI")
-    session.install(".[tests]")
+    session.install(".", "anyio", "pytest")
     session.run(
         f"python{session.python}",
-        "-Wonce::DeprecationWarning",
         "-Im",
-        "unittest",
-        "discover",
-        "--pattern",
-        "end_to_end*",
+        "pytest",
+        "-m",
+        "end_to_end",
+        "-vv",
         env={
             "PYTHON_AKISMET_API_KEY": os.getenv("PYTHON_AKISMET_API_KEY", ""),
             "PYTHON_AKISMET_BLOG_URL": os.getenv("PYTHON_AKISMET_BLOG_URL", ""),
@@ -318,7 +319,7 @@ def lint_pylint(session: nox.Session) -> None:
 
     """
     # Pylint requires that all dependencies be importable during the run.
-    session.install("httpx", "typing-extensions", "pylint")
+    session.install("httpx", "typing-extensions", "pylint", "pytest")
     session.run(f"python{session.python}", "-Im", "pylint", "--version")
     session.run(f"python{session.python}", "-Im", "pylint", "src/", "tests/")
     clean()

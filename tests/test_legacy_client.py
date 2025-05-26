@@ -1,20 +1,93 @@
 """
-Tests for the deprectaed legacy Akismet API client.
+Tests for the deprecated legacy Akismet API client.
+
+Much like the legacy API client itself, these tests are deprecated and will be kept only
+as long as the legacy API client is. During the deprecation period, these tests will
+receive only critical bug fixes; refactorings and other improvements made for the rest
+of the test suite will not be ported here.
 
 """
 
 # SPDX-License-Identifier: BSD-3-Clause
 
 import os
+import typing
+import unittest
+from http import HTTPStatus
+
+import httpx
+import pytest
 
 import akismet
 from akismet import _common, _test_clients
 
-from . import base
-from .test_sync_client import make_fixed_response_sync_client
+
+def _make_fixed_response_transport(
+    response_text: str = "true",
+    status_code: HTTPStatus = HTTPStatus.OK,
+    response_json: typing.Optional[dict] = None,
+) -> httpx.MockTransport:
+    """
+    Return an ``httpx`` transport that produces a fixed response, for use
+    in testing.
+
+    The transport will return a response consisting of:
+
+    * ``status_code`` (default 200)
+    * ``response_json`` as the JSON content, if supplied
+    * Otherwise ``response_text`` (default ``"true"``) as the response text
+
+    """
+
+    def _handler(
+        request: httpx.Request,  # pylint: disable=unused-argument
+    ) -> httpx.Response:
+        """
+        Mock transport handler which returns a controlled response.
+
+        """
+        response_kwargs = {"status_code": status_code, "content": response_text}
+        if response_json is not None:
+            del response_kwargs["content"]
+            response_kwargs["json"] = response_json
+        return httpx.Response(**response_kwargs)  # type: ignore
+
+    return httpx.MockTransport(_handler)
 
 
-class LegacyAkismetConfigurationTests(base.AkismetTests):
+def _make_fixed_response_sync_client(
+    response_text: str = "true",
+    status_code: HTTPStatus = HTTPStatus.OK,
+    response_json: typing.Optional[dict] = None,
+) -> httpx.Client:
+    """
+    Return a synchronous HTTP client that produces a fixed repsonse, for use in
+    testing.
+
+    """
+    return httpx.Client(
+        transport=_make_fixed_response_transport(
+            response_text, status_code, response_json
+        )
+    )
+
+
+class CommonData:  # pylint: disable=too-few-public-methods
+    """
+    Common data for all Akismet tests.
+
+    """
+
+    api_key = os.getenv("PYTHON_AKISMET_API_KEY")
+    site_url = os.getenv("PYTHON_AKISMET_BLOG_URL")
+    verify_key_url = f"{_common._API_URL}/{_common._API_V11}/{_common._VERIFY_KEY}"
+
+    config = akismet.Config(key=_test_clients._TEST_KEY, url=_test_clients._TEST_URL)
+    common_kwargs = {"user_ip": "127.0.0.1"}
+
+
+@pytest.mark.filterwarnings("ignore::DeprecationWarning")
+class LegacyAkismetConfigurationTests(CommonData, unittest.TestCase):
     """
     Tests configuration of the legacy Akismet API class.
 
@@ -175,7 +248,8 @@ class LegacyAkismetConfigurationTests(base.AkismetTests):
         self.assertEqual(api.user_agent_header["User-Agent"], _common.USER_AGENT)
 
 
-class LegacyAkismetAPITests(base.AkismetTests):
+@pytest.mark.filterwarnings("ignore::DeprecationWarning")
+class LegacyAkismetAPITests(CommonData, unittest.TestCase):
     """
     Tests implementation of the legacy Akismet API.
 
@@ -286,7 +360,7 @@ class LegacyAkismetAPITests(base.AkismetTests):
             api.verify_key(
                 self.api_key,
                 self.site_url,
-                http_client=make_fixed_response_sync_client(response_text="bad"),
+                http_client=_make_fixed_response_sync_client(response_text="bad"),
             )
 
     def test_unexpected_comment_check_response(self):
@@ -295,7 +369,7 @@ class LegacyAkismetAPITests(base.AkismetTests):
 
         """
         api = akismet.Akismet(
-            http_client=make_fixed_response_sync_client(response_text="valid"),
+            http_client=_make_fixed_response_sync_client(response_text="valid"),
         )
         with self.assertRaises(akismet.ProtocolError):
             check_kwargs = {"comment_author": "viagra-test-123", **self.base_kwargs}
@@ -307,7 +381,7 @@ class LegacyAkismetAPITests(base.AkismetTests):
 
         """
         api = akismet.Akismet(
-            http_client=make_fixed_response_sync_client(response_text="valid"),
+            http_client=_make_fixed_response_sync_client(response_text="valid"),
         )
         with self.assertRaises(akismet.ProtocolError):
             spam_kwargs = {
@@ -324,7 +398,7 @@ class LegacyAkismetAPITests(base.AkismetTests):
 
         """
         api = akismet.Akismet(
-            http_client=make_fixed_response_sync_client(response_text="valid"),
+            http_client=_make_fixed_response_sync_client(response_text="valid"),
         )
         with self.assertRaises(akismet.ProtocolError):
             ham_kwargs = {

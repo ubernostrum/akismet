@@ -37,12 +37,16 @@ readme = "README.rst"
 requires-python = ">=3.9"
 version = "24.11.1a0"
 
+[dependency-groups]
+tests = [
+    "anyio",
+    "coverage[toml]",
+    "pytest",
+]
+
 [project.urls]
 "Documentation" = "https://akismet.readthedocs.io"
 "Source Code" = "https://github.com/ubernostrum/akismet"
-
-[dependency-groups]
-tests = ["nox"]
 
 [tool.bandit]
 skips = ["B101", "B113"]
@@ -92,4 +96,22 @@ source-includes = [
 disable = [
     "duplicate-code",
     "protected-access",
+]
+
+[tool.pytest.ini_options]
+filterwarnings = [
+    "ignore::pytest.PytestCollectionWarning",
+]
+markers = [
+    "akismet_async_client",
+    "akismet_exception_response",
+    "akismet_fixed_response",
+    "akismet_sync_client",
+    "api",
+    "async_client",
+    "constructors",
+    "end_to_end",
+    "errors",
+    "sync_client",
+    "test_client",
 ]
