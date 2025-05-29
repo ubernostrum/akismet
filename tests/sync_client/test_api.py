@@ -18,7 +18,7 @@ pytestmark = [pytest.mark.anyio, pytest.mark.api, pytest.mark.sync_client]
 )
 def test_unsupported_request_method(
     akismet_config: akismet.Config,
-    akismet_sync_client: akismet.AsyncClient,
+    akismet_sync_client: akismet.SyncClient,
     method: str,
 ):
     """
@@ -34,7 +34,7 @@ def test_unsupported_request_method(
         )
 
 
-def test_verify_key_valid(akismet_sync_client: akismet.AsyncClient):
+def test_verify_key_valid(akismet_sync_client: akismet.SyncClient):
     """
     verify_key() returns True when the config is valid.
 
@@ -43,7 +43,7 @@ def test_verify_key_valid(akismet_sync_client: akismet.AsyncClient):
 
 
 @pytest.mark.akismet_sync_client(verify_key_response=False)
-def test_verify_key_invalid(akismet_sync_client: akismet.AsyncClient):
+def test_verify_key_invalid(akismet_sync_client: akismet.SyncClient):
     """
     verify_key() returns False when the config is invalid.
 
@@ -52,7 +52,7 @@ def test_verify_key_invalid(akismet_sync_client: akismet.AsyncClient):
 
 
 def test_verify_key_valid_explicit(
-    akismet_sync_client: akismet.AsyncClient, akismet_config: akismet.Config
+    akismet_sync_client: akismet.SyncClient, akismet_config: akismet.Config
 ):
     """
     verify_key() returns True when the config is valid and explicitly passed in.
@@ -65,7 +65,7 @@ def test_verify_key_valid_explicit(
 
 @pytest.mark.akismet_sync_client(verify_key_response=False)
 def test_verify_key_invalid_explicit(
-    akismet_sync_client: akismet.AsyncClient, akismet_config: akismet.Config
+    akismet_sync_client: akismet.SyncClient, akismet_config: akismet.Config
 ):
     """
     verify_key() returns False when the config is invalid and explicitly
@@ -90,7 +90,7 @@ def test_verify_key_invalid_explicit(
     ids=["comment_check", "submit_ham", "submit_spam", "key_sites", "usage_limit"],
 )
 def test_request_with_invalid_key(
-    akismet_sync_client_fixed_response: akismet.AsyncClient,
+    akismet_sync_client_fixed_response: akismet.SyncClient,
     akismet_common_kwargs: dict,
     method_name: str,
     pass_args: bool,
@@ -135,7 +135,7 @@ def test_request_with_invalid_key(
     ],
 )
 def test_comment_check(
-    akismet_sync_client: akismet.AsyncClient,
+    akismet_sync_client: akismet.SyncClient,
     akismet_common_kwargs: dict,
     expected: akismet.CheckResponse,
 ):
@@ -147,7 +147,7 @@ def test_comment_check(
 
 
 def test_submit_ham(
-    akismet_sync_client: akismet.AsyncClient, akismet_common_kwargs: dict
+    akismet_sync_client: akismet.SyncClient, akismet_common_kwargs: dict
 ):
     """
     submit_ham() returns True when Akismet accepts the submission.
@@ -157,7 +157,7 @@ def test_submit_ham(
 
 
 def test_submit_spam(
-    akismet_sync_client: akismet.AsyncClient, akismet_common_kwargs: dict
+    akismet_sync_client: akismet.SyncClient, akismet_common_kwargs: dict
 ):
     """
     submit_spam() returns True when Akismet accepts the submission.
@@ -166,7 +166,7 @@ def test_submit_spam(
     assert akismet_sync_client.submit_spam(**akismet_common_kwargs)
 
 
-def test_key_sites_json(akismet_sync_client: akismet.AsyncClient):
+def test_key_sites_json(akismet_sync_client: akismet.SyncClient):
     """
     key_sites() returns key usage information in JSON format by default.
 
@@ -188,7 +188,7 @@ def test_key_sites_json(akismet_sync_client: akismet.AsyncClient):
             assert key in site
 
 
-def test_key_sites_csv(akismet_sync_client: akismet.AsyncClient):
+def test_key_sites_csv(akismet_sync_client: akismet.SyncClient):
     """
     key_sites() returns key usage information in CSV format when requested.
 
@@ -208,7 +208,7 @@ def test_key_sites_csv(akismet_sync_client: akismet.AsyncClient):
     }
 
 
-def test_usage_limit(akismet_sync_client: akismet.AsyncClient):
+def test_usage_limit(akismet_sync_client: akismet.SyncClient):
     """
     usage_limit() returns the API usage statistics in JSON format.
 
