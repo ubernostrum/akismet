@@ -13,7 +13,7 @@ import akismet
 pytestmark = [pytest.mark.errors, pytest.mark.sync_client]
 
 check_all_methods = pytest.mark.parametrize(
-    "method_name,pass_args",
+    ["method_name", "pass_args"],
     [
         ("comment_check", True),
         ("key_sites", False),
@@ -37,16 +37,18 @@ check_all_methods = pytest.mark.parametrize(
 @pytest.mark.parametrize(
     "status_code",
     [
-        pytest.param(code, marks=pytest.mark.akismet_fixed_response(status_code=code))
+        pytest.param(
+            code.value, marks=pytest.mark.akismet_fixed_response(status_code=code)
+        )
         for code in HTTPStatus
         if 400 <= code < 600
     ],
-    ids=[code for code in HTTPStatus if 400 <= code < 600],
+    ids=[code.value for code in HTTPStatus if 400 <= code < 600],
 )
 def test_error_status(
     akismet_sync_client_fixed_response: akismet.SyncClient,
     akismet_common_kwargs: dict,
-    status_code: HTTPStatus,
+    status_code: int,
     method_name: str,
     pass_args: bool,
 ):
@@ -55,15 +57,13 @@ def test_error_status(
     code indicating an error.
 
     """
+    method = getattr(akismet_sync_client_fixed_response, method_name)
+    args = akismet_common_kwargs if pass_args else {}
     with pytest.raises(
         akismet.RequestError,
-        match=f"Akismet responded with error status: {status_code.value}",
+        match=f"Akismet responded with error status: {status_code}",
     ):
-        method = getattr(akismet_sync_client_fixed_response, method_name)
-        if pass_args:
-            method(**akismet_common_kwargs)
-        else:
-            method()
+        method(**args)
 
 
 @check_all_methods
@@ -78,12 +78,10 @@ def test_error_timeout(
     RequestError is raised when the request to Akismet times out.
 
     """
+    method = getattr(akismet_sync_client_exception, method_name)
+    args = akismet_common_kwargs if pass_args else {}
     with pytest.raises(akismet.RequestError, match="Akismet timed out."):
-        method = getattr(akismet_sync_client_exception, method_name)
-        if pass_args:
-            method(**akismet_common_kwargs)
-        else:
-            method()
+        method(**args)
 
 
 @check_all_methods
@@ -98,12 +96,10 @@ def test_error_other_httpx(
     RequestError is raised when a generic httpx request error occurs.
 
     """
+    method = getattr(akismet_sync_client_exception, method_name)
+    args = akismet_common_kwargs if pass_args else {}
     with pytest.raises(akismet.RequestError, match="Error making request to Akismet."):
-        method = getattr(akismet_sync_client_exception, method_name)
-        if pass_args:
-            method(**akismet_common_kwargs)
-        else:
-            method()
+        method(**args)
 
 
 @check_all_methods
@@ -119,12 +115,10 @@ def test_error_other(
     request.
 
     """
+    method = getattr(akismet_sync_client_exception, method_name)
+    args = akismet_common_kwargs if pass_args else {}
     with pytest.raises(akismet.RequestError, match="Error making request to Akismet."):
-        method = getattr(akismet_sync_client_exception, method_name)
-        if pass_args:
-            method(**akismet_common_kwargs)
-        else:
-            method()
+        method(**args)
 
 
 @pytest.mark.parametrize("method_name", ["comment_check", "submit_ham", "submit_spam"])
@@ -145,7 +139,7 @@ def test_unknown_argument(
 
 
 @pytest.mark.parametrize(
-    "method_name,pass_args",
+    ["method_name", "pass_args"],
     [
         ("comment_check", True),
         ("submit_ham", True),
@@ -166,9 +160,7 @@ def test_protocol_error(
     response.
 
     """
+    method = getattr(akismet_sync_client_fixed_response, method_name)
+    args = akismet_common_kwargs if pass_args else {}
     with pytest.raises(akismet.ProtocolError):
-        method = getattr(akismet_sync_client_fixed_response, method_name)
-        if pass_args:
-            method(**akismet_common_kwargs)
-        else:
-            method()
+        method(**args)

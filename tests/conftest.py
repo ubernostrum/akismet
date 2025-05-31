@@ -259,7 +259,7 @@ def akismet_sync_client(
 @pytest.fixture
 def akismet_async_client(
     akismet_async_class: type[akismet.AsyncClient],
-) -> akismet.SyncClient:
+) -> akismet.AsyncClient:
     """
     Return an (async) Akismet test client.
 

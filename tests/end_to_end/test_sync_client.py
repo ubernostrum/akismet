@@ -51,7 +51,7 @@ def test_verify_key_invalid(akismet_bad_config: akismet.Config):
 
 
 @pytest.mark.parametrize(
-    "method_name,pass_args",
+    ["method_name", "pass_args"],
     [
         ("comment_check", True),
         ("submit_ham", True),
@@ -73,12 +73,10 @@ def test_request_with_invalid_key(
 
     """
     client = akismet.SyncClient(config=akismet_bad_config)
+    method = getattr(client, method_name)
+    args = akismet_end_to_end_kwargs if pass_args else {}
     with pytest.raises(akismet.APIKeyError):
-        method = getattr(client, method_name)
-        if pass_args:
-            method(**akismet_end_to_end_kwargs)
-        else:
-            method()
+        method(**args)
 
 
 def test_comment_check_spam(akismet_end_to_end_kwargs: dict, akismet_spam_author: str):

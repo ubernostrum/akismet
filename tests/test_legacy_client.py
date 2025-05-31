@@ -108,15 +108,15 @@ class LegacyAkismetConfigurationTests(CommonData, unittest.TestCase):
             blog_url=self.site_url,
             http_client=_test_clients._make_test_sync_http_client(),
         )
-        self.assertEqual(self.api_key, api.api_key)
-        self.assertEqual(self.site_url, api.blog_url)
+        assert self.api_key == api.api_key
+        assert self.site_url == api.blog_url
 
     def test_bad_config_args(self):
         """
         Configuring with bad arguments fails.
 
         """
-        with self.assertRaises(akismet.APIKeyError):
+        with pytest.raises(akismet.APIKeyError):
             akismet.Akismet(
                 key="invalid",
                 blog_url="http://invalid",
@@ -135,12 +135,12 @@ class LegacyAkismetConfigurationTests(CommonData, unittest.TestCase):
             blog_url=None,
             http_client=_test_clients._make_test_sync_http_client(),
         )
-        self.assertEqual(self.api_key, api.api_key)
-        self.assertEqual(self.site_url, api.blog_url)
+        assert self.api_key == api.api_key
+        assert self.site_url == api.blog_url
 
         api = akismet.Akismet(http_client=_test_clients._make_test_sync_http_client())
-        self.assertEqual(self.api_key, api.api_key)
-        self.assertEqual(self.site_url, api.blog_url)
+        assert self.api_key == api.api_key
+        assert self.site_url == api.blog_url
 
     def test_bad_config_env(self):
         """
@@ -150,7 +150,7 @@ class LegacyAkismetConfigurationTests(CommonData, unittest.TestCase):
         try:
             os.environ[_common._KEY_ENV_VAR] = "invalid"
             os.environ[_common._URL_ENV_VAR] = "http://invalid"
-            with self.assertRaises(akismet.APIKeyError):
+            with pytest.raises(akismet.APIKeyError):
                 akismet.Akismet(
                     http_client=_test_clients._make_test_sync_http_client(
                         verify_key_response=False
@@ -167,7 +167,7 @@ class LegacyAkismetConfigurationTests(CommonData, unittest.TestCase):
         """
         try:
             del os.environ[_common._KEY_ENV_VAR]
-            with self.assertRaises(akismet.ConfigurationError):
+            with pytest.raises(akismet.ConfigurationError):
                 akismet.Akismet(
                     http_client=_test_clients._make_test_sync_http_client(
                         verify_key_response=False
@@ -184,7 +184,7 @@ class LegacyAkismetConfigurationTests(CommonData, unittest.TestCase):
         """
         try:
             del os.environ[_common._URL_ENV_VAR]
-            with self.assertRaises(akismet.ConfigurationError):
+            with pytest.raises(akismet.ConfigurationError):
                 akismet.Akismet(
                     http_client=_test_clients._make_test_sync_http_client(
                         verify_key_response=False
@@ -206,7 +206,7 @@ class LegacyAkismetConfigurationTests(CommonData, unittest.TestCase):
             "https//example.com",
         )
         for url in bad_urls:
-            with self.assertRaises(akismet.ConfigurationError):
+            with pytest.raises(akismet.ConfigurationError):
                 akismet.Akismet(
                     key=self.api_key,
                     blog_url=url,
@@ -220,7 +220,7 @@ class LegacyAkismetConfigurationTests(CommonData, unittest.TestCase):
         Instantiating without any configuration fails.
 
         """
-        with self.assertRaises(akismet.ConfigurationError):
+        with pytest.raises(akismet.ConfigurationError):
             akismet.Akismet(
                 key=None,
                 blog_url=None,
@@ -228,7 +228,7 @@ class LegacyAkismetConfigurationTests(CommonData, unittest.TestCase):
                     verify_key_response=False
                 ),
             )
-        with self.assertRaises(akismet.ConfigurationError):
+        with pytest.raises(akismet.ConfigurationError):
             akismet.Akismet(
                 http_client=_test_clients._make_test_sync_http_client(
                     verify_key_response=False
@@ -245,7 +245,7 @@ class LegacyAkismetConfigurationTests(CommonData, unittest.TestCase):
             blog_url=self.site_url,
             http_client=_test_clients._make_test_sync_http_client(),
         )
-        self.assertEqual(api.user_agent_header["User-Agent"], _common.USER_AGENT)
+        assert api.user_agent_header["User-Agent"] == _common.USER_AGENT
 
 
 @pytest.mark.filterwarnings("ignore::DeprecationWarning")
@@ -265,12 +265,10 @@ class LegacyAkismetAPITests(CommonData, unittest.TestCase):
         The verify_key operation succeeds with a valid key and URL.
 
         """
-        self.assertTrue(
-            akismet.Akismet.verify_key(
-                self.api_key,
-                self.site_url,
-                http_client=_test_clients._make_test_sync_http_client(),
-            )
+        assert akismet.Akismet.verify_key(
+            self.api_key,
+            self.site_url,
+            http_client=_test_clients._make_test_sync_http_client(),
         )
 
     def test_verify_key_invalid(self):
@@ -278,14 +276,12 @@ class LegacyAkismetAPITests(CommonData, unittest.TestCase):
         The verify_key operation fails with an invalid key and URL.
 
         """
-        self.assertFalse(
-            akismet.Akismet.verify_key(
-                "invalid",
-                "http://invalid",
-                http_client=_test_clients._make_test_sync_http_client(
-                    verify_key_response=False
-                ),
-            )
+        assert not akismet.Akismet.verify_key(
+            "invalid",
+            "http://invalid",
+            http_client=_test_clients._make_test_sync_http_client(
+                verify_key_response=False
+            ),
         )
 
     def test_comment_check_spam(self):
@@ -299,7 +295,7 @@ class LegacyAkismetAPITests(CommonData, unittest.TestCase):
             **self.base_kwargs,
         }
         api = akismet.Akismet(http_client=_test_clients._make_test_sync_http_client())
-        self.assertTrue(api.comment_check(**check_kwargs))
+        assert api.comment_check(**check_kwargs)
 
     def test_comment_check_not_spam(self):
         """
@@ -316,7 +312,7 @@ class LegacyAkismetAPITests(CommonData, unittest.TestCase):
                 comment_check_response=_common.CheckResponse.HAM
             )
         )
-        self.assertFalse(api.comment_check(**check_kwargs))
+        assert not api.comment_check(**check_kwargs)
 
     def test_submit_spam(self):
         """
@@ -330,7 +326,7 @@ class LegacyAkismetAPITests(CommonData, unittest.TestCase):
             **self.base_kwargs,
         }
         api = akismet.Akismet(http_client=_test_clients._make_test_sync_http_client())
-        self.assertTrue(api.submit_spam(**spam_kwargs))
+        assert api.submit_spam(**spam_kwargs)
 
     def test_submit_ham(self):
         """
@@ -345,7 +341,7 @@ class LegacyAkismetAPITests(CommonData, unittest.TestCase):
             **self.base_kwargs,
         }
         api = akismet.Akismet(http_client=_test_clients._make_test_sync_http_client())
-        self.assertTrue(api.submit_ham(**ham_kwargs))
+        assert api.submit_ham(**ham_kwargs)
 
     def test_unexpected_verify_key_response(self):
         """
@@ -356,7 +352,7 @@ class LegacyAkismetAPITests(CommonData, unittest.TestCase):
         api = akismet.Akismet(
             http_client=_test_clients._make_test_sync_http_client(),
         )
-        with self.assertRaises(akismet.ProtocolError):
+        with pytest.raises(akismet.ProtocolError):
             api.verify_key(
                 self.api_key,
                 self.site_url,
@@ -371,8 +367,8 @@ class LegacyAkismetAPITests(CommonData, unittest.TestCase):
         api = akismet.Akismet(
             http_client=_make_fixed_response_sync_client(response_text="valid"),
         )
-        with self.assertRaises(akismet.ProtocolError):
-            check_kwargs = {"comment_author": "viagra-test-123", **self.base_kwargs}
+        check_kwargs = {"comment_author": "viagra-test-123", **self.base_kwargs}
+        with pytest.raises(akismet.ProtocolError):
             api.comment_check(**check_kwargs)
 
     def test_unexpected_submit_spam_response(self):
@@ -383,13 +379,13 @@ class LegacyAkismetAPITests(CommonData, unittest.TestCase):
         api = akismet.Akismet(
             http_client=_make_fixed_response_sync_client(response_text="valid"),
         )
-        with self.assertRaises(akismet.ProtocolError):
-            spam_kwargs = {
-                "comment_type": "comment",
-                "comment_author": "viagra-test-123",
-                "comment_content": "viagra-test-123",
-                **self.base_kwargs,
-            }
+        spam_kwargs = {
+            "comment_type": "comment",
+            "comment_author": "viagra-test-123",
+            "comment_content": "viagra-test-123",
+            **self.base_kwargs,
+        }
+        with pytest.raises(akismet.ProtocolError):
             api.submit_spam(**spam_kwargs)
 
     def test_unexpected_submit_ham_response(self):
@@ -400,14 +396,14 @@ class LegacyAkismetAPITests(CommonData, unittest.TestCase):
         api = akismet.Akismet(
             http_client=_make_fixed_response_sync_client(response_text="valid"),
         )
-        with self.assertRaises(akismet.ProtocolError):
-            ham_kwargs = {
-                "comment_type": "comment",
-                "comment_author": "Legitimate Author",
-                "comment_content": "This is a legitimate comment.",
-                "user_role": "administrator",
-                **self.base_kwargs,
-            }
+        ham_kwargs = {
+            "comment_type": "comment",
+            "comment_author": "Legitimate Author",
+            "comment_content": "This is a legitimate comment.",
+            "user_role": "administrator",
+            **self.base_kwargs,
+        }
+        with pytest.raises(akismet.ProtocolError):
             api.submit_ham(**ham_kwargs)
 
     def test_unknown_kwargs(self):
@@ -419,5 +415,5 @@ class LegacyAkismetAPITests(CommonData, unittest.TestCase):
         api = akismet.Akismet(
             http_client=_test_clients._make_test_sync_http_client(),
         )
-        with self.assertRaises(akismet.UnknownArgumentError):
+        with pytest.raises(akismet.UnknownArgumentError):
             api.comment_check(**bad_kwargs)

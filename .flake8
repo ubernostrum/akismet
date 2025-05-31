@@ -3,3 +3,5 @@ extend-ignore = E203,E501
 extend-select = B950
 max-complexity = 13
 max-line-length = 88
+pytest-parametrize-names-type = list
+pytest-parametrize-values-type = list

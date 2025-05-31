@@ -79,7 +79,7 @@ async def test_verify_key_invalid_explicit(
 
 @pytest.mark.akismet_fixed_response(response_text="invalid")
 @pytest.mark.parametrize(
-    "method_name,pass_args",
+    ["method_name", "pass_args"],
     [
         ("comment_check", True),
         ("submit_ham", True),
@@ -100,12 +100,10 @@ async def test_request_with_invalid_key(
     an invalid API key/URL.
 
     """
+    method = getattr(akismet_async_client_fixed_response, method_name)
+    args = akismet_common_kwargs if pass_args else {}
     with pytest.raises(akismet.APIKeyError):
-        method = getattr(akismet_async_client_fixed_response, method_name)
-        if pass_args:
-            await method(**akismet_common_kwargs)
-        else:
-            await method()
+        await method(**args)
 
 
 @pytest.mark.parametrize(

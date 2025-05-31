@@ -298,7 +298,7 @@ def lint_flake8(session: nox.Session) -> None:
     Lint code with flake8.
 
     """
-    session.install("flake8", "flake8-bugbear")
+    session.install("flake8", "flake8-bugbear", "flake8-pytest-style")
     session.run(f"python{session.python}", "-Im", "flake8", "--version")
     session.run(
         f"python{session.python}",
