@@ -312,19 +312,17 @@ class SyncClient:
            optional argument names.
 
         """
-        unknown_args = [k for k in kwargs if k not in _common._OPTIONAL_KEYS]
-        if unknown_args:
-            raise _exceptions.UnknownArgumentError(
-                f"Received unknown argument(s) for Akismet operation {endpoint}: "
-                f"{', '.join(unknown_args)}"
-            )
-        data = {
-            "api_key": self._config.key,
-            "blog": self._config.url,
-            "user_ip": user_ip,
-            **kwargs,
-        }
-        return self._request("POST", version, endpoint, data)
+        return self._request(
+            "POST",
+            version,
+            endpoint,
+            data={
+                "api_key": self._config.key,
+                "blog": self._config.url,
+                "user_ip": user_ip,
+                **_common._check_post_kwargs(kwargs, endpoint),
+            },
+        )
 
     def _submit(
         self, endpoint: str, user_ip: str, **kwargs: Unpack[_common.AkismetArguments]

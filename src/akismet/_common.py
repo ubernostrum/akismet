@@ -14,7 +14,7 @@ from typing import Literal, NamedTuple, NoReturn, TypedDict
 
 import httpx
 
-from ._exceptions import APIKeyError, ConfigurationError, ProtocolError
+from . import _exceptions
 
 # Private constants.
 # -------------------------------------------------------------------------------
@@ -131,7 +131,7 @@ def _configuration_error(config: Config) -> NoReturn:
     Raise an appropriate exception for invalid configuration.
 
     """
-    raise APIKeyError(
+    raise _exceptions.APIKeyError(
         textwrap.dedent(
             f"""
             Akismet API key and/or blog URL were invalid.
@@ -164,7 +164,7 @@ def _protocol_error(operation: str, response: httpx.Response) -> NoReturn:
     Raise an appropriate exception for unexpected API responses.
 
     """
-    raise ProtocolError(
+    raise _exceptions.ProtocolError(
         textwrap.dedent(
             f"""
         Received unexpected or non-standard response from Akismet API.
@@ -190,7 +190,7 @@ def _try_discover_config() -> Config:
     url = os.getenv(_URL_ENV_VAR, None)
 
     if key is None or url is None:
-        raise ConfigurationError(
+        raise _exceptions.ConfigurationError(
             textwrap.dedent(
                 f"""
         Could not find full Akismet configuration.
@@ -202,7 +202,7 @@ def _try_discover_config() -> Config:
         )
 
     if not url.startswith(("http://", "https://")):
-        raise ConfigurationError(
+        raise _exceptions.ConfigurationError(
             textwrap.dedent(
                 f"""
             Invalid Akismet site URL specified: {url}
@@ -227,3 +227,17 @@ def _handle_check_response(response: httpx.Response) -> CheckResponse:
     if response.text == "false":
         return CheckResponse.HAM
     _protocol_error(_COMMENT_CHECK, response)
+
+
+def _check_post_kwargs(kwargs: dict, endpoint: str) -> AkismetArguments:
+    """
+    Verify that the provided set of keyword arguments is valid for an Akismet POST
+    request, returning them if they are or raising UnknownArgumentError if they aren't.
+
+    """
+    if unknown_args := [k for k in kwargs if k not in _OPTIONAL_KEYS]:
+        raise _exceptions.UnknownArgumentError(
+            f"Received unknown argument(s) for Akismet operation {endpoint}: "
+            f"{', '.join(unknown_args)}"
+        )
+    return kwargs
