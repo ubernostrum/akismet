@@ -58,6 +58,10 @@ target-version = ["py39", "py310", "py311", "py312", "py313"]
 source = ["src", ".nox/tests_with_coverage*/**/site-packages"]
 
 [tool.coverage.report]
+omit = [
+    "tests/conftest.py",
+    "tests/end_to_end/*"
+]
 fail_under = 100
 
 [tool.coverage.run]

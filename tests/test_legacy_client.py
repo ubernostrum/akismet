@@ -11,7 +11,6 @@ of the test suite will not be ported here.
 # SPDX-License-Identifier: BSD-3-Clause
 
 import os
-import typing
 import unittest
 from http import HTTPStatus
 
@@ -25,7 +24,6 @@ from akismet import _common, _test_clients
 def _make_fixed_response_transport(
     response_text: str = "true",
     status_code: HTTPStatus = HTTPStatus.OK,
-    response_json: typing.Optional[dict] = None,
 ) -> httpx.MockTransport:
     """
     Return an ``httpx`` transport that produces a fixed response, for use
@@ -34,7 +32,6 @@ def _make_fixed_response_transport(
     The transport will return a response consisting of:
 
     * ``status_code`` (default 200)
-    * ``response_json`` as the JSON content, if supplied
     * Otherwise ``response_text`` (default ``"true"``) as the response text
 
     """
@@ -46,11 +43,7 @@ def _make_fixed_response_transport(
         Mock transport handler which returns a controlled response.
 
         """
-        response_kwargs = {"status_code": status_code, "content": response_text}
-        if response_json is not None:
-            del response_kwargs["content"]
-            response_kwargs["json"] = response_json
-        return httpx.Response(**response_kwargs)  # type: ignore
+        return httpx.Response(status_code=status_code, content=response_text)
 
     return httpx.MockTransport(_handler)
 
@@ -58,7 +51,6 @@ def _make_fixed_response_transport(
 def _make_fixed_response_sync_client(
     response_text: str = "true",
     status_code: HTTPStatus = HTTPStatus.OK,
-    response_json: typing.Optional[dict] = None,
 ) -> httpx.Client:
     """
     Return a synchronous HTTP client that produces a fixed repsonse, for use in
@@ -66,9 +58,7 @@ def _make_fixed_response_sync_client(
 
     """
     return httpx.Client(
-        transport=_make_fixed_response_transport(
-            response_text, status_code, response_json
-        )
+        transport=_make_fixed_response_transport(response_text, status_code)
     )
 
 

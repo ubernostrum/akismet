@@ -80,6 +80,8 @@ def tests_with_coverage(session: nox.Session) -> None:
         "run",
         "--source",
         PACKAGE_NAME,
+        "--source",
+        "tests/",
         "-m",
         "pytest",
         "-m",
