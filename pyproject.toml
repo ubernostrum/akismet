@@ -67,7 +67,7 @@ fail_under = 100
 [tool.coverage.run]
 branch = true
 parallel = true
-source = ["akismet"]
+source = ["akismet", "tests"]
 
 [tool.interrogate]
 fail-under = 100
