@@ -237,16 +237,10 @@ class SyncClient:
            when Akiset returns a non-success status code.
 
         """
-        if method not in ("GET", "POST"):
-            raise _exceptions.AkismetError(
-                f"Unrecognized request method attempted: {method}."
-            )
+        url, kwargs = _common._prepare_request(method, version, endpoint, data)
         handler = getattr(self._http_client, method.lower())
-        request_kwarg = "data" if method == "POST" else "params"
         try:
-            response = handler(
-                f"{_common._API_URL}/{version}/{endpoint}", **{request_kwarg: data}
-            )
+            response = handler(url, **kwargs)
             response.raise_for_status()
         except httpx.HTTPStatusError as exc:
             raise _exceptions.RequestError(
@@ -258,14 +252,7 @@ class SyncClient:
             raise _exceptions.RequestError("Error making request to Akismet.") from exc
         except Exception as exc:
             raise _exceptions.RequestError("Error making request to Akismet.") from exc
-        # Since it's possible to construct a client without performing up-front API key
-        # validation, we have to watch out here for the possibility that we're making
-        # requests with an invalid key, and raise the appropriate exception.
-        if endpoint != _common._VERIFY_KEY and response.text == "invalid":
-            raise _exceptions.APIKeyError(
-                "Akismet API key and/or site URL are invalid."
-            )
-        return response
+        return _common._check_response(endpoint, response)
 
     def _get_request(self, version: str, endpoint: str, params: dict) -> httpx.Response:
         """

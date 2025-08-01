@@ -241,3 +241,32 @@ def _check_post_kwargs(kwargs: dict, endpoint: str) -> AkismetArguments:
             f"{', '.join(unknown_args)}"
         )
     return kwargs
+
+
+def _prepare_request(
+    method: _REQUEST_METHODS, api_version: str, endpoint: str, data: dict
+) -> tuple[str, dict]:
+    """
+    From the raw arguments passed to _request(), prepare the correct argument set to
+    pass to the HTTP client and return them.
+
+    """
+    if method not in ("GET", "POST"):
+        raise _exceptions.AkismetError(
+            f"Unrecognized request method attempted: {method}."
+        )
+    request_kwarg = "data" if method == "POST" else "params"
+    return f"{_API_URL}/{api_version}/{endpoint}", {request_kwarg: data}
+
+
+def _check_response(endpoint: str, response: httpx.Response) -> httpx.Response:
+    """
+    Check the response to see if it indicates an invalid key.
+
+    """
+    # It's possible to construct a client without performing up-front API key
+    # validation, in which case the responses will all have text "invalid". So we check
+    # for that and raise an exception when it's detected.
+    if endpoint != _VERIFY_KEY and response.text == "invalid":
+        raise _exceptions.APIKeyError("Akismet API key and/or site URL are invalid.")
+    return response
