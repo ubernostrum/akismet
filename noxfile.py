@@ -227,7 +227,7 @@ def format_black(session: nox.Session) -> None:
     Check code formatting with Black.
 
     """
-    session.install("black>=24.0,<25.0")
+    session.install("black>=25.0,<26.0")
     session.run(f"python{session.python}", "-Im", "black", "--version")
     session.run(
         f"python{session.python}",
