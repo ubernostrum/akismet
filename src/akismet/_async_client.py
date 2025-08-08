@@ -251,7 +251,7 @@ class AsyncClient:
             raise _exceptions.RequestError("Error making request to Akismet.") from exc
         except Exception as exc:
             raise _exceptions.RequestError("Error making request to Akismet.") from exc
-        return _common._check_response(endpoint, response)
+        return _common._akismet_response(endpoint, response)
 
     async def _get_request(
         self, version: str, endpoint: str, params: dict
@@ -327,12 +327,12 @@ class AsyncClient:
            received from the Akismet API.
 
         """
-        response = await self._post_request(
-            _common._API_V11, endpoint, user_ip=user_ip, **kwargs
+        return _common._submit_response(
+            endpoint,
+            await self._post_request(
+                _common._API_V11, endpoint, user_ip=user_ip, **kwargs
+            ),
         )
-        if response.text == _common._SUBMISSION_RESPONSE:
-            return True
-        _common._protocol_error(endpoint, response)
 
     # Public methods corresponding to the methods of the Akismet API.
     # ----------------------------------------------------------------------------

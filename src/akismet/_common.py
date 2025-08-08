@@ -259,7 +259,7 @@ def _prepare_request(
     return f"{_API_URL}/{api_version}/{endpoint}", {request_kwarg: data}
 
 
-def _check_response(endpoint: str, response: httpx.Response) -> httpx.Response:
+def _akismet_response(endpoint: str, response: httpx.Response) -> httpx.Response:
     """
     Check the response to see if it indicates an invalid key.
 
@@ -270,3 +270,13 @@ def _check_response(endpoint: str, response: httpx.Response) -> httpx.Response:
     if endpoint != _VERIFY_KEY and response.text == "invalid":
         raise _exceptions.APIKeyError("Akismet API key and/or site URL are invalid.")
     return response
+
+
+def _submit_response(endpoint: str, response: httpx.Response) -> bool:
+    """
+    Proces the response from a submit (ham/spam) request.
+
+    """
+    if response.text == _SUBMISSION_RESPONSE:
+        return True
+    _protocol_error(endpoint, response)
