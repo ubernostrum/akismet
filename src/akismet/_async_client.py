@@ -5,6 +5,8 @@ Asynchronous Akismet API client implementation.
 
 # SPDX-License-Identifier: BSD-3-Clause
 
+from __future__ import annotations
+
 from types import TracebackType
 from typing import TYPE_CHECKING, Literal, Optional, Type, Union
 
@@ -124,14 +126,14 @@ class AsyncClient:
     """
 
     _http_client: httpx.AsyncClient
-    _config: "akismet.Config"
+    _config: akismet.Config
 
     # Constructors.
     # ----------------------------------------------------------------------------
 
     def __init__(
         self,
-        config: Optional["akismet.Config"] = None,
+        config: Optional[akismet.Config] = None,
         http_client: Optional[httpx.AsyncClient] = None,
     ) -> None:
         """
@@ -146,7 +148,7 @@ class AsyncClient:
     @classmethod
     async def validated_client(
         cls,
-        config: Optional["akismet.Config"] = None,
+        config: Optional[akismet.Config] = None,
         http_client: Optional[httpx.AsyncClient] = None,
     ) -> Self:
         """
@@ -339,7 +341,7 @@ class AsyncClient:
 
     async def comment_check(
         self, user_ip: str, **kwargs: Unpack[_common.AkismetArguments]
-    ) -> "akismet.CheckResponse":
+    ) -> akismet.CheckResponse:
         """
         Check a piece of user-submitted content to determine whether it is spam.
 

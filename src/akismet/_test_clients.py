@@ -6,6 +6,8 @@ testing by applications and libraries which use Akismet.
 
 # SPDX-License-Identifier: BSD-3-Clause
 
+from __future__ import annotations
+
 from http import HTTPStatus
 from typing import TYPE_CHECKING, Optional
 
@@ -222,12 +224,12 @@ class TestAsyncClient(AsyncClient):
 
     """
 
-    comment_check_response: "akismet.CheckResponse" = _common.CheckResponse.HAM
+    comment_check_response: akismet.CheckResponse = _common.CheckResponse.HAM
     verify_key_response: bool = True
 
     def __init__(
         self,
-        config: Optional["akismet.Config"] = None,
+        config: Optional[akismet.Config] = None,
         http_client: Optional[httpx.AsyncClient] = None,
     ) -> None:
         """
@@ -286,12 +288,12 @@ class TestSyncClient(SyncClient):
 
     """
 
-    comment_check_response: "akismet.CheckResponse" = _common.CheckResponse.HAM
+    comment_check_response: akismet.CheckResponse = _common.CheckResponse.HAM
     verify_key_response: bool = True
 
     def __init__(
         self,
-        config: Optional["akismet.Config"] = None,
+        config: Optional[akismet.Config] = None,
         http_client: Optional[httpx.Client] = None,
     ) -> None:
         """
