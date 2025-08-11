@@ -280,3 +280,15 @@ def _submit_response(endpoint: str, response: httpx.Response) -> bool:
     if response.text == _SUBMISSION_RESPONSE:
         return True
     _protocol_error(endpoint, response)
+
+
+def _verify_key_response(response: httpx.Response) -> bool:
+    """
+    Handle the response from a verify_key() request.
+
+    """
+    if response.text == "valid":
+        return True
+    if response.text == "invalid":
+        return False
+    _protocol_error(_VERIFY_KEY, response)

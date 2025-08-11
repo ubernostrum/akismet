@@ -561,11 +561,8 @@ class SyncClient:
         """
         if not all([key, url]):
             key, url = self._config
-        response = self._request(
-            "POST", _common._API_V11, _common._VERIFY_KEY, {"key": key, "blog": url}
+        return _common._verify_key_response(
+            self._request(
+                "POST", _common._API_V11, _common._VERIFY_KEY, {"key": key, "blog": url}
+            )
         )
-        if response.text == "valid":
-            return True
-        if response.text == "invalid":
-            return False
-        _common._protocol_error(_common._VERIFY_KEY, response)
