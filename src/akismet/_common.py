@@ -36,25 +36,6 @@ _URL_ENV_VAR = "PYTHON_AKISMET_BLOG_URL"
 
 _TIMEOUT = float(os.getenv("PYTHON_AKISMET_TIMEOUT", "1.0"))
 
-_OPTIONAL_KEYS = [
-    "blog_charset",
-    "blog_lang",
-    "comment_author",
-    "comment_author_email",
-    "comment_author_url",
-    "comment_content",
-    "comment_context",
-    "comment_date_gmt",
-    "comment_post_modified_gmt",
-    "comment_type",
-    "honeypot_field_name",
-    "is_test",
-    "permalink",
-    "recheck_reason",
-    "referrer",
-    "user_agent",
-    "user_role",
-]
 
 # Public constants.
 # -------------------------------------------------------------------------------
@@ -281,7 +262,11 @@ def _prepare_post_kwargs(kwargs: dict, endpoint: str) -> AkismetArguments:
     request, returning them if they are or raising UnknownArgumentError if they aren't.
 
     """
-    if unknown_args := [k for k in kwargs if k not in _OPTIONAL_KEYS]:
+    if unknown_args := [
+        k
+        for k in kwargs
+        if k not in AkismetArguments.__optional_keys__  # pylint: disable=no-member
+    ]:
         raise _exceptions.UnknownArgumentError(
             f"Received unknown argument(s) for Akismet operation {endpoint}: "
             f"{', '.join(unknown_args)}"
