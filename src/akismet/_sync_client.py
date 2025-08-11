@@ -254,7 +254,7 @@ class SyncClient:
             raise _exceptions.RequestError("Error making request to Akismet.") from exc
         except Exception as exc:
             raise _exceptions.RequestError("Error making request to Akismet.") from exc
-        return _common._akismet_response(endpoint, response)
+        return _common._handle_akismet_response(endpoint, response)
 
     def _get_request(self, version: str, endpoint: str, params: dict) -> httpx.Response:
         """
@@ -309,7 +309,7 @@ class SyncClient:
                 "api_key": self._config.key,
                 "blog": self._config.url,
                 "user_ip": user_ip,
-                **_common._check_post_kwargs(kwargs, endpoint),
+                **_common._prepare_post_kwargs(kwargs, endpoint),
             },
         )
 
@@ -328,7 +328,7 @@ class SyncClient:
            received from the Akismet API.
 
         """
-        return _common._submit_response(
+        return _common._handle_submit_response(
             endpoint,
             self._post_request(_common._API_V11, endpoint, user_ip=user_ip, **kwargs),
         )
@@ -561,7 +561,7 @@ class SyncClient:
         """
         if not all([key, url]):
             key, url = self._config
-        return _common._verify_key_response(
+        return _common._handle_verify_key_response(
             self._request(
                 "POST", _common._API_V11, _common._VERIFY_KEY, {"key": key, "blog": url}
             )

@@ -10,7 +10,7 @@ import os
 import sys
 import textwrap
 from importlib.metadata import version
-from typing import Literal, NamedTuple, NoReturn, TypedDict
+from typing import Literal, NamedTuple, NoReturn, TypedDict, cast
 
 import httpx
 
@@ -69,6 +69,32 @@ USER_AGENT = (
 # -------------------------------------------------------------------------------
 
 
+class AkismetArguments(TypedDict, total=False):
+    """
+    A :class:`~typing.TypedDict` representing the optional keyword arguments accepted by
+    most Akismet API operations.
+
+    """
+
+    blog_charset: str
+    blog_lang: str
+    comment_author: str
+    comment_author_email: str
+    comment_author_url: str
+    comment_content: str
+    comment_context: str
+    comment_date_gmt: str
+    comment_post_modified_gmt: str
+    comment_type: str
+    honeypot_field_name: str
+    is_test: bool
+    permalink: str
+    recheck_reason: str
+    referrer: str
+    user_agent: str
+    user_role: str
+
+
 class CheckResponse(enum.IntEnum):
     """
     Possible response values from an Akismet content check, including the
@@ -96,33 +122,11 @@ class Config(NamedTuple):
     url: str
 
 
-class AkismetArguments(TypedDict, total=False):
-    """
-    A :class:`~typing.TypedDict` representing the optional keyword arguments accepted by
-    most Akismet API operations.
-
-    """
-
-    blog_charset: str
-    blog_lang: str
-    comment_author: str
-    comment_author_email: str
-    comment_author_url: str
-    comment_content: str
-    comment_context: str
-    comment_date_gmt: str
-    comment_post_modified_gmt: str
-    comment_type: str
-    honeypot_field_name: str
-    is_test: bool
-    permalink: str
-    recheck_reason: str
-    referrer: str
-    user_agent: str
-    user_role: str
-
-
 # Private helper functions.
+# -------------------------------------------------------------------------------
+
+
+# Functions which throw errors for various situations.
 # -------------------------------------------------------------------------------
 
 
@@ -143,22 +147,6 @@ def _configuration_error(config: Config) -> NoReturn:
     )
 
 
-def _get_async_http_client() -> httpx.AsyncClient:
-    """
-    Return an asynchronous HTTP client for interacting with the Akismet API.
-
-    """
-    return httpx.AsyncClient(headers={"User-Agent": USER_AGENT}, timeout=_TIMEOUT)
-
-
-def _get_sync_http_client() -> httpx.Client:
-    """
-    Return a synchronous HTTP client for interacting with the Akismet API.
-
-    """
-    return httpx.Client(headers={"User-Agent": USER_AGENT}, timeout=_TIMEOUT)
-
-
 def _protocol_error(operation: str, response: httpx.Response) -> NoReturn:
     """
     Raise an appropriate exception for unexpected API responses.
@@ -175,6 +163,26 @@ def _protocol_error(operation: str, response: httpx.Response) -> NoReturn:
         """
         )
     )
+
+
+# Functions which help autodiscover/autofill configuration.
+# -------------------------------------------------------------------------------
+
+
+def _get_async_http_client() -> httpx.AsyncClient:
+    """
+    Return an asynchronous HTTP client for interacting with the Akismet API.
+
+    """
+    return httpx.AsyncClient(headers={"User-Agent": USER_AGENT}, timeout=_TIMEOUT)
+
+
+def _get_sync_http_client() -> httpx.Client:
+    """
+    Return a synchronous HTTP client for interacting with the Akismet API.
+
+    """
+    return httpx.Client(headers={"User-Agent": USER_AGENT}, timeout=_TIMEOUT)
 
 
 def _try_discover_config() -> Config:
@@ -207,12 +215,28 @@ def _try_discover_config() -> Config:
                 f"""
             Invalid Akismet site URL specified: {url}
 
-            Akismet requires the full URL including the leading
-            'http://' or 'https://'.
+            Akismet requires the full URL including the leading 'http://' or 'https://'.
             """
             )
         )
     return Config(key=key, url=url)
+
+
+# Functions which help process Akismet requests and responses.
+# -------------------------------------------------------------------------------
+
+
+def _handle_akismet_response(endpoint: str, response: httpx.Response) -> httpx.Response:
+    """
+    Check the response to see if it indicates an invalid key.
+
+    """
+    # It's possible to construct a client without performing up-front API key
+    # validation, in which case the responses will all have text "invalid". So we check
+    # for that and raise an exception when it's detected.
+    if endpoint != _VERIFY_KEY and response.text == "invalid":
+        raise _exceptions.APIKeyError("Akismet API key and/or site URL are invalid.")
+    return response
 
 
 def _handle_check_response(response: httpx.Response) -> CheckResponse:
@@ -229,7 +253,29 @@ def _handle_check_response(response: httpx.Response) -> CheckResponse:
     _protocol_error(_COMMENT_CHECK, response)
 
 
-def _check_post_kwargs(kwargs: dict, endpoint: str) -> AkismetArguments:
+def _handle_submit_response(endpoint: str, response: httpx.Response) -> bool:
+    """
+    Proces the response from a submit (ham/spam) request.
+
+    """
+    if response.text == _SUBMISSION_RESPONSE:
+        return True
+    _protocol_error(endpoint, response)
+
+
+def _handle_verify_key_response(response: httpx.Response) -> bool:
+    """
+    Handle the response from a verify_key() request.
+
+    """
+    if response.text == "valid":
+        return True
+    if response.text == "invalid":
+        return False
+    _protocol_error(_VERIFY_KEY, response)
+
+
+def _prepare_post_kwargs(kwargs: dict, endpoint: str) -> AkismetArguments:
     """
     Verify that the provided set of keyword arguments is valid for an Akismet POST
     request, returning them if they are or raising UnknownArgumentError if they aren't.
@@ -240,7 +286,7 @@ def _check_post_kwargs(kwargs: dict, endpoint: str) -> AkismetArguments:
             f"Received unknown argument(s) for Akismet operation {endpoint}: "
             f"{', '.join(unknown_args)}"
         )
-    return kwargs
+    return cast(AkismetArguments, kwargs)
 
 
 def _prepare_request(
@@ -257,38 +303,3 @@ def _prepare_request(
         )
     request_kwarg = "data" if method == "POST" else "params"
     return f"{_API_URL}/{api_version}/{endpoint}", {request_kwarg: data}
-
-
-def _akismet_response(endpoint: str, response: httpx.Response) -> httpx.Response:
-    """
-    Check the response to see if it indicates an invalid key.
-
-    """
-    # It's possible to construct a client without performing up-front API key
-    # validation, in which case the responses will all have text "invalid". So we check
-    # for that and raise an exception when it's detected.
-    if endpoint != _VERIFY_KEY and response.text == "invalid":
-        raise _exceptions.APIKeyError("Akismet API key and/or site URL are invalid.")
-    return response
-
-
-def _submit_response(endpoint: str, response: httpx.Response) -> bool:
-    """
-    Proces the response from a submit (ham/spam) request.
-
-    """
-    if response.text == _SUBMISSION_RESPONSE:
-        return True
-    _protocol_error(endpoint, response)
-
-
-def _verify_key_response(response: httpx.Response) -> bool:
-    """
-    Handle the response from a verify_key() request.
-
-    """
-    if response.text == "valid":
-        return True
-    if response.text == "invalid":
-        return False
-    _protocol_error(_VERIFY_KEY, response)
