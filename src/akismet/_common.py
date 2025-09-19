@@ -9,6 +9,7 @@ import enum
 import os
 import sys
 import textwrap
+from collections.abc import Mapping
 from importlib.metadata import version
 from typing import Literal, NamedTuple, NoReturn, TypedDict, cast
 
@@ -256,7 +257,7 @@ def _handle_verify_key_response(response: httpx.Response) -> bool:
     _protocol_error(_VERIFY_KEY, response)
 
 
-def _prepare_post_kwargs(kwargs: dict, endpoint: str) -> AkismetArguments:
+def _prepare_post_kwargs(kwargs: Mapping, endpoint: str) -> AkismetArguments:
     """
     Verify that the provided set of keyword arguments is valid for an Akismet POST
     request, returning them if they are or raising UnknownArgumentError if they aren't.
