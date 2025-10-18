@@ -60,7 +60,7 @@ def clean(paths: typing.Iterable[pathlib.Path] = ARTIFACT_PATHS) -> None:
 # -----------------------------------------------------------------------------------
 
 
-@nox.session(python=["3.9", "3.10", "3.11", "3.12", "3.13"], tags=["tests"])
+@nox.session(python=["3.10", "3.11", "3.12", "3.13", "3.14"], tags=["tests"])
 def tests_with_coverage(session: nox.Session) -> None:
     """
     Run the package's unit tests, with coverage instrumentation.

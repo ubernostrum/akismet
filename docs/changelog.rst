@@ -56,6 +56,16 @@ The API stability/deprecation policy for this library is as follows:
 Releases under CalVer
 ---------------------
 
+Version 25.10.0
+~~~~~~~~~~~~~~~
+
+*In development*
+
+* Supported Python versions are now Python 3.10, 3.11, 3.12, 3.13, and 3.14.
+* Added :ref:`a pytest plugin <pytest-plugin>` to make use of the test clients
+  easier.
+
+
 Version 24.11.0
 ~~~~~~~~~~~~~~~
 

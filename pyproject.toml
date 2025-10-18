@@ -18,11 +18,11 @@ classifiers = [
     "Operating System :: OS Independent",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
     "Topic :: Utilities",
 ]
 name = "akismet"
@@ -34,8 +34,8 @@ dependencies = [
 keywords = ["akismet", "spam", "spam-filtering"]
 license = { text = "BSD-3-Clause" }
 readme = "README.rst"
-requires-python = ">=3.9"
-version = "25.10.1a0"
+requires-python = ">=3.10"
+version = "25.10.0a0"
 
 [dependency-groups]
 tests = [
@@ -52,15 +52,16 @@ akismet = "akismet.pytest_plugin"
 "Source Code" = "https://github.com/ubernostrum/akismet"
 
 [tool.bandit]
-skips = ["B101", "B113"]
+skips = ["B101"]
 
 [tool.black]
-target-version = ["py39", "py310", "py311", "py312", "py313"]
+target-version = ["py310", "py311", "py312", "py313", "py314"]
 
 [tool.coverage.paths]
 source = ["src", ".nox/tests_with_coverage*/**/site-packages"]
 
 [tool.coverage.report]
+exclude_also = ["pass"]
 omit = [
     "tests/conftest.py",
     "tests/end_to_end/*"

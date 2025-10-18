@@ -34,6 +34,8 @@ subclass:
 See :ref:`the test client documentation <test-clients>` for details.
 
 
+.. _pytest-plugin:
+
 Using the pytest plugin
 ~~~~~~~~~~~~~~~~~~~~~~~
 

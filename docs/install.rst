@@ -7,8 +7,6 @@ Installation guide
 The |release| version of ``akismet`` is officially tested and supported
 on the following versions of Python:
 
-* Python 3.9
-
 * Python 3.10
 
 * Python 3.11
@@ -16,6 +14,8 @@ on the following versions of Python:
 * Python 3.12
 
 * Python 3.13
+
+* Python 3.14
 
 
 Installing ``akismet``
