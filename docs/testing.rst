@@ -289,13 +289,13 @@ unit-test suite and no other tasks:
 
    .. code-block:: shell
 
-      python -m nox --tag tests
+      python -m nox -t tests
 
 .. tab:: Windows
 
    .. code-block:: shell
 
-      py -m nox --tag tests
+      py -m nox -t tests
 
 Other useful tags are: ``docs`` (documentation build and checks);
 ``formatters`` (code-formatting checks); ``linters`` (code linters);
