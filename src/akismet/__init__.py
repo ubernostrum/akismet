@@ -99,13 +99,11 @@ from ._exceptions import (
     RequestError,
     UnknownArgumentError,
 )
-from ._legacy_client import Akismet
 from ._sync_client import SyncClient
 from ._test_clients import TestAsyncClient, TestSyncClient
 
 __all__ = [
     "APIKeyError",
-    "Akismet",
     "AkismetArguments",
     "AkismetError",
     "AsyncClient",
