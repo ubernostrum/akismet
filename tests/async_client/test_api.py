@@ -42,7 +42,7 @@ async def test_verify_key_valid(akismet_async_client: akismet.AsyncClient):
     assert await akismet_async_client.verify_key()
 
 
-@pytest.mark.akismet_async_client(verify_key_response=False)
+@pytest.mark.akismet_client(verify_key_response=False)
 async def test_verify_key_invalid(akismet_async_client: akismet.AsyncClient):
     """
     verify_key() returns False when the config is invalid.
@@ -63,7 +63,7 @@ async def test_verify_key_valid_explicit(
     )
 
 
-@pytest.mark.akismet_async_client(verify_key_response=False)
+@pytest.mark.akismet_client(verify_key_response=False)
 async def test_verify_key_invalid_explicit(
     akismet_async_client: akismet.AsyncClient, akismet_config: akismet.Config
 ):
@@ -111,21 +111,21 @@ async def test_request_with_invalid_key(
     [
         pytest.param(
             akismet.CheckResponse.HAM,
-            marks=pytest.mark.akismet_async_client(
+            marks=pytest.mark.akismet_client(
                 comment_check_response=akismet.CheckResponse.HAM
             ),
             id="ham",
         ),
         pytest.param(
             akismet.CheckResponse.SPAM,
-            marks=pytest.mark.akismet_async_client(
+            marks=pytest.mark.akismet_client(
                 comment_check_response=akismet.CheckResponse.SPAM
             ),
             id="spam",
         ),
         pytest.param(
             akismet.CheckResponse.DISCARD,
-            marks=pytest.mark.akismet_async_client(
+            marks=pytest.mark.akismet_client(
                 comment_check_response=akismet.CheckResponse.DISCARD
             ),
             id="discard",

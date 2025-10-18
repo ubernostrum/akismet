@@ -67,7 +67,7 @@ def test_construct_config_valid(akismet_sync_class: type[akismet.SyncClient]):
     akismet_sync_class.validated_client()
 
 
-@pytest.mark.akismet_sync_client(verify_key_response=False)
+@pytest.mark.akismet_client(verify_key_response=False)
 def test_construct_config_invalid_key(akismet_sync_class: type[akismet.SyncClient]):
     """
     With an invalid API key, constructing a client raises an APIKeyError.
@@ -88,7 +88,7 @@ def test_construct_config_valid_context_manager(
         pass
 
 
-@pytest.mark.akismet_sync_client(verify_key_response=False)
+@pytest.mark.akismet_client(verify_key_response=False)
 def test_construct_config_invalid_key_context_manager(
     akismet_sync_class: type[akismet.SyncClient],
 ):
@@ -112,7 +112,7 @@ def test_construct_config_valid_explicit(
     akismet_sync_class.validated_client(config=akismet_config)
 
 
-@pytest.mark.akismet_sync_client(verify_key_response=False)
+@pytest.mark.akismet_client(verify_key_response=False)
 def test_construct_config_invalid_key_explicit(
     akismet_config: akismet.Config, akismet_sync_class: type[akismet.SyncClient]
 ):

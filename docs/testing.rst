@@ -31,6 +31,78 @@ subclass:
   :exc:`~akismet.APIKeyError`, allowing you to test your handling of
   that situation.
 
+See :ref:`the test client documentation <test-clients>` for details.
+
+
+Using the pytest plugin
+~~~~~~~~~~~~~~~~~~~~~~~
+
+If you're using `pytest <https://docs.pytest.org/>`_, ``akismet`` includes a
+pytest plugin which provides the test clients as fixtures:
+
+* ``akismet_async_client``: An instance of the async test client.
+
+* ``akismet_sync_client``: An instance of the sync test client.
+
+* ``akismet_async_class``: The class object for the async test client.
+
+* ``akismet_sync_class``: The class object for the sync test client.
+
+By default, these will succeed at key verification and will mark all content
+as spam. To configure the behavior, you can apply the pytest mark
+``akismet_client``, with arguments ``comment_check_response`` (which should be
+a value from the :class:`~akismet.CheckResponse` enum), and/or
+``verify_key_response`` (which should be a :class:`bool`). For example:
+
+.. tab:: Sync
+
+   .. code-block:: python
+
+      import akismet
+      import pytest
+
+      @pytest.mark.akismet_client(comment_check_response=akismet.CheckResponse.DISCARD)
+      def test_akismet_discard_response(akismet_sync_client: akismet.SyncClient):
+          # Inside this test, akismet_sync_client's comment_check() will always
+          # return CheckResponse.DISCARD.
+
+      @pytest.mark.akismet_client(verify_key_response=False)
+      def test_akismet_fails_key_verification(akismet_sync_class: type[akismet.SyncClient]):
+          # The key verification will always fail on this class.
+          with pytest.raises(akismet.APIKeyError):
+              akismet_sync_class.validated_client()
+
+.. tab:: Async
+
+   .. code-block:: python
+
+      import akismet
+      import pytest
+
+      @pytest.mark.akismet_client(comment_check_response=akismet.CheckResponse.DISCARD)
+      async def test_akismet_discard_response(akismet_async_client: akismet.ASyncClient):
+          # Inside this test, akismet_async_client's comment_check() will always
+          # return CheckResponse.DISCARD.
+
+      @pytest.mark.akismet_client(verify_key_response=False)
+      async def test_akismet_fails_key_verification(akismet_async_class: type[akismet.ASyncClient]):
+          # Key verification will always fail on this class and on all instances
+          # of it.
+          with pytest.raises(akismet.APIKeyError):
+              await akismet_async_class.validated_client()
+
+As a general guideline, request the client class fixtures when you want to test
+key verification handling in your own code, or when you're using some testing
+pattern which will construct instances on demand from the class, and otherwise
+always request a client instance fixture.
+
+Testing with ``unittest``
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you use the Python standard library's ``unittest`` module, or another test
+setup derived from it (such as Django's testing tools), you can create and use
+test client classes directly in your tests.
+
 For example:
 
 .. tab:: Sync
@@ -127,6 +199,9 @@ For example:
          verify_key_response = False
 
 
+Testing against the live Akismet service
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 If you also want to perform live end-to-end testing of your use of Akismet, you
 can do so with a real Akismet API client, by passing the optional keyword
 argument ``is_test=1`` to the comment-check, submit-ham, and submit-spam
@@ -142,7 +217,7 @@ certain special values for use in triggering specific responses:
   always cause Akismet to mark the content as not spam.
 
 However, it is generally discouraged to make live requests to an external
-service as part of a normal test suite -- for most cases you should be making
+service as part of a normal test suite, For most cases you should be making
 use of the included test clients.
 
 
@@ -234,14 +309,14 @@ responses without needing to contact the live Akismet web service, so setting
 the environment variables for your Akismet API key and site URL is not
 necessary to run the normal test suite.
 
-However, there is a separate test file -- found at ``tests/end_to_end.py`` --
-which is not run as part of the usual test suite invoked by ``nox`` and which
-makes live requests to Akismet. Running the tests in that file *does* require
-setting the ``PYTHON_AKISMET_API_KEY`` and ``PYTHON_AKISMET_BLOG_URL``
-environment variables to valid values, after which you can run the end-to-end
-tests by invoking ``nox`` and asking it to run tasks with the keyword
-``release`` (normally this test file is only run as a final check prior to
-issuing a new release, hence the keyword name):
+However, there is a separate test file--found at ``tests/end_to_end.py``--which
+is not run as part of the usual test suite invoked by ``nox`` and which makes
+live requests to Akismet. Running the tests in that file *does* require setting
+the ``PYTHON_AKISMET_API_KEY`` and ``PYTHON_AKISMET_BLOG_URL`` environment
+variables to valid values, after which you can run the end-to-end tests by
+invoking ``nox`` and asking it to run tasks with the keyword ``release``
+(normally this test file is only run as a final check prior to issuing a new
+release, hence the keyword name):
 
 .. tab:: macOS/Linux/other Unix
 

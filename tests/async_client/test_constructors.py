@@ -67,7 +67,7 @@ async def test_construct_config_valid(akismet_async_class: type[akismet.AsyncCli
     await akismet_async_class.validated_client()
 
 
-@pytest.mark.akismet_async_client(verify_key_response=False)
+@pytest.mark.akismet_client(verify_key_response=False)
 async def test_construct_config_invalid_key(
     akismet_async_class: type[akismet.AsyncClient],
 ):
@@ -90,7 +90,7 @@ async def test_construct_config_valid_context_manager(
         pass
 
 
-@pytest.mark.akismet_async_client(verify_key_response=False)
+@pytest.mark.akismet_client(verify_key_response=False)
 async def test_construct_config_invalid_key_context_manager(
     akismet_async_class: type[akismet.AsyncClient],
 ):
@@ -114,7 +114,7 @@ async def test_construct_config_valid_explicit(
     await akismet_async_class.validated_client(config=akismet_config)
 
 
-@pytest.mark.akismet_async_client(verify_key_response=False)
+@pytest.mark.akismet_client(verify_key_response=False)
 async def test_construct_config_invalid_key_explicit(
     akismet_config: akismet.Config, akismet_async_class: type[akismet.AsyncClient]
 ):

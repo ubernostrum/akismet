@@ -423,67 +423,38 @@ And then test it like so:
       from your_app.moderation import flag_spam_comment
 
 
-      class AlwaysSpam(akismet.TestSyncClient):
-          """
-          An Akismet client whose comment_check() always returns SPAM.
-
-          """
-          comment_check_response = akismet.CheckResponse.SPAM
-
-
-      class NeverSpam(akismet.TestSyncClient):
-          """
-          An Akismet client whose comment_check() always returns HAM.
-
-          """
-          comment_check_response = akismet.CheckResponse.HAM
-
-
-      @pytest.fixture
-      def always_spam_client():
-          """
-          pytest fixture yielding an AlwaysSpam client instance.
-
-          """
-          with AlwaysSpam() as akismet_client:
-              yield akismet_client
-
-
-      @pytest.fixture
-      def never_spam_client():
-          """
-          pytest fixture yielding a NeverSpam client instance.
-
-          """
-          with NeverSpam() as akismet_client:
-              yield akismet_client
-
-
       # The following test functions assume you have also defined pytest
       # fixtures to create the request and comment objects.
+      #
+      #
+      # A pytest plugin provided with akismet defines fixtures for
+      # sync and async clients, with behavior configured by the
+      # akismet_client mark.
 
-      def test_flag_set_on_spam(always_spam_client, test_request, test_comment):
+      @pytest.mark.akismet_client(comment_check_response=akismet.CheckResponse.SPAM)
+      def test_flag_set_on_spam(akismet_sync_client, test_request, test_comment):
           """
           When the comment is identified as spam, the "filtered" attribute
           is set to True.
 
           """
           comment = flag_spam_comment(
-              always_spam_client,
+              akismet_sync_client,
               test_request,
               test_comment
           )
           assert comment.filtered
 
 
-      def test_flag_not_set_on_non_spam(never_spam_client, test_request, test_comment):
+      @pytest.mark.akismet_client(comment_check_response=akismet.CheckResponse.HAM)
+      def test_flag_not_set_on_non_spam(akismet_sync_client, test_request, test_comment):
           """
           When the comment is identified as non-spam, the "filtered" attribute
           is set to False.
 
           """
           comment = flag_spam_comment(
-              never_spam_client,
+              akismet_sync_client,
               test_request,
               test_comment
           )

@@ -35,7 +35,7 @@ keywords = ["akismet", "spam", "spam-filtering"]
 license = { text = "BSD-3-Clause" }
 readme = "README.rst"
 requires-python = ">=3.9"
-version = "24.11.1a0"
+version = "25.10.1a0"
 
 [dependency-groups]
 tests = [
@@ -43,6 +43,9 @@ tests = [
     "coverage[toml]",
     "pytest",
 ]
+
+[project.entry-points.pytest11]
+akismet = "akismet.pytest_plugin"
 
 [project.urls]
 "Documentation" = "https://akismet.readthedocs.io"
