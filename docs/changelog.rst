@@ -68,6 +68,9 @@ Version 25.10.0
   synchronous :class:`~akismet.SyncClient` or asynchronous
   :class:`~akismet.AsyncClient` is now mandatory. The legacy ``Akismet`` client
   class had been deprecated and raising warnings since version 1.3.
+* Added the :class:`~akismet.AkismetArguments` typed dictionary to represent
+  the set of optional keyword arguments accepted by the comment-check, submit-ham,
+  and submit-spam API operations.
 
 
 Version 24.11.0

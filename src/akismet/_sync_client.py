@@ -279,7 +279,7 @@ class SyncClient:
         version: str,
         endpoint: str,
         user_ip: str,
-        **kwargs: Unpack[_common.AkismetArguments],
+        **kwargs: Unpack[akismet.AkismetArguments],
     ) -> httpx.Response:
         """
         Make a POST request to the Akismet API and return the response.
@@ -314,7 +314,7 @@ class SyncClient:
         )
 
     def _submit(
-        self, endpoint: str, user_ip: str, **kwargs: Unpack[_common.AkismetArguments]
+        self, endpoint: str, user_ip: str, **kwargs: Unpack[akismet.AkismetArguments]
     ) -> bool:
         """
         Submit ham or spam to the Akismet API.
@@ -337,7 +337,7 @@ class SyncClient:
     # ----------------------------------------------------------------------------
 
     def comment_check(
-        self, user_ip: str, **kwargs: Unpack[_common.AkismetArguments]
+        self, user_ip: str, **kwargs: Unpack[akismet.AkismetArguments]
     ) -> akismet.CheckResponse:
         """
         Check a piece of user-submitted content to determine whether it is spam.
@@ -388,7 +388,7 @@ class SyncClient:
         )
 
     def submit_ham(
-        self, user_ip: str, **kwargs: Unpack[_common.AkismetArguments]
+        self, user_ip: str, **kwargs: Unpack[akismet.AkismetArguments]
     ) -> bool:
         """
         Inform Akismet that a piece of user-submitted comment is not spam.
@@ -430,7 +430,7 @@ class SyncClient:
         return self._submit(_common._SUBMIT_HAM, user_ip, **kwargs)
 
     def submit_spam(
-        self, user_ip: str, **kwargs: Unpack[_common.AkismetArguments]
+        self, user_ip: str, **kwargs: Unpack[akismet.AkismetArguments]
     ) -> bool:
         """
         Inform Akismet that a piece of user-submitted comment is spam.

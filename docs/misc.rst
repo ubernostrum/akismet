@@ -9,6 +9,36 @@ Other code and data
 The following additional items are part of the publicly-exported API of this
 module:
 
+.. class:: AkismetArguments
+
+   A :class:`~typing.TypedDict` representing the optional keyword arguments
+   accepted by the comment-check, submit-ham, and submit-spam Akismet API
+   operations.
+
+   The names and types of these optional arguments are:
+
+   * ``blog_charset``: :class:`str`
+   * ``blog_lang``: :class:`str`
+   * ``comment_author``: :class:`str`
+   * ``comment_author_email``: :class:`str`
+   * ``comment_author_url``: :class:`str`
+   * ``comment_content``: :class:`str`
+   * ``comment_context``: :class:`str`
+   * ``comment_date_gmt``: :class:`str`
+   * ``comment_post_modified_gmt``: :class:`str`
+   * ``comment_type``: :class:`str`
+   * ``honeypot_field_name``: :class:`str`
+   * ``is_test``: :class:`bool`
+   * ``permalink``: :class:`str`
+   * ``recheck_reason``: :class:`str`
+   * ``referrer``: :class:`str`
+   * ``user_agent``: :class:`str`
+   * ``user_role``: :class:`str`
+
+   For the meanings of these arguments, see `the Akismet web service
+   documentation <https://akismet.com/developers/detailed-docs/comment-check/>`_.
+
+
 .. class:: CheckResponse
 
    Possible response values from an Akismet content check, including the

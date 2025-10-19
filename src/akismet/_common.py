@@ -54,7 +54,7 @@ USER_AGENT = (
 class AkismetArguments(TypedDict, total=False):
     """
     A :class:`~typing.TypedDict` representing the optional keyword arguments accepted by
-    most Akismet API operations.
+    the comment-check, submit-ham, and submit-spam Akismet API operations.
 
     """
 
