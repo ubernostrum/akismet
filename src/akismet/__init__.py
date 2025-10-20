@@ -18,10 +18,42 @@ have a key and corresponding registered site URL to use with it, place them in t
 environment variables ``PYTHON_AKISMET_API_KEY`` and ``PYTHON_AKISMET_BLOG_URL``, and
 they will be automatically detected and used.
 
-You can then construct a client instance and call its methods. For creating a long-lived
-API client instance, it's recommended that you use the ``validated_client()``
-constructor method, which will automatically validate your API key with the Akismet web
-service. For example, to check a submitted forum post for spam:
+You can then construct a client instance and call its methods. It's recommended that you
+always use a client construction method which will automatically validate your API key
+with the Akismet web service. You can do this by creating your client as a context
+manager, in which case the key is automatically validated on entering the ``with``
+block:
+
+.. code-block:: python
+
+   import akismet
+
+   with akismet.SyncClient() as akismet_client:
+       if akismet_client.comment_check(
+           user_ip=submitter_ip,
+           comment_content=submitted_content,
+           comment_type="forum-post",
+           comment_author=submitter_name
+       ):
+           # This piece of content was classified as spam; handle it appropriately.
+
+Or using the asynchronous client:
+
+.. code-block:: python
+
+   import akismet
+
+   async with akismet.AsyncClient() as akismet_client:
+       if await akismet_client.comment_check(
+           user_ip=submitter_ip,
+           comment_content=submitted_content,
+           comment_type="forum-post",
+           comment_author=submitter_name
+       ):
+           # This piece of content was classified as spam; handle it appropriately.
+
+Or you can use the ``validated_client()`` constructor method, which will validate your
+key when constructing the client instance:
 
 .. code-block:: python
 
@@ -52,38 +84,6 @@ Or using the asynchronous client:
        comment_author=submitter_name
    ):
        # This piece of content was classified as spam; handle it appropriately.
-
-You can also use either client class as a context manager. This does *not* require the
-``validated_client()`` constructor, because your API key is validated on entering the
-``with`` block.
-
-.. code-block:: python
-
-   import akismet
-
-   with akismet.SyncClient() as akismet_client:
-       if akismet_client.comment_check(
-           user_ip=submitter_ip,
-           comment_content=submitted_content,
-           comment_type="forum-post",
-           comment_author=submitter_name
-       ):
-           # This piece of content was classified as spam; handle it appropriately.
-
-Or using the asynchronous client:
-
-.. code-block:: python
-
-   import akismet
-
-   async with akismet.AsyncClient() as akismet_client:
-       if await akismet_client.comment_check(
-           user_ip=submitter_ip,
-           comment_content=submitted_content,
-           comment_type="forum-post",
-           comment_author=submitter_name
-       ):
-           # This piece of content was classified as spam; handle it appropriately.
 
 """
 

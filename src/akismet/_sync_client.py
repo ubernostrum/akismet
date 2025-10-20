@@ -39,7 +39,12 @@ class SyncClient:
 
     **Recommended for most uses:** Place your Akismet API key and site URL in the
     environment variables ``PYTHON_AKISMET_API_KEY`` and ``PYTHON_AKISMET_BLOG_URL``,
-    and then use the :meth:`validated_client` constructor:
+    and then use a client construction method which will automatically read those
+    variables and validate your API key. You can do this with the
+    :meth:`validated_client` constructor method, or by creating your client as a context
+    manager.
+
+    Using :meth:`validated_client`:
 
     .. code-block:: python
 
@@ -84,7 +89,10 @@ class SyncClient:
 
     You can also use this class as a context manager; when doing so, you do *not* need
     to use the :meth:`validated_client` constructor, as the context manager can perform
-    the validation for you when entering the ``with`` block.
+    the API key validation for you when entering the ``with`` block.
+
+    All arguments accepted by :meth:`validated_client` are also accepted by the default
+    constructor when used as a context manager.
 
     .. code-block:: python
 
