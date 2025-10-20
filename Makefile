@@ -37,8 +37,7 @@ install: ### Set up the local development environment, including pre-commit hook
 
 .PHONY: lock
 lock: ### Update PDM dependency lockfiles.
-	@pdm lock --python="<3.10"
-	@pdm lock --python=">=3.10" --append
+	@pdm lock
 
 .PHONY: update
 update: ### Update dependencies and tooling.
