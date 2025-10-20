@@ -55,7 +55,7 @@ Releases under CalVer
 Version 25.10.0
 ~~~~~~~~~~~~~~~
 
-*In development*
+Released October 2025
 
 * Supported Python versions are now Python 3.10, 3.11, 3.12, 3.13, and 3.14.
 
