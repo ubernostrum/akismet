@@ -102,7 +102,7 @@ def akismet_sync_client_fixed_response(
     marker = request.node.get_closest_marker("akismet_fixed_response")
     return akismet.SyncClient(
         http_client=httpx.Client(
-            transport=akismet_fixed_response_transport(**marker.kwargs)
+            transport=akismet_fixed_response_transport(**marker.kwargs)  # type: ignore
         )
     )
 
@@ -122,7 +122,7 @@ def akismet_async_client_fixed_response(
     marker = request.node.get_closest_marker("akismet_fixed_response")
     return akismet.AsyncClient(
         http_client=httpx.AsyncClient(
-            transport=akismet_fixed_response_transport(**marker.kwargs)
+            transport=akismet_fixed_response_transport(**marker.kwargs)  # type: ignore
         )
     )
 

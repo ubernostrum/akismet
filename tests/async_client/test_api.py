@@ -4,6 +4,7 @@ Tests for the sync client's API.
 """
 
 import csv
+from typing import Any, cast
 
 import pytest
 
@@ -169,7 +170,7 @@ async def test_key_sites_json(akismet_async_client: akismet.AsyncClient):
     key_sites() returns key usage information in JSON format by async default.
 
     """
-    response_json = await akismet_async_client.key_sites()
+    response_json = cast(dict[str, Any], await akismet_async_client.key_sites())
     for key in ["2022-09", "limit", "offset", "total"]:
         assert key in response_json
     sites = response_json["2022-09"]
@@ -192,7 +193,7 @@ async def test_key_sites_csv(akismet_async_client: akismet.AsyncClient):
 
     """
     first, *rest = (
-        await akismet_async_client.key_sites(result_format="csv")
+        cast(str, await akismet_async_client.key_sites(result_format="csv"))
     ).splitlines()
     assert first.startswith("Active sites for")
     reader = csv.DictReader(rest)

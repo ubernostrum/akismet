@@ -8,7 +8,7 @@ Asynchronous Akismet API client implementation.
 from __future__ import annotations
 
 from types import TracebackType
-from typing import TYPE_CHECKING, Literal, Optional, Type, Union
+from typing import TYPE_CHECKING, Literal, Optional
 
 import httpx
 from typing_extensions import Self, Unpack
@@ -205,7 +205,7 @@ class AsyncClient:
         return self
 
     async def __aexit__(
-        self, exc_type: Type[BaseException], exc: BaseException, tb: TracebackType
+        self, exc_type: type[BaseException], exc: BaseException, tb: TracebackType
     ):
         """
         Exit method of the async context manager.
@@ -483,7 +483,7 @@ class AsyncClient:
         order: Optional[str] = None,
         limit: Optional[int] = None,
         offset: Optional[int] = None,
-    ) -> Union[dict, str]:
+    ) -> dict | str:
         """
         Return Akismet API usage statistics keyed by site.
 

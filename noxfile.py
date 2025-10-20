@@ -323,6 +323,18 @@ def lint_pylint(session: nox.Session) -> None:
     clean()
 
 
+@nox.session(python=["3.13"], tags=["linters"])
+def lint_mypy(session: nox.Session) -> None:
+    """
+    Lint code with mypy.
+
+    """
+    session.install(".", "mypy")
+    session.run(f"python{session.python}", "-Im", "mypy", "--version")
+    session.run(f"python{session.python}", "-Im", "mypy", "src/", "tests/")
+    clean()
+
+
 # Packaging checks.
 # -----------------------------------------------------------------------------------
 
