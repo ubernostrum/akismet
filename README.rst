@@ -90,9 +90,6 @@ Or using the asynchronous client:
    ):
        # This piece of content was classified as spam; handle it appropriately.
 
-You can also use either client class as a context manager. This does *not* require the
-``validated_client()`` constructor, because your API key is validated on entering the
-``with`` block.
 
 See `the documentation <http://akismet.readthedocs.io/>`_ for full details.
 
