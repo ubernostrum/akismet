@@ -52,6 +52,14 @@ The API stability/deprecation policy for this library is as follows:
 Releases under CalVer
 ---------------------
 
+Version 25.10.1
+~~~~~~~~~~~~~~~
+
+Released October 2025
+
+* Fixed an instance of duplicated text in the README/documentation index.
+
+
 Version 25.10.0
 ~~~~~~~~~~~~~~~
 
