@@ -100,7 +100,7 @@ jobs:
           # Report again and fail if under 100%.
           coverage report --fail-under=100
 
-      - name: Upload HTML report if check failed.
+      - name: Upload HTML report if coverage check failed.
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: html-report
