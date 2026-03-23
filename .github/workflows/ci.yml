@@ -183,7 +183,7 @@ jobs:
 
 
   required-checks-pass:
-    name: Ensure required checks pass for branch protection
+    name: Ensure required checks pass for branch protection.
     if: always()
 
     needs:
