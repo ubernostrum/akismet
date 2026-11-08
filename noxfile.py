@@ -18,7 +18,9 @@ import typing
 
 import nox
 
+nox.options.allow_parallel = True
 nox.options.default_venv_backend = "venv"
+nox.options.parallel = "auto"
 nox.options.reuse_existing_virtualenvs = True
 
 PACKAGE_NAME = "akismet"
@@ -72,7 +74,7 @@ def tests_with_coverage(session: nox.Session) -> None:
         "pytest",
         "coverage[toml]",
     )
-    clean()
+
     session.run(
         f"python{session.python}",
         "-Im",
@@ -108,10 +110,9 @@ def tests_end_to_end(session: nox.Session) -> None:
             "PYTHON_AKISMET_BLOG_URL": os.getenv("PYTHON_AKISMET_BLOG_URL", ""),
         },
     )
-    clean()
 
 
-@nox.session(python=["3.15"], tags=["tests"])
+@nox.session(python=["3.15"], tags=["tests"], allow_parallel=False)
 def coverage_report(session: nox.Session) -> None:
     """
     Combine coverage from the various test runs and output the report.
@@ -157,7 +158,6 @@ def docs_build(session: nox.Session) -> None:
         "docs/",
         f"{build_dir}/html",
     )
-    clean()
 
 
 @nox.session(python=["3.15"], tags=["docs"])
@@ -181,7 +181,6 @@ def docs_docstrings(session: nox.Session) -> None:
         "tests/",
         "noxfile.py",
     )
-    clean()
 
 
 @nox.session(python=["3.15"], tags=["docs"])
@@ -211,7 +210,6 @@ def docs_spellcheck(session: nox.Session) -> None:
         # https://github.com/pyenchant/pyenchant/issues/265#issuecomment-1126415843
         env={"PYENCHANT_LIBRARY_PATH": os.getenv("PYENCHANT_LIBRARY_PATH", "")},
     )
-    clean()
 
 
 # Code formatting checks.
@@ -240,7 +238,6 @@ def format_black(session: nox.Session) -> None:
         "docs/",
         "noxfile.py",
     )
-    clean()
 
 
 @nox.session(python=["3.15"], tags=["formatters"])
@@ -262,7 +259,6 @@ def format_isort(session: nox.Session) -> None:
         "docs/",
         "noxfile.py",
     )
-    clean()
 
 
 # Linters.
@@ -287,7 +283,6 @@ def lint_bandit(session: nox.Session) -> None:
         "src/",
         "tests/",
     )
-    clean()
 
 
 @nox.session(python=["3.15"], tags=["linters"])
@@ -307,7 +302,6 @@ def lint_flake8(session: nox.Session) -> None:
         "docs/",
         "noxfile.py",
     )
-    clean()
 
 
 @nox.session(python=["3.15"], tags=["linters"])
@@ -320,7 +314,6 @@ def lint_pylint(session: nox.Session) -> None:
     session.install("httpx", "typing-extensions", "pylint", "pytest")
     session.run(f"python{session.python}", "-Im", "pylint", "--version")
     session.run(f"python{session.python}", "-Im", "pylint", "src/", "tests/")
-    clean()
 
 
 @nox.session(python=["3.15"], tags=["linters"])
@@ -332,7 +325,6 @@ def lint_mypy(session: nox.Session) -> None:
     session.install(".", "mypy")
     session.run(f"python{session.python}", "-Im", "mypy", "--version")
     session.run(f"python{session.python}", "-Im", "mypy", "src/", "tests/")
-    clean()
 
 
 # Packaging checks.
@@ -348,7 +340,6 @@ def package_build(session: nox.Session) -> None:
     session.install("build")
     session.run(f"python{session.python}", "-Im", "build", "--version")
     session.run(f"python{session.python}", "-Im", "build")
-    clean()
 
 
 @nox.session(python=["3.15"], tags=["packaging"])
@@ -372,7 +363,6 @@ def package_description(session: nox.Session) -> None:
     session.run(
         f"python{session.python}", "-Im", "twine", "check", f"{package_dir}/build/*"
     )
-    clean()
 
 
 @nox.session(python=["3.15"], tags=["packaging"])
@@ -386,7 +376,6 @@ def package_manifest(session: nox.Session) -> None:
     session.install("check-manifest")
     session.run(f"python{session.python}", "-Im", "check_manifest", "--version")
     session.run(f"python{session.python}", "-Im", "check_manifest", "--verbose")
-    clean()
 
 
 @nox.session(python=["3.15"], tags=["packaging"])
@@ -397,7 +386,6 @@ def package_pyroma(session: nox.Session) -> None:
     """
     session.install("pyroma")
     session.run(f"python{session.python}", "-Im", "pyroma", ".")
-    clean()
 
 
 @nox.session(python=["3.15"], tags=["packaging"])
@@ -421,4 +409,3 @@ def package_wheel(session: nox.Session) -> None:
     session.run(
         f"python{session.python}", "-Im", "check_wheel_contents", f"{package_dir}/build"
     )
-    clean()
