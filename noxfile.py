@@ -83,7 +83,7 @@ def tests_end_to_end(session: nox.Session) -> None:
     )
 
 
-@nox.session(python=["3.15"], tags=["tests"], requires=["tests_with_coverage"])
+@nox.session(python=["3.15"], tags=["tests"], allow_parallel=False)
 def coverage_report(session: nox.Session) -> None:
     """
     Combine coverage from the various test runs and output the report.
