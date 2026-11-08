@@ -117,16 +117,12 @@ def _configuration_error(config: Config) -> NoReturn:
     Raise an appropriate exception for invalid configuration.
 
     """
-    raise _exceptions.APIKeyError(
-        textwrap.dedent(
-            f"""
+    raise _exceptions.APIKeyError(textwrap.dedent(f"""
             Akismet API key and/or blog URL were invalid.
 
             Found API key: {config.key}
             Found URL: {config.url}
-            """
-        )
-    )
+            """))
 
 
 def _protocol_error(operation: str, response: httpx.Response) -> NoReturn:
@@ -134,17 +130,13 @@ def _protocol_error(operation: str, response: httpx.Response) -> NoReturn:
     Raise an appropriate exception for unexpected API responses.
 
     """
-    raise _exceptions.ProtocolError(
-        textwrap.dedent(
-            f"""
+    raise _exceptions.ProtocolError(textwrap.dedent(f"""
         Received unexpected or non-standard response from Akismet API.
 
         API operation was: {operation}
         API response received was: {response.text}
         Debug header value was: {response.headers.get('X-akismet-debug-help', None)}
-        """
-        )
-    )
+        """))
 
 
 # Functions which help autodiscover/autofill configuration.
@@ -180,27 +172,19 @@ def _try_discover_config() -> Config:
     url = os.getenv(_URL_ENV_VAR, None)
 
     if key is None or url is None:
-        raise _exceptions.ConfigurationError(
-            textwrap.dedent(
-                f"""
+        raise _exceptions.ConfigurationError(textwrap.dedent(f"""
         Could not find full Akismet configuration.
 
         Found API key: {key}
         Found blog URL: {url}
-        """
-            )
-        )
+        """))
 
     if not url.startswith(("http://", "https://")):
-        raise _exceptions.ConfigurationError(
-            textwrap.dedent(
-                f"""
+        raise _exceptions.ConfigurationError(textwrap.dedent(f"""
             Invalid Akismet site URL specified: {url}
 
             Akismet requires the full URL including the leading 'http://' or 'https://'.
-            """
-            )
-        )
+            """))
     return Config(key=key, url=url)
 
 
@@ -266,7 +250,8 @@ def _prepare_post_kwargs(kwargs: Mapping, endpoint: str) -> AkismetArguments:
     if unknown_args := [
         k
         for k in kwargs
-        if k not in AkismetArguments.__optional_keys__  # pylint: disable=no-member
+        if k
+        not in AkismetArguments.__optional_keys__  # pylint: disable=unsupported-membership-test
     ]:
         raise _exceptions.UnknownArgumentError(
             f"Received unknown argument(s) for Akismet operation {endpoint}: "

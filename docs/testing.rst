@@ -252,23 +252,22 @@ root of your git checkout of ``akismet``:
 Note that to run the full test matrix you will need to have each supported version of
 Python available. To run only the subset of test tasks for a specific Python version,
 pass the ``--python`` flag with a version number. For example, to run tasks for Python
-3.10 only, you could run:
+3.14 only, you could run:
 
 .. tab:: macOS/Linux/other Unix
 
    .. code-block:: shell
 
-      python -m nox --python "3.10"
+      python -m nox --python "3.14"
 
 .. tab:: Windows
 
    .. code-block:: shell
 
-      py -m nox --python "3.10"
+      py -m nox --python "3.14"
 
-By default, ``nox`` will only run the tasks whose associated Python versions are
-available on your system. For example, if you have only Python 3.10 and 3.13 installed,
-test runs for Python 3.11, 3.12, and 3.14 would be skipped.
+By default, ``nox`` will only run the tasks whose associated Python
+versions are available on your system.
 
 To see a list of all available test tasks, run:
 
