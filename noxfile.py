@@ -24,6 +24,7 @@ nox.options.parallel = "auto"
 nox.options.reuse_existing_virtualenvs = True
 
 PACKAGE_NAME = "akismet"
+PYPROJECT = nox.project.load_toml("pyproject.toml")
 
 IS_CI = bool(os.getenv("CI", False))
 
@@ -62,7 +63,7 @@ def clean(paths: typing.Iterable[pathlib.Path] = ARTIFACT_PATHS) -> None:
 # -----------------------------------------------------------------------------------
 
 
-@nox.session(python=["3.11", "3.12", "3.13", "3.14", "3.15"], tags=["tests"])
+@nox.session(python=nox.project.python_versions(PYPROJECT), tags=["tests"])
 def tests_with_coverage(session: nox.Session) -> None:
     """
     Run the package's unit tests, with coverage instrumentation.
