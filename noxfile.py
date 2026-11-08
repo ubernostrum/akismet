@@ -12,9 +12,6 @@ nox``. To run a single task, use ``python -m nox --session`` with the name of th
 """
 
 import os
-import pathlib
-import shutil
-import typing
 
 import nox
 
@@ -28,35 +25,8 @@ PYPROJECT = nox.project.load_toml("pyproject.toml")
 
 IS_CI = bool(os.getenv("CI", False))
 
-NOXFILE_PATH = pathlib.Path(__file__).parents[0]
-ARTIFACT_PATHS = (
-    NOXFILE_PATH / "src" / f"{PACKAGE_NAME}.egg-info",
-    NOXFILE_PATH / "build",
-    NOXFILE_PATH / "dist",
-    NOXFILE_PATH / "__pycache__",
-    NOXFILE_PATH / "src" / "__pycache__",
-    NOXFILE_PATH / "src" / PACKAGE_NAME / "__pycache__",
-    NOXFILE_PATH / "tests" / "__pycache__",
-)
-
 TEST_KEY = "invalid-test-key"
 TEST_URL = "http://example.com/"
-
-
-def clean(paths: typing.Iterable[pathlib.Path] = ARTIFACT_PATHS) -> None:
-    """
-    Clean up after a test run.
-
-    """
-    # This cleanup is only useful for the working directory of a local checkout; in CI
-    # we don't need it because CI environments are ephemeral anyway.
-    if IS_CI:
-        return
-    [
-        shutil.rmtree(path) if path.is_dir() else path.unlink()
-        for path in paths
-        if path.exists()
-    ]
 
 
 # Tasks which run the package's test suites.
@@ -113,7 +83,7 @@ def tests_end_to_end(session: nox.Session) -> None:
     )
 
 
-@nox.session(python=["3.15"], tags=["tests"], allow_parallel=False)
+@nox.session(python=["3.15"], tags=["tests"], requires=["tests_with_coverage"])
 def coverage_report(session: nox.Session) -> None:
     """
     Combine coverage from the various test runs and output the report.
