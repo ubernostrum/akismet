@@ -185,7 +185,7 @@ Released February 2020
 
 * Support was added for the optional ``recheck_reason``, used when a comment or other
   content is being submitted a second or later time, and indicating the reason (such as
-  `"edit"` when resubmitting a comment after the user edited it).
+  ``"edit"`` when resubmitting a comment after the user edited it).
 
 Version 1.0.1
 ~~~~~~~~~~~~~
