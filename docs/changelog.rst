@@ -52,6 +52,14 @@ The API stability/deprecation policy for this library is as follows:
 Releases under CalVer
 ---------------------
 
+Version 26.11.0
+~~~~~~~~~~~~~~~
+
+Released November 2026
+
+* Supported Python versions are now Python 3.11, 3.12, 3.13, 3.14, and 3.15.
+
+
 Version 25.10.1
 ~~~~~~~~~~~~~~~
 
